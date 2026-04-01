@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- Body -->
+  <rect x="20" y="44" width="40" height="28" rx="8" fill="#6366f1"/>
+  <!-- Collar/tie -->
+  <polygon points="36,44 44,44 41,56 39,56" fill="#e0e7ff"/>
+  <!-- Head -->
+  <circle cx="40" cy="32" r="18" fill="#fde68a"/>
+  <!-- Hair -->
+  <ellipse cx="40" cy="16" rx="16" ry="7" fill="#1e1b4b"/>
+  <rect x="24" y="18" width="6" height="8" rx="3" fill="#1e1b4b"/>
+  <rect x="50" y="18" width="6" height="8" rx="3" fill="#1e1b4b"/>
+  <!-- Eyes (neutral) -->
+  <circle cx="33" cy="31" r="3" fill="#1e1b4b"/>
+  <circle cx="47" cy="31" r="3" fill="#1e1b4b"/>
+  <circle cx="34" cy="30" r="1" fill="white"/>
+  <circle cx="48" cy="30" r="1" fill="white"/>
+  <!-- Smile -->
+  <path d="M33 39 Q40 44 47 39" stroke="#92400e" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Glasses -->
+  <rect x="28" y="27" width="10" height="8" rx="3" stroke="#6366f1" stroke-width="1.5" fill="none"/>
+  <rect x="42" y="27" width="10" height="8" rx="3" stroke="#6366f1" stroke-width="1.5" fill="none"/>
+  <line x1="38" y1="31" x2="42" y2="31" stroke="#6366f1" stroke-width="1.5"/>
+</svg>
