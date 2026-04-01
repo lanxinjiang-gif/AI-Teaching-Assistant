@@ -24,3 +24,35 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Document viewer table styles */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin: 0.75rem 0;
+}
+.prose thead tr {
+  background-color: #f1f5f9;
+}
+.prose th,
+.prose td {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  white-space: nowrap;
+}
+.prose th {
+  font-weight: 600;
+  color: #374151;
+}
+.prose tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+.prose blockquote {
+  border-left: 3px solid #6366f1;
+  padding-left: 0.75rem;
+  color: #4b5563;
+  font-style: italic;
+  margin: 0.5rem 0;
+}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { fadeUp } from '@/lib/motion/variants';
 import type { Document } from '@/lib/types/case';
 
@@ -62,9 +63,9 @@ export function DocumentViewer({ document }: DocumentViewerProps) {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="px-4 pb-4 prose prose-sm max-w-none text-gray-700 border-t border-gray-100"
+            className="px-4 pb-4 prose prose-sm max-w-none text-gray-700 border-t border-gray-100 overflow-x-auto"
           >
-            <ReactMarkdown>{document.content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{document.content}</ReactMarkdown>
           </motion.div>
         )}
       </AnimatePresence>
