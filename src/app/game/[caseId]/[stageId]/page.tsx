@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CaseHeader } from '@/components/game/CaseHeader';
 import { ScenarioCard } from '@/components/game/ScenarioCard';
-import { ActionChoices } from '@/components/game/ActionChoices';
 import { EventOverlay } from '@/components/game/EventOverlay';
 import { StageTransition } from '@/components/immersion/StageTransition';
 import { useGame } from '@/lib/hooks/useGame';
@@ -63,19 +62,15 @@ export default function StagePage() {
       <main className="max-w-2xl mx-auto px-4 py-6 pb-12 space-y-5">
         <StageTransition stageId={stageId}>
           <div className="space-y-5">
-            {/* Immersive scene + documents */}
+            {/* Immersive scene + choices, all inside one panel */}
             <ScenarioCard
               stage={currentStage}
               documents={caseDef.documents}
               role={role}
               company={company}
-            />
-
-            {/* Action choices */}
-            <ActionChoices
               choices={currentStage.choices}
               onChoice={handleChoice}
-              disabled={choiceMade}
+              choiceMade={choiceMade}
             />
 
             {/* Advance button */}
