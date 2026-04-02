@@ -1,19 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
   <!-- Body -->
   <rect x="20" y="44" width="40" height="28" rx="8" fill="#6366f1"/>
-  <!-- Collar/tie -->
-  <polygon points="36,44 44,44 41,56 39,56" fill="#e0e7ff"/>
+  <!-- Collar/bow -->
+  <polygon points="36,44 44,44 41,50 39,50" fill="#e0e7ff"/>
+  <polygon points="36,44 40,47 36,50" fill="#a5b4fc"/>
+  <polygon points="44,44 40,47 44,50" fill="#a5b4fc"/>
+  <circle cx="40" cy="47" r="1.8" fill="#6366f1"/>
   <!-- Head -->
   <circle cx="40" cy="32" r="18" fill="#fde68a"/>
-  <!-- Hair -->
-  <ellipse cx="40" cy="16" rx="16" ry="7" fill="#1e1b4b"/>
-  <rect x="24" y="18" width="6" height="8" rx="3" fill="#1e1b4b"/>
-  <rect x="50" y="18" width="6" height="8" rx="3" fill="#1e1b4b"/>
-  <!-- Eyes (neutral) -->
+  <!-- Long hair (back layer) -->
+  <ellipse cx="40" cy="16" rx="17" ry="8" fill="#1e1b4b"/>
+  <rect x="22" y="18" width="7" height="22" rx="3.5" fill="#1e1b4b"/>
+  <rect x="51" y="18" width="7" height="22" rx="3.5" fill="#1e1b4b"/>
+  <!-- Hair top / bangs -->
+  <ellipse cx="40" cy="15" rx="15" ry="6" fill="#1e1b4b"/>
+  <path d="M25 22 Q27 14 35 16" stroke="#1e1b4b" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M55 22 Q53 14 45 16" stroke="#1e1b4b" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Small hair bow -->
+  <polygon points="44,12 50,9 50,15" fill="#f472b6"/>
+  <polygon points="56,12 50,9 50,15" fill="#f472b6"/>
+  <circle cx="50" cy="12" r="2" fill="#ec4899"/>
+  <!-- Eyes (with lashes) -->
   <circle cx="33" cy="31" r="3" fill="#1e1b4b"/>
   <circle cx="47" cy="31" r="3" fill="#1e1b4b"/>
   <circle cx="34" cy="30" r="1" fill="white"/>
   <circle cx="48" cy="30" r="1" fill="white"/>
+  <!-- Eyelashes -->
+  <path d="M30 28 Q33 26 36 28" stroke="#1e1b4b" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  <path d="M44 28 Q47 26 50 28" stroke="#1e1b4b" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  <!-- Rosy cheeks -->
+  <ellipse cx="27" cy="35" rx="4" ry="2.5" fill="#f9a8d4" opacity="0.5"/>
+  <ellipse cx="53" cy="35" rx="4" ry="2.5" fill="#f9a8d4" opacity="0.5"/>
   <!-- Smile -->
   <path d="M33 39 Q40 44 47 39" stroke="#92400e" stroke-width="2" stroke-linecap="round" fill="none"/>
   <!-- Glasses -->
