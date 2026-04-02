@@ -68,6 +68,8 @@ export function ScenarioCard({ stage, documents, role, company }: ScenarioCardPr
             alt={role.label}
             width={80}
             height={90}
+            style={{ height: 'auto' }}
+            unoptimized
           />
         </motion.div>
 

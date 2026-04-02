@@ -10,14 +10,17 @@ interface RoleAvatarProps {
 }
 
 export function RoleAvatar({ roleId, size = 48, className = '' }: RoleAvatarProps) {
+  // SVG viewBox is 80×90 — maintain that aspect ratio
   return (
     <Image
       src={`/avatars/${roleId}.svg`}
       alt={roleId}
       width={size}
-      height={size}
+      height={Math.round(size * 1.125)}
+      style={{ height: 'auto' }}
       className={className}
       priority
+      unoptimized
     />
   );
 }
