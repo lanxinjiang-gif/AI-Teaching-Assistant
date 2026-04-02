@@ -55,7 +55,7 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
         <div className="relative">
 
           {/* ── Avatar + stage area ─────────────────────── */}
-          <div className="relative h-44">
+          <div className="relative h-[26rem]">
             {/* Stage badge */}
             <motion.div
               initial={{ y: -16, opacity: 0 }}
@@ -82,8 +82,8 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
               <Image
                 src={`/avatars/${role.avatarId}.svg`}
                 alt={role.label}
-                width={80}
-                height={90}
+                width={160}
+                height={180}
                 style={{ height: 'auto' }}
                 unoptimized
               />
@@ -96,10 +96,10 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
             animate={{ opacity: 1 }}
             transition={{ delay: 0.45, duration: 0.35 }}
             onClick={skip}
-            className="w-full text-left bg-black/65 backdrop-blur-sm px-5 py-3 cursor-pointer border-t border-white/10"
+            className="w-full text-left bg-black/65 backdrop-blur-sm px-5 py-2 cursor-pointer border-t border-white/10"
             title={done ? undefined : 'Click to skip'}
           >
-            <p className="text-white text-sm leading-relaxed font-medium">
+            <p className="text-white text-xs leading-snug font-medium">
               {displayed}
               {!done && (
                 <span className="inline-block w-0.5 h-4 bg-white/80 animate-pulse ml-0.5 align-middle" />
@@ -111,8 +111,8 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
           </motion.button>
 
           {/* ── Choices ──────────────────────────────────── */}
-          <div className="bg-black/75 px-4 pt-3 pb-4 space-y-2 border-t border-white/10">
-            <p className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-2">
+          <div className="bg-black/75 px-4 pt-2 pb-3 space-y-1.5 border-t border-white/10">
+            <p className="text-white/50 text-[9px] font-semibold uppercase tracking-widest mb-1.5">
               What do you do?
             </p>
 
@@ -135,7 +135,7 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
                     whileHover={!selected ? { x: 3 } : {}}
                     whileTap={!selected ? { scale: 0.98 } : {}}
                     className={[
-                      'w-full text-left flex items-start gap-3 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150',
+                      'w-full text-left flex items-start gap-2.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all duration-150',
                       !selected ? 'border-white/20 bg-white/10 hover:bg-white/20 hover:border-white/40 cursor-pointer text-white' : '',
                       isChosen && choice.isCorrect ? 'border-green-400/70 bg-green-500/25 text-green-100' : '',
                       isChosen && !choice.isCorrect ? 'border-red-400/70 bg-red-500/20 text-red-100' : '',
