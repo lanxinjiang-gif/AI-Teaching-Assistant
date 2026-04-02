@@ -67,7 +67,7 @@ export function ScenarioCard({ stage, documents, role, company }: ScenarioCardPr
             src={`/avatars/${role.avatarId}.svg`}
             alt={role.label}
             width={80}
-            height={80}
+            height={90}
           />
         </motion.div>
 

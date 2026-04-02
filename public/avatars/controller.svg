@@ -1,29 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
-  <!-- Body / suit -->
-  <rect x="20" y="44" width="40" height="28" rx="8" fill="#1e1b4b"/>
-  <!-- Lapels -->
-  <polygon points="36,44 40,52 34,60 20,60 20,44" fill="#312e81"/>
-  <polygon points="44,44 40,52 46,60 60,60 60,44" fill="#312e81"/>
-  <!-- Shirt / tie -->
-  <rect x="37" y="44" width="6" height="14" fill="#f8fafc"/>
-  <polygon points="38,46 42,46 41,58 39,58" fill="#7c3aed"/>
-  <!-- Head -->
-  <circle cx="40" cy="32" r="18" fill="#fde68a"/>
-  <!-- Silver hair -->
-  <ellipse cx="40" cy="16" rx="16" ry="7" fill="#cbd5e1"/>
-  <rect x="24" y="18" width="5" height="7" rx="2" fill="#cbd5e1"/>
-  <rect x="51" y="18" width="5" height="7" rx="2" fill="#cbd5e1"/>
-  <!-- Authoritative eyes -->
-  <ellipse cx="33" cy="31" rx="3" ry="2.5" fill="#1e293b"/>
-  <ellipse cx="47" cy="31" rx="3" ry="2.5" fill="#1e293b"/>
-  <circle cx="34" cy="30" r="1" fill="white"/>
-  <circle cx="48" cy="30" r="1" fill="white"/>
-  <!-- Strong brow -->
-  <path d="M29 26 L37 25" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-  <path d="M43 25 L51 26" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 90" fill="none">
+
+  <!-- Cape (short formal dark navy, behind body) -->
+  <path d="M23 46 Q17 60 21 75 Q30 82 40 82 Q50 82 59 75 Q63 60 57 46 Q49 51 40 51 Q31 51 23 46Z" fill="#1e2a3a" stroke="#334155" stroke-width="1"/>
+  <!-- Cape lining edge (subtle slate highlight) -->
+  <path d="M26 52 Q40 57 54 52" stroke="#475569" stroke-width="0.8" fill="none"/>
+  <!-- Cape clasp (gold, distinguished) -->
+  <circle cx="40" cy="47" r="2.5" fill="#d97706" stroke="#92400e" stroke-width="0.8"/>
+
+  <!-- Legs -->
+  <rect x="30" y="62" width="9" height="10" rx="3" fill="#1e1b4b"/>
+  <rect x="41" y="62" width="9" height="10" rx="3" fill="#1e1b4b"/>
+
+  <!-- Boots (polished, dark) -->
+  <rect x="26" y="68" width="16" height="11" rx="5.5" fill="#1a1a2e"/>
+  <rect x="38" y="68" width="16" height="11" rx="5.5" fill="#1a1a2e"/>
+  <!-- Polished toe highlight -->
+  <ellipse cx="31" cy="71" rx="5" ry="2.5" fill="#2e2e50" opacity="0.9"/>
+  <ellipse cx="43" cy="71" rx="5" ry="2.5" fill="#2e2e50" opacity="0.9"/>
+
+  <!-- Body — deep navy double-breasted suit -->
+  <rect x="25" y="42" width="30" height="23" rx="8" fill="#1e1b4b"/>
+  <!-- Suit lapels -->
+  <path d="M25 42 Q31 54 37 50 L37 42Z" fill="#312e81"/>
+  <path d="M55 42 Q49 54 43 50 L43 42Z" fill="#312e81"/>
+  <!-- White shirt -->
+  <rect x="37" y="42" width="6" height="14" rx="1" fill="#f8fafc"/>
+  <!-- Purple tie -->
+  <polygon points="38.5,44 41.5,44 42,57 40,59 38,57" fill="#7c3aed"/>
+  <polygon points="38.5,44 41.5,44 40,47.5" fill="#6d28d9"/>
+  <!-- Double-breasted buttons -->
+  <circle cx="29" cy="52" r="1.6" fill="#4338ca"/>
+  <circle cx="29" cy="57" r="1.6" fill="#4338ca"/>
+  <circle cx="51" cy="52" r="1.6" fill="#4338ca"/>
+  <circle cx="51" cy="57" r="1.6" fill="#4338ca"/>
+  <!-- Pocket square -->
+  <path d="M28 47 Q30.5 44.5 33 47" fill="none" stroke="#c7d2fe" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Head — big round chibi -->
+  <circle cx="40" cy="24" r="19" fill="#fde68a"/>
+
+  <!-- Ears -->
+  <ellipse cx="21.5" cy="25" rx="3" ry="4" fill="#fcd34d"/>
+  <ellipse cx="58.5" cy="25" rx="3" ry="4" fill="#fcd34d"/>
+
+  <!-- Hair — silver/white, neat and distinguished -->
+  <ellipse cx="40" cy="10" rx="16" ry="9" fill="#cbd5e1"/>
+  <ellipse cx="23" cy="18" rx="5" ry="8" fill="#cbd5e1"/>
+  <ellipse cx="57" cy="18" rx="5" ry="8" fill="#cbd5e1"/>
+  <!-- Clean side part -->
+  <path d="M34 8 Q40 5 46 8" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Rosy cheeks (subtler, distinguished) -->
+  <ellipse cx="27" cy="30" rx="5" ry="3.5" fill="#fb7185" opacity="0.2"/>
+  <ellipse cx="53" cy="30" rx="5" ry="3.5" fill="#fb7185" opacity="0.2"/>
+
+  <!-- Eyes — confident, warm, slightly more composed -->
+  <circle cx="33" cy="24" r="5" fill="white"/>
+  <circle cx="47" cy="24" r="5" fill="white"/>
+  <circle cx="33" cy="24" r="3.2" fill="#1e293b"/>
+  <circle cx="47" cy="24" r="3.2" fill="#1e293b"/>
+  <!-- Iris tint -->
+  <circle cx="33" cy="24" r="1.8" fill="#312e81" opacity="0.6"/>
+  <circle cx="47" cy="24" r="1.8" fill="#312e81" opacity="0.6"/>
+  <!-- Shine -->
+  <circle cx="34.5" cy="22" r="1.4" fill="white"/>
+  <circle cx="48.5" cy="22" r="1.4" fill="white"/>
+
+  <!-- Strong, level brows -->
+  <path d="M27 18 L37 17" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+  <path d="M43 17 L53 18" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Button nose -->
+  <ellipse cx="40" cy="30.5" rx="2" ry="1.5" fill="#d97706" opacity="0.45"/>
+
   <!-- Confident half-smile -->
-  <path d="M34 39 Q40 43 46 39" stroke="#92400e" stroke-width="2" stroke-linecap="round" fill="none"/>
-  <!-- Subtle wrinkle lines for seniority -->
-  <path d="M27 29 Q28 32 27 35" stroke="#d97706" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.4"/>
-  <path d="M53 29 Q52 32 53 35" stroke="#d97706" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.4"/>
+  <path d="M34 37 Q40 42 46 37" stroke="#92400e" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Subtle wisdom lines (very faint) -->
+  <path d="M26 28 Q27 31 26 34" stroke="#d97706" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.3"/>
+  <path d="M54 28 Q53 31 54 34" stroke="#d97706" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.3"/>
+
 </svg>
