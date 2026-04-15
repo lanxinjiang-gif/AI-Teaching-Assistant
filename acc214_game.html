@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saucy Apple Mfg. Co. — ACC 214 Study Game</title>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pr:#2C3E50;--pr2:#34495E;--ac:#E74C3C;--gr:#27AE60;--bl:#3498DB;
+  --or:#F39C12;--gy:#95A5A6;--fav:#2ECC71;--unf:#E74C3C;
+  --bg:#ECF0F1;--cb:#fff;--bd:#BDC3C7;--tx:#2C3E50;--tm:#7F8C8D;
+  --sh:0 4px 20px rgba(0,0,0,.12);--ss:0 2px 8px rgba(0,0,0,.08);
+  --r:12px;--r2:8px
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-top:56px}
+
+/* ── SCORE BAR ── */
+#sb{position:fixed;top:0;left:0;right:0;height:56px;background:var(--pr);color:#fff;
+  display:flex;align-items:center;padding:0 20px;gap:12px;z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,.3)}
+#sb .brand{font-weight:700;font-size:.95rem;white-space:nowrap}
+#sb .brand b{color:var(--ac)}
+#sb .si{margin-left:auto;display:flex;gap:16px;align-items:center;font-size:.85rem}
+#sb .ts{font-size:1.05rem;font-weight:700;color:#F1C40F}
+#sb .pr{opacity:.75}
+#btnHub{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:5px 13px;
+  font-size:.82rem;font-weight:700;cursor:pointer;display:none}
+#btnHub:hover{background:#C0392B}
+
+/* ── SCREENS ── */
+.scr{display:none;min-height:calc(100vh - 56px);padding:20px}
+.scr.on{display:block}
+
+/* ── HUB ── */
+#hub{max-width:1080px;margin:0 auto}
+.hub-h{text-align:center;margin-bottom:32px}
+.hub-h h1{font-size:2rem;font-weight:800;color:var(--pr)}
+.hub-h h1 b{color:var(--ac)}
+.hub-h p{color:var(--tm);margin-top:6px}
+.hub-tot{display:inline-flex;align-items:center;gap:8px;background:var(--pr);color:#fff;
+  padding:7px 18px;border-radius:20px;margin-top:10px;font-weight:600}
+.hub-tot .v{color:#F1C40F;font-size:1.15rem}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
+.dc{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:22px;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;border:2px solid transparent;position:relative}
+.dc:hover{transform:translateY(-4px);box-shadow:var(--sh);border-color:var(--pr)}
+.dc.done{border-color:var(--fav)}
+.dc.done::after{content:'✓';position:absolute;top:12px;right:14px;color:var(--fav);font-size:1.1rem;font-weight:700}
+.dc .ico{font-size:2.2rem;margin-bottom:10px}
+.dc .dn{font-size:1rem;font-weight:700;color:var(--pr)}
+.dc .dt{font-size:.82rem;color:var(--tm);margin:3px 0 10px}
+.sbar{background:var(--bg);border-radius:4px;height:7px;margin-bottom:6px;overflow:hidden}
+.sfill{height:100%;background:var(--pr);border-radius:4px;transition:width .6s}
+.stext{font-size:.77rem;color:var(--tm);display:flex;justify-content:space-between}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.72rem;font-weight:600;margin-top:8px}
+.b0{background:#eee;color:var(--tm)}
+.b1{background:#FEF9C3;color:#92400E}
+.b2{background:#D1FAE5;color:#065F46}
+.btn-e{display:block;width:100%;margin-top:12px;background:var(--pr);color:#fff;border:none;
+  border-radius:var(--r2);padding:9px;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-e:hover{background:var(--pr2)}
+
+/* ── GAME COMMON ── */
+.gc{max-width:980px;margin:0 auto}
+.gh{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.gt{font-size:1.5rem;font-weight:800;color:var(--pr)}
+.gs{font-size:.82rem;color:var(--tm)}
+.gb{margin-left:auto;background:var(--pr);color:#fff;padding:5px 14px;border-radius:18px;font-weight:700}
+.gb span{color:#F1C40F}
+.ib{background:#EBF5FB;border-left:4px solid var(--bl);border-radius:var(--r2);
+  padding:12px 16px;margin-bottom:18px;font-size:.87rem;line-height:1.6}
+.btn{background:var(--pr);color:#fff;border:none;border-radius:var(--r2);padding:9px 22px;
+  font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--pr2)}
+.btn.g{background:var(--gr)}.btn.g:hover{background:#219A52}
+.btn.s{background:#fff;color:var(--pr);border:2px solid var(--bd)}.btn.s:hover{border-color:var(--pr)}
+.cbanner{background:linear-gradient(135deg,var(--gr),#219A52);color:#fff;border-radius:var(--r);
+  padding:24px;text-align:center;box-shadow:var(--sh);display:none;margin-top:20px}
+.cbanner.on{display:block}
+.cbanner h2{font-size:1.4rem;font-weight:800;margin-bottom:8px}
+.cbanner .pts{font-size:2rem;font-weight:800;color:#F1C40F}
+.fb{position:fixed;z-index:2000;padding:10px 18px;border-radius:var(--r2);font-weight:600;
+  font-size:.87rem;box-shadow:var(--sh);pointer-events:none;max-width:300px;line-height:1.4}
+.fb.ok{background:#D1FAE5;color:#065F46;border:2px solid var(--fav)}
+.fb.bad{background:#FEE2E2;color:#991B1B;border:2px solid var(--unf)}
+
+/* ── GAME 1 CLASSIFICATION ── */
+.g1-scene{display:flex;gap:20px;justify-content:center;align-items:flex-start;
+  flex-wrap:wrap;margin:20px 0}
+.ccard{background:#fff;border:2px solid var(--bd);border-radius:var(--r2);padding:13px 16px;
+  cursor:grab;font-size:.88rem;font-weight:600;text-align:center;box-shadow:var(--ss);
+  width:200px;user-select:none;transition:transform .15s,box-shadow .15s;min-height:60px;
+  display:flex;align-items:center;justify-content:center}
+.ccard:hover{transform:scale(1.04);box-shadow:var(--sh)}
+.ccard.drag-ghost{opacity:.35;transform:scale(.95)}
+.bins{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.bin{width:200px;min-height:160px;border-radius:var(--r);border:3px dashed var(--bd);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:14px;text-align:center;transition:all .2s}
+.bin.pr-bin{border-color:var(--gr);background:rgba(39,174,96,.06)}
+.bin.pe-bin{border-color:var(--bl);background:rgba(52,152,219,.06)}
+.bin.va-bin{border-color:var(--fav);background:rgba(46,204,113,.06)}
+.bin.fi-bin{border-color:var(--or);background:rgba(243,156,18,.06)}
+.bin.pm-bin{border-color:#9B59B6;background:rgba(155,89,182,.06)}
+.bin.cv-bin{border-color:#1ABC9C;background:rgba(26,188,156,.06)}
+.bin.hover{border-style:solid;transform:scale(1.03)}
+.bin .bi{font-size:2.2rem}
+.bin .bl{font-size:.95rem;font-weight:700;color:var(--pr)}
+.bin .bs{font-size:.75rem;color:var(--tm)}
+.rl{font-size:.95rem;font-weight:700;color:var(--pr);margin-bottom:10px}
+.cc{font-size:.82rem;color:var(--tm);margin-top:6px}
+.stk{font-size:.88rem;font-weight:600;color:var(--or);min-height:22px}
+
+/* ── GAME 2 COST BEHAVIOR ── */
+.g2-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+@media(max-width:768px){.g2-layout{grid-template-columns:1fr}}
+.chart-wrap{perspective:500px}
+.chart-tilt{transform:rotateX(7deg) rotateY(-2deg);transform-origin:center bottom;
+  background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:14px}
+#g2svg{display:block;width:100%}
+.cp{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px}
+.cp h3{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--pr)}
+.sl-g{margin-bottom:18px}
+.sl-l{font-size:.82rem;font-weight:600;display:flex;justify-content:space-between;margin-bottom:5px}
+.sl-l .sv{color:var(--ac);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--pr)}
+.eq{background:var(--bg);border-radius:var(--r2);padding:10px;text-align:center;
+  font-size:.95rem;font-weight:700;color:var(--pr);margin:10px 0;font-family:'Courier New',monospace}
+.pred{margin-top:14px;border-top:1px solid var(--bd);padding-top:14px}
+.pred label{font-size:.85rem;font-weight:600;display:block;margin-bottom:6px}
+.pred input{width:100%;padding:7px 10px;border:2px solid var(--bd);border-radius:6px;font-size:.88rem;margin-bottom:8px}
+.pred input:focus{outline:none;border-color:var(--pr)}
+.dtab{font-size:.77rem;width:100%;border-collapse:collapse;margin-top:10px}
+.dtab th{background:var(--pr);color:#fff;padding:5px 8px;text-align:center}
+.dtab td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--bd)}
+.dtab tr:nth-child(even) td{background:var(--bg)}
+.rr-msg{margin-top:10px;font-size:.82rem;font-weight:600;color:var(--tm);min-height:20px}
+
+/* ── GAME 3 ABC TOWER ── */
+.g3-layout{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
+@media(max-width:768px){.g3-layout{grid-template-columns:1fr}}
+.tower-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.tower-scene{perspective:700px;width:200px;height:330px;position:relative}
+.tower-3d{width:200px;height:320px;position:absolute;transform-style:preserve-3d;
+  animation:tr 20s linear infinite}
+.tower-3d:hover{animation-play-state:paused}
+@keyframes tr{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.tf{position:absolute;width:100%;height:72px;border-radius:8px;padding:10px;text-align:center;
+  font-weight:700;font-size:.82rem;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.2);
+  border:2px solid rgba(255,255,255,.25);display:flex;flex-direction:column;justify-content:center}
+.tf-fa{bottom:240px;background:linear-gradient(135deg,#566573,#95A5A6)}
+.tf-pr{bottom:160px;background:linear-gradient(135deg,#1A5276,#3498DB)}
+.tf-ba{bottom:80px;background:linear-gradient(135deg,#784212,#F39C12)}
+.tf-un{bottom:0;background:linear-gradient(135deg,#145A32,#27AE60)}
+.tf .fc{font-size:.68rem;font-weight:400;opacity:.8}
+.g3-right{display:flex;flex-direction:column;gap:14px}
+.dz-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dz{border-radius:var(--r2);border:3px dashed transparent;padding:10px;min-height:80px;
+  font-size:.78rem;font-weight:600;transition:all .2s}
+.dz-fa{background:rgba(149,165,166,.15);border-color:#95A5A6;color:#566573}
+.dz-pr{background:rgba(52,152,219,.1);border-color:#3498DB;color:#1A5276}
+.dz-ba{background:rgba(243,156,18,.1);border-color:#F39C12;color:#784212}
+.dz-un{background:rgba(39,174,96,.1);border-color:#27AE60;color:#145A32}
+.dz.hover{transform:scale(1.03);box-shadow:var(--ss)}
+.dz .zt{font-size:.85rem;margin-bottom:5px;display:block}
+.dz .placed-list{display:flex;flex-wrap:wrap;gap:3px}
+.placed-tag{background:rgba(255,255,255,.7);border-radius:4px;padding:2px 6px;
+  font-size:.68rem;border:1px solid rgba(0,0,0,.1)}
+.cards-pool{display:flex;flex-wrap:wrap;gap:6px}
+.acard{background:#fff;border:2px solid var(--bd);border-radius:6px;padding:6px 10px;
+  font-size:.77rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s;box-shadow:var(--ss)}
+.acard:hover{border-color:var(--pr);transform:translateY(-2px)}
+.acard.gone{opacity:.25;pointer-events:none}
+/* Phase 2 driver matching */
+.dm-grid{display:flex;flex-direction:column;gap:10px}
+.dm-row{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:8px}
+.dm-act{background:var(--bg);border-radius:6px;padding:8px 10px;font-size:.83rem;font-weight:600;text-align:center}
+.dm-sel{padding:7px 8px;border:2px solid var(--bd);border-radius:6px;font-size:.8rem;
+  width:100%;background:#fff;cursor:pointer}
+.dm-sel.ok{border-color:var(--fav);background:#D1FAE5}
+.dm-sel.bad{border-color:var(--unf);background:#FEE2E2}
+
+/* ── GAME 4 VARIANCE ── */
+.vtbl-wrap{overflow-x:auto;margin-bottom:16px}
+.vtbl{width:100%;border-collapse:collapse;font-size:.88rem;background:#fff;
+  border-radius:var(--r);overflow:hidden;box-shadow:var(--ss)}
+.vtbl th{padding:11px 14px;font-size:.82rem;font-weight:700;text-align:center;border-bottom:2px solid var(--bd)}
+.vtbl th.c0{background:var(--pr);color:#fff;text-align:left}
+.vtbl th.c1{background:#2980B9;color:#fff}
+.vtbl th.c2{background:#E67E22;color:#fff}
+.vtbl th.c3{background:#27AE60;color:#fff}
+.vtbl td{padding:9px 14px;border-bottom:1px solid var(--bd);text-align:center}
+.vtbl td.lbl{text-align:left;font-weight:600;color:var(--pr)}
+.vtbl tr:last-child td{border-bottom:none}
+.vi{width:105px;padding:5px 7px;border:2px solid var(--bd);border-radius:6px;font-size:.85rem;text-align:center;font-family:inherit}
+.vi:focus{outline:none;border-color:var(--or)}
+.vi.ok{border-color:var(--fav);background:#D1FAE5}
+.vi.bad{border-color:var(--unf);background:#FEE2E2}
+.vfav{color:var(--fav);font-weight:700}
+.vunf{color:var(--unf);font-weight:700}
+#g4chart{width:100%;height:360px;background:#1a252f;border-radius:var(--r);overflow:hidden;margin:16px 0;position:relative}
+#g4chart canvas{border-radius:var(--r)}
+.chart-legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;font-size:.82rem}
+.li{display:flex;align-items:center;gap:5px}
+.ld{width:12px;height:12px;border-radius:3px}
+.formula-box{background:var(--pr);color:#fff;border-radius:var(--r2);padding:11px 18px;
+  text-align:center;font-size:.95rem;font-weight:700;margin:14px 0}
+.formula-box span{color:#F1C40F}
+.mcq-box{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px;margin-bottom:14px}
+.mcq-box h3{font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--pr)}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mo{padding:9px 13px;border:2px solid var(--bd);border-radius:var(--r2);cursor:pointer;font-size:.87rem;transition:all .2s}
+.mo:hover{border-color:var(--pr);background:rgba(44,62,80,.04)}
+.mo.sel{border-color:var(--pr);background:rgba(44,62,80,.08)}
+.mo.ok{border-color:var(--fav);background:#D1FAE5;pointer-events:none}
+.mo.bad{border-color:var(--unf);background:#FEE2E2}
+.dd-box{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px}
+.dd-box h3{font-size:.95rem;font-weight:700;margin-bottom:8px;color:var(--pr)}
+.given{background:var(--bg);border-radius:6px;padding:10px 14px;font-family:monospace;
+  font-size:.85rem;line-height:1.9;margin:10px 0}
+.vc-row{display:flex;align-items:center;gap:8px;margin:7px 0;flex-wrap:wrap}
+.vc-lbl{font-size:.85rem;font-weight:600;min-width:160px}
+.vc-amt{width:110px;padding:6px 8px;border:2px solid var(--bd);border-radius:6px;
+  font-size:.85rem;text-align:center}
+.vc-amt:focus{outline:none;border-color:var(--pr)}
+.vc-amt.ok{border-color:var(--fav);background:#D1FAE5}
+.vc-amt.bad{border-color:var(--unf);background:#FEE2E2}
+.vc-sel{padding:6px 9px;border:2px solid var(--bd);border-radius:6px;font-size:.82rem;cursor:pointer}
+.vc-sel.ok{border-color:var(--fav)}
+.vc-sel.bad{border-color:var(--unf)}
+
+/* ── GAME 5 CAPBUDGET ── */
+.scenario-box{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;
+  border-radius:var(--r);padding:18px 22px;margin-bottom:20px}
+.scenario-box h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+.scenario-box p{font-size:.85rem;opacity:.85;line-height:1.6}
+.s-data{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:12px}
+.sd{background:rgba(255,255,255,.15);border-radius:8px;padding:7px 11px;font-size:.8rem}
+.sd .sl{opacity:.7;margin-bottom:2px;font-size:.75rem}
+.sd .sv{font-weight:700}
+.steps{display:flex;flex-direction:column;gap:14px}
+.step{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px 22px;
+  border:2px solid var(--bd);transition:border-color .3s}
+.step.done{border-color:var(--fav)}
+.step-num{display:inline-flex;width:26px;height:26px;background:var(--pr);color:#fff;
+  border-radius:50%;align-items:center;justify-content:center;font-size:.77rem;font-weight:700;margin-bottom:8px}
+.step h4{font-size:.92rem;font-weight:700;color:var(--pr);margin-bottom:6px}
+.step-formula{background:var(--bg);border-radius:6px;padding:7px 12px;font-family:'Courier New',monospace;
+  font-size:.85rem;color:var(--pr);margin:7px 0}
+.s-inp-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.s-inp{padding:7px 11px;border:2px solid var(--bd);border-radius:6px;font-size:.88rem;width:140px}
+.s-inp:focus{outline:none;border-color:var(--pr)}
+.s-inp.ok{border-color:var(--fav);background:#D1FAE5}
+.s-inp.bad{border-color:var(--unf);background:#FEE2E2}
+.s-result{display:none;margin-top:10px;padding:9px 13px;background:#D1FAE5;border-radius:6px;
+  font-size:.85rem;color:#065F46;line-height:1.5}
+.s-result.on{display:block}
+.npv-result{background:linear-gradient(135deg,#145A32,var(--gr));color:#fff;border-radius:var(--r);
+  padding:22px;text-align:center;box-shadow:var(--sh);display:none;margin-top:16px}
+.npv-result.on{display:block}
+.npv-result h2{font-size:1.7rem;font-weight:800;margin-bottom:6px}
+.npv-result p{opacity:.85;font-size:.88rem}
+.mc-opts{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.mc-opt{padding:8px 16px;border:2px solid var(--bd);border-radius:var(--r2);cursor:pointer;
+  font-size:.88rem;font-weight:600;transition:all .2s}
+.mc-opt:hover{border-color:var(--pr)}
+.mc-opt.ok{border-color:var(--fav);background:#D1FAE5;pointer-events:none}
+.mc-opt.bad{border-color:var(--unf);background:#FEE2E2}
+
+/* ── GAME 6 BSC ── */
+.g6-top{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:700px){.g6-top{grid-template-columns:1fr}}
+.bsc-quad{border-radius:var(--r);padding:13px;min-height:110px;border:3px dashed transparent;transition:all .2s}
+.bsc-fin{background:rgba(241,196,15,.12);border-color:#F1C40F}
+.bsc-cus{background:rgba(52,152,219,.1);border-color:#3498DB}
+.bsc-int{background:rgba(39,174,96,.1);border-color:#27AE60}
+.bsc-lea{background:rgba(155,89,182,.1);border-color:#9B59B6}
+.bsc-quad.hover{transform:scale(1.02);box-shadow:var(--ss)}
+.bq-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+.bsc-fin .bq-title{color:#7D6608}
+.bsc-cus .bq-title{color:#1A5276}
+.bsc-int .bq-title{color:#145A32}
+.bsc-lea .bq-title{color:#4A235A}
+.placed-chips{display:flex;flex-wrap:wrap;gap:3px}
+.pchip{background:rgba(255,255,255,.8);border-radius:4px;padding:2px 7px;font-size:.69rem;font-weight:600;border:1px solid rgba(0,0,0,.1)}
+.kpi-pool{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.kc{background:#fff;border:2px solid var(--bd);border-radius:6px;padding:6px 11px;font-size:.77rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s;box-shadow:var(--ss)}
+.kc:hover{border-color:var(--pr);transform:translateY(-2px)}
+.kc.gone{opacity:.25;pointer-events:none}
+.tp-section{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px}
+.tp-section h3{font-size:.95rem;font-weight:700;color:var(--pr);margin-bottom:10px}
+.tp-scen{background:var(--bg);border-radius:6px;padding:11px;font-size:.83rem;line-height:1.6;margin-bottom:14px}
+.tp-slider-wrap{padding:8px 0}
+.tp-slider-wrap label{font-size:.85rem;font-weight:600;display:block;margin-bottom:6px}
+#g6tp{width:100%;accent-color:var(--pr)}
+.tp-val{text-align:center;font-size:1.5rem;font-weight:800;color:var(--pr);margin:4px 0}
+.tp-divs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.tp-div{background:var(--bg);border-radius:var(--r2);padding:11px;text-align:center}
+.tp-div .dn{font-size:.77rem;font-weight:600;color:var(--tm);margin-bottom:3px}
+.tp-div .di{font-size:1.15rem;font-weight:700;color:var(--pr)}
+.phase-hdr{display:flex;align-items:center;gap:8px;margin:18px 0 10px}
+.ph-badge{background:var(--pr);color:#fff;border-radius:10px;padding:3px 11px;font-size:.75rem;font-weight:700}
+.ph-title{font-size:.95rem;font-weight:700;color:var(--pr)}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.flex-g{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hidden{display:none!important}
+.drag-clone{position:fixed;z-index:9999;pointer-events:none;opacity:.85;
+  transform:scale(1.05) rotate(2deg);border-radius:6px}
+</style>
+</head>
+<body>
+
+<!-- SCORE BAR -->
+<div id="sb">
+  <div class="brand"><b>Saucy Apple</b> Mfg. Co.</div>
+  <button id="btnHub" onclick="Nav.hub()">← Hub</button>
+  <div class="si">
+    <span class="pr" id="sb-prog">0/6 complete</span>
+    <span class="ts" id="sb-total">0 pts</span>
+  </div>
+</div>
+
+<!-- HUB -->
+<div id="hub" class="scr on">
+  <div class="gc">
+    <div class="hub-h">
+      <h1>🍎 <b>Saucy Apple</b> Manufacturing Co.</h1>
+      <p>ACC 214 · Managerial Cost Analysis · Interactive Study Game</p>
+      <div class="hub-tot">Total Score: <span class="v" id="hub-score">0</span> / 9,125 pts</div>
+    </div>
+    <div class="dg" id="dept-grid"></div>
+  </div>
+</div>
+
+<!-- GAME 1: COST CLASSIFICATION -->
+<div id="g1" class="scr">
+  <div class="gc">
+    <div class="gh">
+      <div><div class="gt">📦 Receiving Dept. — Cost Classification</div><div class="gs">Chapter 2 · 3 rounds</div></div>
+      <div class="gb">Score: <span id="g1-score">0</span></div>
+    </div>
+    <div class="ib"><strong>How to play:</strong> Drag each cost card to the correct bin. Complete all 3 rounds to earn your score.</div>
+    <div class="rl" id="g1-rlabel"></div>
+    <div class="cc" id="g1-counter"></div>
+    <div class="stk" id="g1-streak"></div>
+    <div class="g1-scene">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+        <div id="g1-card" class="ccard">Loading...</div>
+      </div>
+      <div class="bins" id="g1-bins"></div>
+    </div>
+    <div class="cbanner" id="g1-done">
+      <h2>📦 Receiving Dept. Complete!</h2>
+      <div class="pts" id="g1-earned">0</div>
+      <p style="margin-top:6px;opacity:.85">All costs classified!</p>
+      <button class="btn mt12" onclick="Nav.hub()">Back to Hub</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 2: COST BEHAVIOR -->
+<div id="g2" class="scr">
+  <div class="gc">
+    <div class="gh">
+      <div><div class="gt">⚙️ Operations Dept. — Cost Behavior</div><div class="gs">Chapter 3 · High-Low Method</div></div>
+      <div class="gb">Score: <span id="g2-score">0</span></div>
+    </div>
+    <div class="ib"><strong>How to play:</strong> Adjust the sliders to fit a cost line through Zeffani's pottery data using the High-Low method. Then predict the cost at X = 350 mugs.</div>
+    <div class="g2-layout">
+      <div class="chart-wrap">
+        <div class="chart-tilt">
+          <svg id="g2svg" viewBox="0 0 520 400" style="background:#FAFAFA;border-radius:8px"></svg>
+        </div>
+      </div>
+      <div class="cp">
+        <h3>High-Low Method</h3>
+        <div class="sl-g">
+          <div class="sl-l"><span>Slope (m) — $/mug</span><span class="sv" id="g2-mval">$10.00</span></div>
+          <input type="range" id="g2-m" min="0" max="20" step="0.01" value="10">
+        </div>
+        <div class="sl-g">
+          <div class="sl-l"><span>Intercept (b) — Fixed $</span><span class="sv" id="g2-bval">$3,000</span></div>
+          <input type="range" id="g2-b" min="0" max="6000" step="1" value="3000">
+        </div>
+        <div class="eq" id="g2-eq">Y = $10.00X + $3,000</div>
+        <div class="pred" id="g2-pred-section">
+          <label><strong>Phase 2:</strong> Predict cost at X = 350 mugs</label>
+          <input type="number" id="g2-pred" placeholder="Enter $ amount" class="pred-inp" style="width:100%;padding:7px 10px;border:2px solid var(--bd);border-radius:6px;font-size:.88rem;margin-bottom:8px">
+          <button class="btn" onclick="G2.checkPred()">Check Prediction</button>
+          <div class="rr-msg" id="g2-rrmsg"></div>
+        </div>
+        <table class="dtab" style="margin-top:14px">
+          <tr><th>Month</th><th>Mugs</th><th>Total Cost</th></tr>
+          <tr><td>Jan</td><td>220</td><td>$6,120</td></tr>
+          <tr><td>Feb</td><td>340</td><td>$7,550</td></tr>
+          <tr><td>Mar</td><td>280</td><td>$6,800</td></tr>
+          <tr><td>Apr*</td><td>467</td><td>$9,094</td></tr>
+          <tr><td>May</td><td>390</td><td>$8,180</td></tr>
+          <tr><td>Jun</td><td>310</td><td>$7,200</td></tr>
+          <tr><td>Jul</td><td>255</td><td>$6,450</td></tr>
+        </table>
+        <p style="font-size:.72rem;color:var(--tm);margin-top:4px">* = High point</p>
+        <div class="flex-g mt12">
+          <button class="btn" onclick="G2.lockIn()">🔒 Lock In Answer</button>
+        </div>
+        <div id="g2-result" style="margin-top:10px;font-size:.85rem"></div>
+      </div>
+    </div>
+    <div class="cbanner" id="g2-done">
+      <h2>⚙️ Operations Dept. Complete!</h2>
+      <div class="pts" id="g2-earned">0</div>
+      <p style="margin-top:6px;opacity:.85">Cost behavior mastered!</p>
+      <button class="btn mt12" onclick="Nav.hub()">Back to Hub</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 3: ABC TOWER -->
+<div id="g3" class="scr">
+  <div class="gc">
+    <div class="gh">
+      <div><div class="gt">🏭 Production Floor — ABC Costing</div><div class="gs">Chapter 9 · Cost Hierarchy</div></div>
+      <div class="gb">Score: <span id="g3-score">0</span></div>
+    </div>
+    <div class="ib"><strong>Phase 1:</strong> Drag each cost card to the correct level of the 5-level cost hierarchy. <strong>Phase 2:</strong> Match each activity to its cost driver.</div>
+    <div id="g3-phase1">
+      <div class="phase-hdr"><span class="ph-badge">Phase 1</span><span class="ph-title">Sort costs into the hierarchy</span></div>
+      <div class="g3-layout">
+        <div class="tower-wrap">
+          <div class="tower-scene">
+            <div class="tower-3d">
+              <div class="tf tf-fa"><span>Facility-Level</span><span class="fc" id="tf-fa-ct">0 placed</span></div>
+              <div class="tf tf-pr"><span>Product-Level</span><span class="fc" id="tf-pr-ct">0 placed</span></div>
+              <div class="tf tf-ba"><span>Batch-Level</span><span class="fc" id="tf-ba-ct">0 placed</span></div>
+              <div class="tf tf-un"><span>Unit-Level</span><span class="fc" id="tf-un-ct">0 placed</span></div>
+            </div>
+          </div>
+          <p style="font-size:.75rem;color:var(--tm);text-align:center">Hover to pause rotation</p>
+        </div>
+        <div class="g3-right">
+          <div class="dz-grid">
+            <div class="dz dz-fa" id="dz-fa" data-zone="fa"><span class="zt">🏢 Facility-Level</span><div class="placed-list" id="pl-fa"></div></div>
+            <div class="dz dz-pr" id="dz-pr" data-zone="pr"><span class="zt">📦 Product-Level</span><div class="placed-list" id="pl-pr"></div></div>
+            <div class="dz dz-ba" id="dz-ba" data-zone="ba"><span class="zt">📋 Batch-Level</span><div class="placed-list" id="pl-ba"></div></div>
+            <div class="dz dz-un" id="dz-un" data-zone="un"><span class="zt">🔩 Unit-Level</span><div class="placed-list" id="pl-un"></div></div>
+          </div>
+          <div>
+            <p style="font-size:.82rem;font-weight:600;margin-bottom:7px;color:var(--pr)">Cost Cards — drag to the correct level:</p>
+            <div class="cards-pool" id="g3-pool"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="g3-phase2" class="hidden">
+      <div class="phase-hdr"><span class="ph-badge">Phase 2</span><span class="ph-title">Match each activity to its cost driver (Maglie Co.)</span></div>
+      <div style="background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px">
+        <p style="font-size:.85rem;color:var(--tm);margin-bottom:14px">Maglie Co. makes tomato sauce and alfredo sauce. Select the correct cost driver for each activity.</p>
+        <div class="dm-grid" id="g3-dm"></div>
+        <button class="btn mt16" onclick="G3.checkDrivers()">Check Drivers</button>
+      </div>
+    </div>
+    <div class="cbanner" id="g3-done">
+      <h2>🏭 Production Floor Complete!</h2>
+      <div class="pts" id="g3-earned">0</div>
+      <p style="margin-top:6px;opacity:.85">ABC Costing mastered!</p>
+      <button class="btn mt12" onclick="Nav.hub()">Back to Hub</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 4: VARIANCE ANALYSIS -->
+<div id="g4" class="scr">
+  <div class="gc">
+    <div class="gh">
+      <div><div class="gt">🔍 Quality Control — Variance Analysis</div><div class="gs">Chapter 10 · The Saucy Apple</div></div>
+      <div class="gb">Score: <span id="g4-score">0</span></div>
+    </div>
+    <div class="ib"><strong>The Saucy Apple</strong> budgeted 2,800 jars but produced 2,400. Work through the 4 phases to diagnose every variance.</div>
+
+    <div id="g4-p1">
+      <div class="phase-hdr"><span class="ph-badge">Phase 1</span><span class="ph-title">Complete the Flexible Budget Column</span></div>
+      <div class="vtbl-wrap">
+        <table class="vtbl">
+          <tr><th class="c0">Item</th><th class="c1">Master Budget<br><small>(2,800 units)</small></th><th class="c2">Flexible Budget<br><small>(2,400 units)</small></th><th class="c3">Actual<br><small>(2,400 units)</small></th></tr>
+          <tr><td class="lbl">Units Sold</td><td>2,800</td><td><input class="vi" id="v0" placeholder="?"></td><td>2,400</td></tr>
+          <tr><td class="lbl">Revenue</td><td>$11,200</td><td><input class="vi" id="v1" placeholder="?"></td><td>$9,600</td></tr>
+          <tr><td class="lbl">DM — Apples</td><td>$3,360</td><td><input class="vi" id="v2" placeholder="?"></td><td>$2,940</td></tr>
+          <tr><td class="lbl">DM — Jars</td><td>$644</td><td><input class="vi" id="v3" placeholder="?"></td><td>$677</td></tr>
+          <tr><td class="lbl">Direct Labor</td><td>$2,800</td><td><input class="vi" id="v4" placeholder="?"></td><td>$2,520</td></tr>
+          <tr><td class="lbl">Fixed MOH</td><td>$1,200</td><td><input class="vi" id="v5" placeholder="?"></td><td>$1,200</td></tr>
+        </table>
+      </div>
+      <p style="font-size:.78rem;color:var(--tm);margin-bottom:10px">Hint: Flexible Budget = Actual Volume × Budgeted Price/Rate (Fixed costs stay fixed)</p>
+      <button class="btn" onclick="G4.checkTable()">Check Flexible Budget</button>
+    </div>
+
+    <div id="g4-p2" class="hidden">
+      <div class="phase-hdr"><span class="ph-badge">Phase 2</span><span class="ph-title">3D Variance Bar Chart</span></div>
+      <div class="chart-legend">
+        <span class="li"><span class="ld" style="background:#2980B9"></span>Master Budget</span>
+        <span class="li"><span class="ld" style="background:#F39C12"></span>Flexible Budget</span>
+        <span class="li"><span class="ld" style="background:#27AE60"></span>Actual</span>
+      </div>
+      <div id="g4chart"></div>
+      <p style="font-size:.77rem;color:var(--tm);text-align:center;margin-bottom:12px">Drag to rotate · Scroll to zoom</p>
+      <div class="formula-box">MBV = <span>FBV</span> + <span>SAV</span> &nbsp;|&nbsp; Master Budget Variance = Flexible Budget Variance + Sales Activity Variance</div>
+      <button class="btn mt8" onclick="G4.showP3()">Continue to Diagnosis →</button>
+    </div>
+
+    <div id="g4-p3" class="hidden">
+      <div class="phase-hdr"><span class="ph-badge">Phase 3</span><span class="ph-title">Diagnose the Variances</span></div>
+      <div class="mcq-box">
+        <h3>Q1: The Saucy Apple produced fewer jars than planned (2,400 vs 2,800). Which variance captures this <em>volume</em> difference?</h3>
+        <div class="mcq-opts">
+          <div class="mo" onclick="G4.mcq(this,'sav',1)">A) Sales Activity Variance (SAV) — measures volume difference</div>
+          <div class="mo" onclick="G4.mcq(this,'fbv',1)">B) Flexible Budget Variance (FBV) — measures price/efficiency</div>
+          <div class="mo" onclick="G4.mcq(this,'mbv',1)">C) Master Budget Variance (MBV) — total combined difference</div>
+        </div>
+      </div>
+      <div class="mcq-box">
+        <h3>Q2: Actual DL cost $2,520 vs. Flexible Budget of $2,400 (same volume). Is this FBV favorable or unfavorable?</h3>
+        <div class="mcq-opts">
+          <div class="mo" onclick="G4.mcq(this,'U',2)">A) Unfavorable — actual cost exceeded flexible budget</div>
+          <div class="mo" onclick="G4.mcq(this,'F',2)">B) Favorable — actual cost was below flexible budget</div>
+        </div>
+      </div>
+      <div class="mcq-box">
+        <h3>Q3: SAV on revenue = Flexible Budget Revenue − Master Budget Revenue = $9,600 − $11,200. What is this SAV?</h3>
+        <div class="mcq-opts">
+          <div class="mo" onclick="G4.mcq(this,'1600U',3)">A) $1,600 Unfavorable — fewer units sold than planned</div>
+          <div class="mo" onclick="G4.mcq(this,'1600F',3)">B) $1,600 Favorable — better than master budget</div>
+          <div class="mo" onclick="G4.mcq(this,'0',3)">C) $0 — volume differences don't affect revenue SAV</div>
+        </div>
+      </div>
+      <button class="btn mt8 hidden" id="g4-p3-btn" onclick="G4.showP4()">Continue to Drill-Down →</button>
+    </div>
+
+    <div id="g4-p4" class="hidden">
+      <div class="phase-hdr"><span class="ph-badge">Phase 4</span><span class="ph-title">DM Variance Drill-Down — Apples</span></div>
+      <div class="dd-box">
+        <h3>Direct Materials Variance — Apples</h3>
+        <div class="given">
+          AP (Actual Price) = $0.15/lb &nbsp;|&nbsp; SP (Standard Price) = $0.20/lb<br>
+          AQ (Actual Quantity) = 19,600 lbs &nbsp;|&nbsp; SQ (Standard Quantity) = 16,800 lbs<br>
+          <br>
+          DM Price Variance = (AP − SP) × AQ<br>
+          DM Efficiency Variance = (AQ − SQ) × SP
+        </div>
+        <div class="vc-row">
+          <span class="vc-lbl">Price Variance amount:</span>
+          <input class="vc-amt" id="v-pv" placeholder="e.g. 980">
+          <select class="vc-sel" id="v-pvfu"><option value="">F/U</option><option value="F">Favorable</option><option value="U">Unfavorable</option></select>
+        </div>
+        <div class="vc-row">
+          <span class="vc-lbl">Efficiency Variance amount:</span>
+          <input class="vc-amt" id="v-ev" placeholder="e.g. 560">
+          <select class="vc-sel" id="v-evfu"><option value="">F/U</option><option value="F">Favorable</option><option value="U">Unfavorable</option></select>
+        </div>
+        <button class="btn mt12" onclick="G4.checkDrill()">Check Variances</button>
+        <div id="g4-drill-result" style="margin-top:10px;font-size:.85rem"></div>
+      </div>
+    </div>
+
+    <div class="cbanner" id="g4-done">
+      <h2>🔍 Quality Control Complete!</h2>
+      <div class="pts" id="g4-earned">0</div>
+      <p style="margin-top:6px;opacity:.85">Variance analysis mastered!</p>
+      <button class="btn mt12" onclick="Nav.hub()">Back to Hub</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 5: CAPITAL BUDGETING -->
+<div id="g5" class="scr">
+  <div class="gc">
+    <div class="gh">
+      <div><div class="gt">💼 Finance Office — Capital Budgeting</div><div class="gs">Chapter 7 · NPV Analysis</div></div>
+      <div class="gb">Score: <span id="g5-score">0</span></div>
+    </div>
+    <div class="ib"><strong>The Air-Porter Van:</strong> Walk through each NPV calculation step. Enter your answer and click Check to reveal the result and explanation.</div>
+    <div class="scenario-box">
+      <h3>Air-Porter Shuttle Van — Capital Investment Decision</h3>
+      <p>Airport shuttle company considering purchasing a new van for passenger transport.</p>
+      <div class="s-data">
+        <div class="sd"><div class="sl">Initial Cost</div><div class="sv">$33,000</div></div>
+        <div class="sd"><div class="sl">Useful Life</div><div class="sv">8 years</div></div>
+        <div class="sd"><div class="sl">Salvage Value</div><div class="sv">$1,000</div></div>
+        <div class="sd"><div class="sl">Annual Inflows</div><div class="sv">$34,200</div></div>
+        <div class="sd"><div class="sl">Annual Outflows</div><div class="sv">$25,500</div></div>
+        <div class="sd"><div class="sl">Tax Rate</div><div class="sv">22%</div></div>
+        <div class="sd"><div class="sl">Required ROR</div><div class="sv">6%</div></div>
+      </div>
+    </div>
+    <div class="steps" id="g5-steps">
+      <div class="step" id="s1">
+        <div class="step-num">1</div>
+        <h4>After-Tax Operating Cash Inflows</h4>
+        <div class="step-formula">After-tax inflows = $34,200 × (1 − 0.22)</div>
+        <div class="s-inp-row">
+          <input class="s-inp" id="s1-inp" placeholder="$ answer" type="number">
+          <button class="btn" onclick="G5.check(1,26676,'After-tax inflows = $34,200 × 0.78 = $26,676. Tax reduces cash received from operations.')">Check</button>
+        </div>
+        <div class="s-result" id="s1-res"></div>
+      </div>
+      <div class="step" id="s2">
+        <div class="step-num">2</div>
+        <h4>After-Tax Operating Cash Outflows</h4>
+        <div class="step-formula">After-tax outflows = $25,500 × (1 − 0.22)</div>
+        <div class="s-inp-row">
+          <input class="s-inp" id="s2-inp" placeholder="$ answer" type="number">
+          <button class="btn" onclick="G5.check(2,19890,'After-tax outflows = $25,500 × 0.78 = $19,890. Operating expenses reduce taxable income.')">Check</button>
+        </div>
+        <div class="s-result" id="s2-res"></div>
+      </div>
+      <div class="step" id="s3">
+        <div class="step-num">3</div>
+        <h4>Annual Straight-Line Depreciation</h4>
+        <div class="step-formula">Depreciation = (Cost − Salvage) ÷ Life = ($33,000 − $1,000) ÷ 8</div>
+        <div class="s-inp-row">
+          <input class="s-inp" id="s3-inp" placeholder="$ answer" type="number">
+          <button class="btn" onclick="G5.check(3,4000,'Depreciation = $32,000 ÷ 8 = $4,000/year. Non-cash expense but creates a tax shield.')">Check</button>
+        </div>
+        <div class="s-result" id="s3-res"></div>
+      </div>
+      <div class="step" id="s4">
+        <div class="step-num">4</div>
+        <h4>Annual Depreciation Tax Shield</h4>
+        <div class="step-formula">Tax Shield = Depreciation × Tax Rate = $4,000 × 0.22</div>
+        <div class="s-inp-row">
+          <input class="s-inp" id="s4-inp" placeholder="$ answer" type="number">
+          <button class="btn" onclick="G5.check(4,880,'Tax Shield = $4,000 × 0.22 = $880/year. Depreciation reduces taxable income, saving $880 in taxes annually.')">Check</button>
+        </div>
+        <div class="s-result" id="s4-res"></div>
+      </div>
+      <div class="step" id="s5">
+        <div class="step-num">5</div>
+        <h4>Present Value Annuity Factor (8 yrs @ 6%)</h4>
+        <p style="font-size:.85rem;margin-bottom:8px">Choose the correct PVA factor from the table for n=8, r=6%:</p>
+        <div class="mc-opts">
+          <div class="mc-opt" onclick="G5.mcOpt(this, false)">5.747 (5%, 8 yrs)</div>
+          <div class="mc-opt" onclick="G5.mcOpt(this, true)">6.210 (6%, 8 yrs) ✓</div>
+          <div class="mc-opt" onclick="G5.mcOpt(this, false)">7.360 (4%, 8 yrs)</div>
+        </div>
+        <div class="s-result" id="s5-res"></div>
+      </div>
+      <div class="step" id="s6">
+        <div class="step-num">6</div>
+        <h4>Net Present Value</h4>
+        <div class="step-formula">NPV = (After-tax net inflow + Tax shield) × PVA − Initial cost<br>
+        = ($26,676 − $19,890 + $880) × 6.210 − $33,000</div>
+        <div class="s-inp-row">
+          <input class="s-inp" id="s6-inp" placeholder="$ answer" type="number">
+          <button class="btn" onclick="G5.check(6,14178,'Net cash flow = $26,676 − $19,890 + $880 = $7,666. NPV = $7,666 × 6.210 − $33,000 ≈ $14,601. Positive NPV → ACCEPT the investment!')">Check</button>
+        </div>
+        <div class="s-result" id="s6-res"></div>
+      </div>
+    </div>
+    <div id="g5-invest" class="hidden" style="background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px;margin-top:14px">
+      <h3 style="font-size:.95rem;font-weight:700;color:var(--pr);margin-bottom:8px">Final Decision: IRR = 16.56% vs. Required Return = 6%. Should the company invest?</h3>
+      <div class="mc-opts">
+        <div class="mc-opt" onclick="G5.invest(this,true)">✅ Yes — NPV is positive and IRR exceeds the required rate of return</div>
+        <div class="mc-opt" onclick="G5.invest(this,false)">❌ No — the investment is too risky</div>
+        <div class="mc-opt" onclick="G5.invest(this,false)">⚠️ Need more information</div>
+      </div>
+    </div>
+    <div class="npv-result" id="g5-npv-result">
+      <h2>✅ INVEST!</h2>
+      <p>NPV &gt; 0 and IRR (16.56%) &gt; Required Return (6%). The Air-Porter Van is a sound investment.</p>
+    </div>
+    <div class="cbanner" id="g5-done">
+      <h2>💼 Finance Office Complete!</h2>
+      <div class="pts" id="g5-earned">0</div>
+      <p style="margin-top:6px;opacity:.85">Capital budgeting mastered!</p>
+      <button class="btn mt12" onclick="Nav.hub()">Back to Hub</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 6: BALANCED SCORECARD -->
+<div id="g6" class="scr">
+  <div class="gc">
+    <div class="gh">
+      <div><div class="gt">📊 Executive Suite — Balanced Scorecard</div><div class="gs">Chapters 17–18 · BSC &amp; Transfer Pricing</div></div>
+      <div class="gb">Score: <span id="g6-score">0</span></div>
+    </div>
+    <div class="ib"><strong>Phase 1:</strong> Drag each KPI to the correct BSC quadrant. <strong>Phase 2:</strong> Use the transfer pricing slider to see how price affects division income.</div>
+    <div class="phase-hdr"><span class="ph-badge">Phase 1</span><span class="ph-title">Sort KPIs into the Balanced Scorecard</span></div>
+    <div class="kpi-pool" id="g6-pool"></div>
+    <div style="perspective:500px">
+      <div style="transform:rotateX(6deg);transform-origin:center top;transform-style:preserve-3d">
+        <div class="g6-top">
+          <div class="bsc-quad bsc-fin" id="bq-fin" data-q="fin"><div class="bq-title">💰 Financial</div><div class="placed-chips" id="pc-fin"></div></div>
+          <div class="bsc-quad bsc-cus" id="bq-cus" data-q="cus"><div class="bq-title">👥 Customer</div><div class="placed-chips" id="pc-cus"></div></div>
+          <div class="bsc-quad bsc-int" id="bq-int" data-q="int"><div class="bq-title">⚙️ Internal Process</div><div class="placed-chips" id="pc-int"></div></div>
+          <div class="bsc-quad bsc-lea" id="bq-lea" data-q="lea"><div class="bq-title">🌱 Learning &amp; Growth</div><div class="placed-chips" id="pc-lea"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-hdr mt12"><span class="ph-badge">Phase 2</span><span class="ph-title">Transfer Pricing — Sip and Tip Co.</span></div>
+    <div class="tp-section">
+      <div class="tp-scen">
+        <strong>Sip and Tip Co.</strong> has two divisions:<br>
+        • <strong>Assembly Division</strong> makes chairs. Variable cost = <strong>$5/chair</strong><br>
+        • <strong>Distribution Division</strong> sells chairs externally for <strong>$12/chair</strong><br>
+        <br>
+        Assembly transfers chairs to Distribution at the <em>transfer price</em>. Move the slider to see how different transfer prices split income between divisions.
+      </div>
+      <div class="tp-slider-wrap">
+        <label>Transfer Price: <span id="g6-tp-lbl" style="color:var(--ac);font-weight:700">$8.50</span></label>
+        <input type="range" id="g6tp" min="5" max="12" step="0.5" value="8.5" oninput="G6.updateTP()">
+        <div style="display:flex;justify-content:space-between;font-size:.77rem;color:var(--tm)"><span>$5 (min)</span><span>$12 (max)</span></div>
+      </div>
+      <div class="tp-divs">
+        <div class="tp-div"><div class="dn">Assembly Division Income</div><div class="di" id="tp-asm">$3.50</div><div style="font-size:.72rem;color:var(--tm)">(TP − Variable Cost)</div></div>
+        <div class="tp-div"><div class="dn">Distribution Division Income</div><div class="di" id="tp-dist">$3.50</div><div style="font-size:.72rem;color:var(--tm)">(Selling Price − TP)</div></div>
+      </div>
+      <div id="g6-tp-insight" style="margin-top:10px;font-size:.83rem;color:var(--tm)"></div>
+      <button class="btn mt12" id="g6-finish-btn" onclick="G6.finish()">Complete Game</button>
+    </div>
+
+    <div class="cbanner" id="g6-done">
+      <h2>📊 Executive Suite Complete!</h2>
+      <div class="pts" id="g6-earned">0</div>
+      <p style="margin-top:6px;opacity:.85">Strategy &amp; control mastered!</p>
+      <button class="btn mt12" onclick="Nav.hub()">Back to Hub</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const State = {
+  scores: {g1:0,g2:0,g3:0,g4:0,g5:0,g6:0},
+  max:    {g1:1400,g2:850,g3:1725,g4:2100,g5:1250,g6:1800},
+  done:   {g1:false,g2:false,g3:false,g4:false,g5:false,g6:false},
+  save(){ try{localStorage.setItem('acc214v2',JSON.stringify({s:this.scores,d:this.done}))}catch(e){} },
+  load(){
+    try{
+      const x=JSON.parse(localStorage.getItem('acc214v2')||'{}');
+      if(x.s) Object.assign(this.scores,x.s);
+      if(x.d) Object.assign(this.done,x.d);
+    }catch(e){}
+  },
+  total(){ return Object.values(this.scores).reduce((a,b)=>a+b,0); },
+  doneCount(){ return Object.values(this.done).filter(Boolean).length; }
+};
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+const Nav = {
+  hub(){
+    document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+    document.getElementById('hub').classList.add('on');
+    document.getElementById('btnHub').style.display='none';
+    updateSB(); updateHubCards();
+  },
+  go(id,initFn){
+    document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.getElementById('btnHub').style.display='block';
+    window.scrollTo(0,0);
+    if(initFn) initFn();
+    updateSB();
+  }
+};
+window.Nav = Nav;
+
+function updateSB(){
+  document.getElementById('sb-total').textContent=State.total().toLocaleString()+' pts';
+  document.getElementById('sb-prog').textContent=State.doneCount()+'/6 complete';
+  document.getElementById('hub-score').textContent=State.total().toLocaleString();
+}
+
+// ═══════════════════════════════════════════════
+//  HUB CARDS
+// ═══════════════════════════════════════════════
+const DEPTS = [
+  {id:'g1',ico:'📦',name:'Receiving Dept.',topic:'Chapter 2 — Cost Classification',game:'g1'},
+  {id:'g2',ico:'⚙️',name:'Operations Dept.',topic:'Chapter 3 — Cost Behavior',game:'g2'},
+  {id:'g3',ico:'🏭',name:'Production Floor',topic:'Chapter 9 — ABC Costing',game:'g3'},
+  {id:'g4',ico:'🔍',name:'Quality Control',topic:'Chapter 10 — Variance Analysis',game:'g4'},
+  {id:'g5',ico:'💼',name:'Finance Office',topic:'Chapter 7 — Capital Budgeting',game:'g5'},
+  {id:'g6',ico:'📊',name:'Executive Suite',topic:'Ch 17–18 — BSC & Transfer Pricing',game:'g6'},
+];
+
+function updateHubCards(){
+  const grid = document.getElementById('dept-grid');
+  grid.innerHTML = '';
+  DEPTS.forEach(d=>{
+    const sc = State.scores[d.id]||0;
+    const mx = State.max[d.id];
+    const pct = Math.round(sc/mx*100);
+    const done = State.done[d.id];
+    const badge = done?'<span class="badge b2">Completed</span>':sc>0?'<span class="badge b1">In Progress</span>':'<span class="badge b0">Not Started</span>';
+    const startFn = `G${d.id.slice(1)}_start`;
+    grid.innerHTML+=`
+    <div class="dc ${done?'done':''}" onclick="${startFn}()">
+      <div class="ico">${d.ico}</div>
+      <div class="dn">${d.name}</div>
+      <div class="dt">${d.topic}</div>
+      <div class="sbar"><div class="sfill" style="width:${pct}%"></div></div>
+      <div class="stext"><span>${sc.toLocaleString()} pts</span><span>Max: ${mx.toLocaleString()}</span></div>
+      ${badge}
+      <button class="btn-e">${done?'🔄 Replay':'▶ Enter'}</button>
+    </div>`;
+  });
+}
+window.G1_start=()=>Nav.go('g1',G1.init.bind(G1));
+window.G2_start=()=>Nav.go('g2',G2.init.bind(G2));
+window.G3_start=()=>Nav.go('g3',G3.init.bind(G3));
+window.G4_start=()=>Nav.go('g4',G4.init.bind(G4));
+window.G5_start=()=>Nav.go('g5',G5.init.bind(G5));
+window.G6_start=()=>Nav.go('g6',G6.init.bind(G6));
+
+// ═══════════════════════════════════════════════
+//  FEEDBACK BUBBLE
+// ═══════════════════════════════════════════════
+function fb(isOk, msg, x, y){
+  const el=document.createElement('div');
+  el.className='fb '+(isOk?'ok':'bad');
+  el.textContent=msg;
+  el.style.left=Math.min(x,window.innerWidth-320)+'px';
+  el.style.top=Math.max(y-60,70)+'px';
+  document.body.appendChild(el);
+  if(window.gsap){
+    gsap.from(el,{scale:0,duration:.25,ease:'back.out(1.7)'});
+    gsap.to(el,{opacity:0,delay:2.5,duration:.3,onComplete:()=>el.remove()});
+  } else {
+    setTimeout(()=>el.remove(),2800);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  DRAG & DROP  (pointer-events based)
+// ═══════════════════════════════════════════════
+let dragEl=null, dragClone=null, dragOffX=0, dragOffY=0;
+
+function initDrag(el, onDrop){
+  el.addEventListener('pointerdown', e=>{
+    if(e.button&&e.button!==0) return;
+    e.preventDefault();
+    dragEl=el;
+    el.classList.add('drag-ghost');
+    dragClone=el.cloneNode(true);
+    dragClone.className='drag-clone '+el.className.replace('drag-ghost','');
+    dragClone.style.width=el.offsetWidth+'px';
+    const r=el.getBoundingClientRect();
+    dragOffX=e.clientX-r.left;
+    dragOffY=e.clientY-r.top;
+    updateDragPos(e);
+    document.body.appendChild(dragClone);
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', e=>{
+    if(dragEl!==el) return;
+    updateDragPos(e);
+  });
+  el.addEventListener('pointerup', e=>{
+    if(dragEl!==el) return;
+    dragClone?.remove(); dragClone=null;
+    el.classList.remove('drag-ghost');
+    dragEl=null;
+    const under=document.elementFromPoint(e.clientX,e.clientY);
+    onDrop(el, under, e.clientX, e.clientY);
+  });
+}
+
+function updateDragPos(e){
+  if(!dragClone) return;
+  dragClone.style.left=(e.clientX-dragOffX)+'px';
+  dragClone.style.top=(e.clientY-dragOffY)+'px';
+}
+
+function closest(el, sel){
+  while(el){ if(el.matches&&el.matches(sel)) return el; el=el.parentElement; }
+  return null;
+}
+
+// ═══════════════════════════════════════════════
+//  GAME 1 — COST CLASSIFICATION
+// ═══════════════════════════════════════════════
+const G1 = {
+  round:0, idx:0, score:0, streak:0,
+  rounds:[
+    {
+      label:'Round 1 of 3: Product Cost vs. Period Cost',
+      bins:[{id:'pr-bin',cls:'pr-bin',icon:'🏭',label:'Product Cost',sub:'Attaches to inventory'},
+            {id:'pe-bin',cls:'pe-bin',icon:'🏢',label:'Period Cost',sub:'Expensed immediately'}],
+      items:[
+        {t:'Factory rent — $3,000/month',                  a:'pr-bin',hint:'Factory rent is MOH — it attaches to the product made in the factory.'},
+        {t:'CEO salary — $15,000/month',                   a:'pe-bin',hint:'CEO salary is a Period Cost — it runs the business, not the factory.'},
+        {t:'Oranges used in juice production',             a:'pr-bin',hint:'Direct Materials are always Product Costs.'},
+        {t:'Advertising campaign',                         a:'pe-bin',hint:'Advertising is a Selling expense — a Period Cost.'},
+        {t:'Depreciation on factory machines',             a:'pr-bin',hint:'Factory machine depreciation is MOH — a Product Cost.'},
+        {t:'Depreciation on office computers',             a:'pe-bin',hint:'Office computer depreciation supports admin, not production — Period Cost.'},
+        {t:'Factory supervisor salary',                    a:'pr-bin',hint:'Supervisor oversees production — their salary is MOH (Product Cost).'},
+        {t:'Factory property taxes — $4,100',              a:'pr-bin',hint:'Property taxes on the factory are MOH — Product Cost.'},
+        {t:'Sales commission',                             a:'pe-bin',hint:'Sales commissions are a Selling expense — Period Cost.'},
+        {t:'Production line workers (Direct Labor)',       a:'pr-bin',hint:'Direct Labor is the primary Product Cost after Direct Materials.'},
+        {t:'Factory insurance',                            a:'pr-bin',hint:'Factory insurance is MOH — indirect Product Cost.'},
+        {t:'Utilities in the front office',                a:'pe-bin',hint:'Front-office utilities support admin — Period Cost.'},
+      ]
+    },
+    {
+      label:'Round 2 of 3: Variable Cost vs. Fixed Cost',
+      bins:[{id:'va-bin',cls:'va-bin',icon:'📈',label:'Variable Cost',sub:'Changes with activity'},
+            {id:'fi-bin',cls:'fi-bin',icon:'📌',label:'Fixed Cost',sub:'Constant in total'}],
+      items:[
+        {t:'Wood per table — $8/unit',                     a:'va-bin',hint:'Direct materials vary in total as units change — Variable Cost.'},
+        {t:'Factory equipment rent — $5,000/month',        a:'fi-bin',hint:'Equipment rent is fixed in total regardless of output.'},
+        {t:'Assembly wages (paid per unit produced)',       a:'va-bin',hint:'Per-unit wages increase in total with production — Variable Cost.'},
+        {t:'Factory property taxes — $2,400/year',         a:'fi-bin',hint:'Property taxes stay the same regardless of output — Fixed Cost.'},
+        {t:'Paint and varnish per table',                  a:'va-bin',hint:'Paint/varnish are direct materials — Variable Cost.'},
+        {t:'Electricity for production lines',             a:'va-bin',hint:'Production electricity varies with activity — Variable Cost.'},
+        {t:'Straight-line depreciation on factory',        a:'fi-bin',hint:'Straight-line depreciation is a fixed periodic charge — Fixed Cost.'},
+        {t:'Base service fee for factory utilities',       a:'fi-bin',hint:'A base fee is fixed — it does not change with production volume.'},
+      ]
+    },
+    {
+      label:'Round 3 of 3: Prime Cost vs. Conversion Cost',
+      bins:[{id:'pm-bin',cls:'pm-bin',icon:'⭐',label:'Prime Cost',sub:'DM + DL'},
+            {id:'cv-bin',cls:'cv-bin',icon:'🔄',label:'Conversion Cost',sub:'DL + MOH'}],
+      items:[
+        {t:'Lumber (Direct Material)',                     a:'pm-bin',hint:'DM is part of Prime Cost (DM + DL). Not Conversion.'},
+        {t:'Factory rent (Manufacturing Overhead)',        a:'cv-bin',hint:'MOH is part of Conversion Cost (DL + MOH). Not Prime.'},
+        {t:'Machine depreciation (MOH)',                   a:'cv-bin',hint:'MOH = Conversion Cost. It converts raw materials into finished goods.'},
+        {t:'Assembly line workers (Direct Labor)',         a:'pm-bin',hint:'DL is in BOTH Prime (DM+DL) AND Conversion (DL+MOH). Placed in Prime here — full credit!'},
+      ]
+    }
+  ],
+
+  init(){
+    this.round=0; this.idx=0; this.score=0; this.streak=0;
+    document.getElementById('g1-done').classList.remove('on');
+    document.getElementById('g1-score').textContent='0';
+    this.loadRound();
+  },
+
+  loadRound(){
+    const r=this.rounds[this.round];
+    document.getElementById('g1-rlabel').textContent=r.label;
+    this.idx=0;
+    const bins=document.getElementById('g1-bins');
+    bins.innerHTML='';
+    r.bins.forEach(b=>{
+      const d=document.createElement('div');
+      d.className='bin '+b.cls;
+      d.id=b.id;
+      d.innerHTML=`<div class="bi">${b.icon}</div><div class="bl">${b.label}</div><div class="bs">${b.sub}</div>`;
+      d.addEventListener('pointerover',()=>d.classList.add('hover'));
+      d.addEventListener('pointerout',()=>d.classList.remove('hover'));
+      bins.appendChild(d);
+    });
+    this.showCard();
+  },
+
+  showCard(){
+    const r=this.rounds[this.round];
+    if(this.idx>=r.items.length){ this.nextRound(); return; }
+    const item=r.items[this.idx];
+    document.getElementById('g1-counter').textContent=`Card ${this.idx+1} of ${r.items.length}`;
+    document.getElementById('g1-streak').textContent=this.streak>=3?`🔥 Streak ×${this.streak>=5?2:1.5}!`:'';
+    const card=document.getElementById('g1-card');
+    card.textContent=item.t;
+    card.style.borderColor='var(--bd)';
+    const r2=this.rounds[this.round];
+    initDrag(card,(el,target,cx,cy)=>{
+      const bin=closest(target,'.bin');
+      if(!bin){ return; }
+      const isOk = bin.id===item.a;
+      if(isOk){
+        this.streak++;
+        const mult=this.streak>=5?2:this.streak>=3?1.5:1;
+        const pts=Math.round(100*mult);
+        this.score+=pts;
+        document.getElementById('g1-score').textContent=this.score;
+        fb(true,`✅ Correct! +${pts} pts — ${item.hint}`,cx,cy);
+        if(window.gsap) gsap.from(card,{scale:1.15,duration:.2});
+      } else {
+        this.streak=0;
+        this.score=Math.max(0,this.score-25);
+        document.getElementById('g1-score').textContent=this.score;
+        fb(false,`❌ Not quite. ${item.hint}`,cx,cy);
+      }
+      this.idx++;
+      setTimeout(()=>this.showCard(),400);
+    });
+  },
+
+  nextRound(){
+    this.round++;
+    if(this.round>=this.rounds.length){
+      this.complete(); return;
+    }
+    this.loadRound();
+  },
+
+  complete(){
+    State.scores.g1=this.score;
+    State.done.g1=true;
+    State.save();
+    updateSB();
+    document.getElementById('g1-earned').textContent=this.score.toLocaleString()+' pts';
+    document.getElementById('g1-done').classList.add('on');
+  }
+};
+window.G1=G1;
+
+// ═══════════════════════════════════════════════
+//  GAME 2 — COST BEHAVIOR
+// ═══════════════════════════════════════════════
+const G2 = {
+  score:0, locked:false, predDone:false,
+  data:[{x:220,y:6120},{x:340,y:7550},{x:280,y:6800},{x:467,y:9094},{x:390,y:8180},{x:310,y:7200},{x:255,y:6450}],
+  ansM:12.04, ansB:3471.32,
+  init(){
+    this.score=0; this.locked=false; this.predDone=false;
+    document.getElementById('g2-done').classList.remove('on');
+    document.getElementById('g2-score').textContent='0';
+    document.getElementById('g2-result').innerHTML='';
+    document.getElementById('g2-rrmsg').textContent='';
+    document.getElementById('g2-pred').value='';
+    const mi=document.getElementById('g2-m'); mi.value=10; mi.disabled=false;
+    const bi=document.getElementById('g2-b'); bi.value=3000; bi.disabled=false;
+    mi.oninput=()=>this.draw();
+    bi.oninput=()=>this.draw();
+    this.draw();
+  },
+  getM(){ return parseFloat(document.getElementById('g2-m').value); },
+  getB(){ return parseFloat(document.getElementById('g2-b').value); },
+  draw(){
+    const m=this.getM(), b=this.getB();
+    document.getElementById('g2-mval').textContent='$'+m.toFixed(2);
+    document.getElementById('g2-bval').textContent='$'+Math.round(b).toLocaleString();
+    document.getElementById('g2-eq').textContent=`Y = $${m.toFixed(2)}X + $${Math.round(b).toLocaleString()}`;
+    this.renderSVG(m,b);
+  },
+  xScale(x){ return (x/600)*460+30; },
+  yScale(y){ return 370-(y/12000)*340; },
+  renderSVG(m,b){
+    const svg=document.getElementById('g2svg');
+    svg.innerHTML='';
+    const ns='http://www.w3.org/2000/svg';
+    const mk=(t,a)=>{const e=document.createElementNS(ns,t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));return e;};
+    // Axes
+    svg.appendChild(mk('line',{x1:30,y1:10,x2:30,y2:375,'stroke':'#BDC3C7','stroke-width':1}));
+    svg.appendChild(mk('line',{x1:25,y1:370,x2:495,y2:370,'stroke':'#BDC3C7','stroke-width':1}));
+    // X-axis labels
+    [0,100,200,300,400,500,600].forEach(v=>{
+      const x=this.xScale(v);
+      svg.appendChild(mk('text',{x,y:390,'text-anchor':'middle','font-size':10,'fill':'#7F8C8D'})).textContent=v;
+      if(v) svg.appendChild(mk('line',{x1:x,y1:368,x2:x,y2:372,'stroke':'#BDC3C7','stroke-width':1}));
+    });
+    // Y-axis labels
+    [0,3000,6000,9000,12000].forEach(v=>{
+      const y=this.yScale(v);
+      svg.appendChild(mk('text',{x:25,y:y+4,'text-anchor':'end','font-size':10,'fill':'#7F8C8D'})).textContent='$'+v/1000+'k';
+      if(v) svg.appendChild(mk('line',{x1:28,y1:y,x2:32,y2:y,'stroke':'#BDC3C7','stroke-width':1}));
+    });
+    // Axis labels
+    const xl=mk('text',{x:265,y:400,'text-anchor':'middle','font-size':11,'fill':'#566573','font-weight':'bold'});
+    xl.textContent='Mugs Produced (X)'; svg.appendChild(xl);
+    const yl=mk('text',{x:10,y:200,'text-anchor':'middle','font-size':11,'fill':'#566573','font-weight':'bold',transform:'rotate(-90,10,200)'});
+    yl.textContent='Total Cost (Y)'; svg.appendChild(yl);
+    // Student's line (orange)
+    const lx1=this.xScale(0), ly1=this.yScale(b);
+    const lx2=this.xScale(600), ly2=this.yScale(m*600+b);
+    svg.appendChild(mk('line',{x1:lx1,y1:ly1,x2:lx2,y2:ly2,'stroke':'#E74C3C','stroke-width':2.5,'stroke-dasharray':this.locked?'none':'6,3','opacity':.85}));
+    // If locked, show correct line
+    if(this.locked){
+      const cx1=this.xScale(0), cy1=this.yScale(this.ansB);
+      const cx2=this.xScale(600), cy2=this.yScale(this.ansM*600+this.ansB);
+      svg.appendChild(mk('line',{x1:cx1,y1:cy1,x2:cx2,y2:cy2,'stroke':'#27AE60','stroke-width':2,'opacity':.7}));
+      const leg1=mk('text',{x:430,y:22,'font-size':10,'fill':'#E74C3C'});leg1.textContent='Your line';svg.appendChild(leg1);
+      const leg2=mk('text',{x:430,y:36,'font-size':10,'fill':'#27AE60'});leg2.textContent='HL answer';svg.appendChild(leg2);
+    }
+    // Data points
+    this.data.forEach(d=>{
+      const cx=this.xScale(d.x), cy=this.yScale(d.y);
+      svg.appendChild(mk('circle',{cx,cy,r:5,'fill':'#2980B9','stroke':'#fff','stroke-width':1.5}));
+    });
+    // Highlight high/low
+    svg.appendChild(mk('circle',{cx:this.xScale(467),cy:this.yScale(9094),r:7,'fill':'none','stroke':'#E74C3C','stroke-width':2}));
+    svg.appendChild(mk('circle',{cx:this.xScale(220),cy:this.yScale(6120),r:7,'fill':'none','stroke':'#F39C12','stroke-width':2}));
+    const ht=mk('text',{x:this.xScale(467)+9,y:this.yScale(9094)-6,'font-size':10,'fill':'#E74C3C'});ht.textContent='HIGH';svg.appendChild(ht);
+    const lt=mk('text',{x:this.xScale(220)+9,y:this.yScale(6120)-6,'font-size':10,'fill':'#F39C12'});lt.textContent='LOW';svg.appendChild(lt);
+  },
+  lockIn(){
+    if(this.locked) return;
+    const m=this.getM(), b=this.getB();
+    const mOk=Math.abs(m-this.ansM)<=0.5, bOk=Math.abs(b-this.ansB)<=200;
+    let pts=0, msg='';
+    if(mOk){pts+=150;} if(bOk){pts+=150;}
+    this.score+=pts;
+    this.locked=true;
+    document.getElementById('g2-m').disabled=true;
+    document.getElementById('g2-b').disabled=true;
+    document.getElementById('g2-score').textContent=this.score;
+    if(mOk&&bOk){
+      msg=`✅ Excellent! Slope ✓ Intercept ✓ +${pts} pts`;
+    } else if(mOk||bOk){
+      msg=`🟡 Partial credit +${pts} pts. HL answer: Y = $12.04X + $3,471.32`;
+    } else {
+      msg=`❌ Not quite. HL answer: Y = $12.04X + $3,471. Slope: (9094−6120)÷(467−220) = $12.04`;
+    }
+    document.getElementById('g2-result').innerHTML=`<div style="padding:8px 12px;background:${pts>0?'#D1FAE5':'#FEE2E2'};border-radius:6px;font-size:.85rem">${msg}</div>`;
+    this.draw();
+  },
+  checkPred(){
+    if(!this.locked){ alert('Lock in your slope & intercept first!'); return; }
+    if(this.predDone) return;
+    const v=parseFloat(document.getElementById('g2-pred').value);
+    const ans=7685.32;
+    const ok=Math.abs(v-ans)<=20;
+    const pts=ok?200:0;
+    this.score+=pts;
+    this.predDone=true;
+    document.getElementById('g2-score').textContent=this.score;
+    document.getElementById('g2-rrmsg').textContent=ok?
+      `✅ Correct! At 350 mugs: Y = $12.04(350) + $3,471 = $7,685. +200 pts` :
+      `❌ Not quite. Y = $12.04(350) + $3,471.32 = $7,685.32. Relevant range: 220–467 mugs.`;
+    document.getElementById('g2-rrmsg').style.color=ok?'var(--gr)':'var(--unf)';
+    if(this.score>0){
+      State.scores.g2=this.score; State.done.g2=true; State.save(); updateSB();
+      document.getElementById('g2-earned').textContent=this.score.toLocaleString()+' pts';
+      setTimeout(()=>document.getElementById('g2-done').classList.add('on'),600);
+    }
+  }
+};
+window.G2=G2;
+
+// ═══════════════════════════════════════════════
+//  GAME 3 — ABC TOWER
+// ═══════════════════════════════════════════════
+const G3 = {
+  score:0, placed:0, p2done:false,
+  items:[
+    {t:'Factory building depreciation',   a:'fa'},
+    {t:'General manager salary',           a:'fa'},
+    {t:'Factory property taxes',           a:'fa'},
+    {t:'Factory insurance',                a:'fa'},
+    {t:'Product design engineering',       a:'pr'},
+    {t:'Product-line advertising',         a:'pr'},
+    {t:'New product testing costs',        a:'pr'},
+    {t:'Machine setup per production run', a:'ba'},
+    {t:'Quality inspection per batch',     a:'ba'},
+    {t:'Moving ingredients to production', a:'ba'},
+    {t:'Cleaning between batches',         a:'ba'},
+    {t:'Direct materials (apples/jar)',    a:'un'},
+    {t:'Direct labor (workers making sauce)',a:'un'},
+    {t:'Indirect materials (hair nets)',   a:'un'},
+    {t:'Bottling/jarring labor',           a:'un'},
+  ],
+  drivers:[
+    {activity:'Move & Sort',       options:['Pounds of ingredients','Machine hours','# of inspections','DL hours'], correct:0},
+    {activity:'Cooking',           options:['Pounds of ingredients','Machine hours','# of inspections','DL hours'], correct:1},
+    {activity:'Quality Control',   options:['Pounds of ingredients','Machine hours','# of inspections','DL hours'], correct:2},
+    {activity:'Cleaning & Maint.', options:['Pounds of ingredients','Machine hours','# of inspections','DL hours'], correct:3},
+  ],
+  counts:{fa:0,pr:0,ba:0,un:0},
+  answers:{fa:4,pr:3,ba:4,un:4},
+
+  init(){
+    this.score=0; this.placed=0; this.p2done=false;
+    Object.keys(this.counts).forEach(k=>this.counts[k]=0);
+    document.getElementById('g3-done').classList.remove('on');
+    document.getElementById('g3-phase2').classList.add('hidden');
+    document.getElementById('g3-phase1').classList.remove('hidden');
+    document.getElementById('g3-score').textContent='0';
+    ['fa','pr','ba','un'].forEach(z=>{
+      document.getElementById('pl-'+z).innerHTML='';
+      document.getElementById('tf-'+z+'-ct').textContent='0 placed';
+    });
+    const pool=document.getElementById('g3-pool');
+    pool.innerHTML='';
+    this.items.forEach((item,i)=>{
+      const c=document.createElement('div');
+      c.className='acard'; c.textContent=item.t; c.dataset.idx=i;
+      initDrag(c,(el,target,cx,cy)=>{
+        if(el.classList.contains('gone')) return;
+        const zone=closest(target,'[data-zone]');
+        if(!zone) return;
+        const z=zone.dataset.zone;
+        const correct=this.items[parseInt(el.dataset.idx)].a===z;
+        if(correct){
+          el.classList.add('gone');
+          this.counts[z]++;
+          document.getElementById('tf-'+z+'-ct').textContent=this.counts[z]+' placed';
+          const tag=document.createElement('span');
+          tag.className='placed-tag'; tag.textContent=el.textContent;
+          document.getElementById('pl-'+z).appendChild(tag);
+          this.score+=75;
+          this.placed++;
+          document.getElementById('g3-score').textContent=this.score;
+          fb(true,'✅ Correct! +75 pts',cx,cy);
+          if(this.placed===this.items.length) setTimeout(()=>this.showPhase2(),500);
+        } else {
+          const labels={fa:'Facility',pr:'Product',ba:'Batch',un:'Unit'};
+          fb(false,`❌ Try again. Hint: ${this.getHint(parseInt(el.dataset.idx))}`,cx,cy);
+        }
+      });
+      pool.appendChild(c);
+    });
+    // Set up drop zones
+    ['fa','pr','ba','un'].forEach(z=>{
+      const dz=document.getElementById('dz-'+z);
+      dz.addEventListener('pointerover',()=>dz.classList.add('hover'));
+      dz.addEventListener('pointerout',()=>dz.classList.remove('hover'));
+    });
+  },
+
+  getHint(i){
+    const a=this.items[i].a;
+    const h={fa:'These costs are shared by the entire facility.',pr:'These costs are specific to a product line.',ba:'These costs are incurred for each batch of production.',un:'These costs attach to each individual unit.'};
+    return h[a]||'';
+  },
+
+  showPhase2(){
+    document.getElementById('g3-phase1').classList.add('hidden');
+    document.getElementById('g3-phase2').classList.remove('hidden');
+    const grid=document.getElementById('g3-dm');
+    grid.innerHTML='';
+    this.drivers.forEach((d,i)=>{
+      const row=document.createElement('div');
+      row.className='dm-row';
+      const opts=d.options.map((o,oi)=>`<option value="${oi}">${o}</option>`).join('');
+      row.innerHTML=`
+        <div class="dm-act">${d.activity}</div>
+        <div style="text-align:center;color:var(--tm)">→</div>
+        <select class="dm-sel" id="dm-${i}"><option value="">Select driver...</option>${opts}</select>`;
+      grid.appendChild(row);
+    });
+  },
+
+  checkDrivers(){
+    if(this.p2done) return;
+    let pts=0;
+    let allDone=true;
+    this.drivers.forEach((d,i)=>{
+      const sel=document.getElementById('dm-'+i);
+      if(!sel.value){ allDone=false; return; }
+      const ok=parseInt(sel.value)===d.correct;
+      sel.className='dm-sel '+(ok?'ok':'bad');
+      if(ok) pts+=100;
+    });
+    if(!allDone){ alert('Please select a driver for every activity.'); return; }
+    this.p2done=true;
+    this.score+=pts;
+    document.getElementById('g3-score').textContent=this.score;
+    State.scores.g3=this.score; State.done.g3=true; State.save(); updateSB();
+    document.getElementById('g3-earned').textContent=this.score.toLocaleString()+' pts';
+    setTimeout(()=>document.getElementById('g3-done').classList.add('on'),600);
+  }
+};
+window.G3=G3;
+
+// ═══════════════════════════════════════════════
+//  GAME 4 — VARIANCE ANALYSIS (+ Three.js)
+// ═══════════════════════════════════════════════
+const G4 = {
+  score:0, mcqAns:{1:false,2:false,3:false}, mcqDone:{1:false,2:false,3:false}, drillDone:false,
+  fbAns:[2400,9600,2880,552,2400,1200],
+  chartCleanup:null,
+
+  init(){
+    this.score=0;
+    Object.keys(this.mcqAns).forEach(k=>{this.mcqAns[k]=false;this.mcqDone[k]=false;});
+    this.drillDone=false;
+    document.getElementById('g4-done').classList.remove('on');
+    document.getElementById('g4-score').textContent='0';
+    document.getElementById('g4-p1').classList.remove('hidden');
+    document.getElementById('g4-p2').classList.add('hidden');
+    document.getElementById('g4-p3').classList.add('hidden');
+    document.getElementById('g4-p4').classList.add('hidden');
+    document.getElementById('g4-p3-btn').classList.add('hidden');
+    // Reset inputs
+    for(let i=0;i<6;i++){
+      const v=document.getElementById('v'+i);
+      v.value=''; v.className='vi'; v.disabled=false;
+    }
+    ['v-pv','v-ev'].forEach(id=>{const e=document.getElementById(id);e.value='';e.className='vc-amt';});
+    ['v-pvfu','v-evfu'].forEach(id=>{const e=document.getElementById(id);e.value='';e.className='vc-sel';});
+    document.getElementById('g4-drill-result').innerHTML='';
+    document.querySelectorAll('#g4-p3 .mo').forEach(m=>{m.className='mo';});
+    if(this.chartCleanup){ this.chartCleanup(); this.chartCleanup=null; }
+    document.getElementById('g4chart').innerHTML='';
+  },
+
+  checkTable(){
+    const answers=this.fbAns;
+    let pts=0;
+    for(let i=0;i<6;i++){
+      const inp=document.getElementById('v'+i);
+      const v=parseFloat(inp.value.replace(/[$,]/g,''));
+      const ok=Math.abs(v-answers[i])<=1;
+      inp.className='vi '+(ok?'ok':'bad');
+      if(ok){ pts+=50; inp.disabled=true; }
+    }
+    this.score+=pts;
+    document.getElementById('g4-score').textContent=this.score;
+    const allOk=[...Array(6)].every((_,i)=>{
+      const v=parseFloat(document.getElementById('v'+i).value.replace(/[$,]/g,''));
+      return Math.abs(v-answers[i])<=1;
+    });
+    if(allOk){
+      setTimeout(()=>{ document.getElementById('g4-p1').classList.add('hidden'); this.showChart(); },400);
+    } else {
+      const wrong=answers.filter((_,i)=>{
+        const v=parseFloat(document.getElementById('v'+i).value.replace(/[$,]/g,''));
+        return Math.abs(v-answers[i])>1;
+      });
+      if(pts===0){
+        alert('Hint: For variable items, multiply the Master Budget amount by (2,400÷2,800). Fixed MOH stays at $1,200.');
+      }
+    }
+  },
+
+  async showChart(){
+    document.getElementById('g4-p2').classList.remove('hidden');
+    window.scrollTo(0,0);
+    await this.initThreeChart();
+  },
+
+  async initThreeChart(){
+    const container=document.getElementById('g4chart');
+    if(!container) return;
+    try {
+      const THREE = await import('three');
+      const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+      const W=container.clientWidth||700, H=container.clientHeight||360;
+      const renderer=new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize(W,H);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      container.appendChild(renderer.domElement);
+      const scene=new THREE.Scene();
+      scene.background=new THREE.Color(0x1a252f);
+      const camera=new THREE.PerspectiveCamera(45,W/H,.1,200);
+      camera.position.set(0,10,18);
+      camera.lookAt(0,2,0);
+      const controls=new OrbitControls(camera,renderer.domElement);
+      controls.enableDamping=true; controls.dampingFactor=.06;
+      controls.minDistance=8; controls.maxDistance=30;
+      scene.add(new THREE.AmbientLight(0xffffff,.7));
+      const dl=new THREE.DirectionalLight(0xffffff,.8);
+      dl.position.set(5,12,8); scene.add(dl);
+      const grid=new THREE.GridHelper(24,24,0x263547,0x1e2d3a);
+      scene.add(grid);
+      // Bar data: Revenue, DM Total, DL, Fixed MOH
+      const cats=['Revenue','DM Total','DL','Fixed MOH'];
+      const mb=[11200,4004,2800,1200];
+      const fb2=[9600,3432,2400,1200];
+      const ac=[9600,3617,2520,1200];
+      const SCALE=0.00085;
+      const groups=[
+        {vals:mb,  color:0x2980B9, xOff:-1.3, name:'MB'},
+        {vals:fb2, color:0xF39C12, xOff:0,    name:'FB'},
+        {vals:ac,  color:0x27AE60, xOff:1.3,  name:'Actual'},
+      ];
+      const bars=[];
+      const spacing=4;
+      groups.forEach(({vals,color,xOff})=>{
+        vals.forEach((val,ci)=>{
+          const h=val*SCALE;
+          const geo=new THREE.BoxGeometry(0.9,h,0.9);
+          const mat=new THREE.MeshPhongMaterial({color});
+          const mesh=new THREE.Mesh(geo,mat);
+          mesh.position.set(xOff+(ci-1.5)*spacing, 0, 0);
+          mesh.scale.y=0.001;
+          scene.add(mesh);
+          bars.push({mesh,targetH:h,xPos:xOff+(ci-1.5)*spacing});
+        });
+      });
+      const start=performance.now();
+      let rafId;
+      const animate=()=>{
+        rafId=requestAnimationFrame(animate);
+        controls.update();
+        const t=Math.min((performance.now()-start)/1600,1);
+        const e=1-Math.pow(1-t,3);
+        bars.forEach(b=>{
+          b.mesh.scale.y=Math.max(e,0.001);
+          b.mesh.position.y=(b.targetH*e)/2;
+        });
+        renderer.render(scene,camera);
+      };
+      animate();
+      const ro=new ResizeObserver(()=>{
+        const w=container.clientWidth,h=container.clientHeight;
+        if(!w||!h) return;
+        camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);
+      });
+      ro.observe(container);
+      this.chartCleanup=()=>{cancelAnimationFrame(rafId);ro.disconnect();renderer.dispose();};
+    } catch(e){
+      container.innerHTML='<div style="color:#fff;padding:20px;text-align:center">3D chart requires a modern browser.<br>Continue to the variance diagnosis below.</div>';
+    }
+  },
+
+  showP3(){ document.getElementById('g4-p2').classList.add('hidden'); document.getElementById('g4-p3').classList.remove('hidden'); },
+
+  mcq(el, val, qn){
+    if(this.mcqDone[qn]) return;
+    document.querySelectorAll(`#g4-p3 .mcq-box:nth-child(${qn}) .mo`).forEach(m=>m.classList.remove('sel'));
+    el.classList.add('sel');
+    const correct={1:'sav',2:'U',3:'1600U'};
+    const isOk=val===correct[qn];
+    el.classList.add(isOk?'ok':'bad');
+    if(isOk){
+      this.score+=100; this.mcqAns[qn]=true;
+      document.getElementById('g4-score').textContent=this.score;
+    }
+    this.mcqDone[qn]=true;
+    const allDone=Object.values(this.mcqDone).every(Boolean);
+    if(allDone) document.getElementById('g4-p3-btn').classList.remove('hidden');
+  },
+
+  showP4(){ document.getElementById('g4-p3').classList.add('hidden'); document.getElementById('g4-p4').classList.remove('hidden'); },
+
+  checkDrill(){
+    if(this.drillDone) return;
+    const pvAmt=parseFloat(document.getElementById('v-pv').value);
+    const pvFU=document.getElementById('v-pvfu').value;
+    const evAmt=parseFloat(document.getElementById('v-ev').value);
+    const evFU=document.getElementById('v-evfu').value;
+    // PV = (AP-SP)×AQ = (0.15-0.20)×19600 = -980 → $980 Favorable
+    // EV = (AQ-SQ)×SP = (19600-16800)×0.20 = 560 → $560 Unfavorable
+    const pvOk=Math.abs(pvAmt-980)<=5 && pvFU==='F';
+    const evOk=Math.abs(evAmt-560)<=5 && evFU==='U';
+    document.getElementById('v-pv').className='vc-amt '+(pvOk?'ok':'bad');
+    document.getElementById('v-pvfu').className='vc-sel '+(pvOk?'ok':'bad');
+    document.getElementById('v-ev').className='vc-amt '+(evOk?'ok':'bad');
+    document.getElementById('v-evfu').className='vc-sel '+(evOk?'ok':'bad');
+    let pts=(pvOk?150:0)+(evOk?150:0);
+    if(pvOk&&evOk){ pts+=250; }
+    this.score+=pts;
+    this.drillDone=true;
+    document.getElementById('g4-score').textContent=this.score;
+    const res=document.getElementById('g4-drill-result');
+    res.innerHTML=`<div style="padding:10px;background:${pts>0?'#D1FAE5':'#FEE2E2'};border-radius:6px;font-size:.85rem">
+      PV = (AP−SP)×AQ = ($0.15−$0.20)×19,600 = <strong>$980 Favorable</strong> (bought cheaper than standard)<br>
+      EV = (AQ−SQ)×SP = (19,600−16,800)×$0.20 = <strong>$560 Unfavorable</strong> (used more apples than standard)<br>
+      Net = $980F − $560U = <strong>$420 Favorable</strong><br>
+      +${pts} pts earned</div>`;
+    State.scores.g4=this.score; State.done.g4=true; State.save(); updateSB();
+    document.getElementById('g4-earned').textContent=this.score.toLocaleString()+' pts';
+    setTimeout(()=>document.getElementById('g4-done').classList.add('on'),800);
+  }
+};
+window.G4=G4;
+
+// ═══════════════════════════════════════════════
+//  GAME 5 — CAPITAL BUDGETING
+// ═══════════════════════════════════════════════
+const G5 = {
+  score:0, s5done:false, investDone:false,
+  init(){
+    this.score=0; this.s5done=false; this.investDone=false;
+    document.getElementById('g5-done').classList.remove('on');
+    document.getElementById('g5-npv-result').classList.remove('on');
+    document.getElementById('g5-invest').classList.add('hidden');
+    document.getElementById('g5-score').textContent='0';
+    for(let i=1;i<=6;i++){
+      const inp=document.getElementById('s'+i+'-inp');
+      if(inp){ inp.value=''; inp.className='s-inp'; inp.disabled=false; }
+      const res=document.getElementById('s'+i+'-res');
+      if(res){ res.className='s-result'; res.innerHTML=''; }
+      document.getElementById('s'+i).classList.remove('done');
+    }
+    document.querySelectorAll('.mc-opt').forEach(m=>m.className='mc-opt');
+  },
+  check(stepNum, answer, explanation){
+    const inp=document.getElementById('s'+stepNum+'-inp');
+    if(!inp||inp.disabled) return;
+    const v=parseFloat(inp.value);
+    const ok=Math.abs(v-answer)<=answer*0.02+10; // 2% tolerance
+    inp.className='s-inp '+(ok?'ok':'bad');
+    if(ok){
+      inp.disabled=true;
+      this.score+=100;
+      document.getElementById('g5-score').textContent=this.score;
+      document.getElementById('s'+stepNum).classList.add('done');
+      document.getElementById('s'+stepNum+'-res').className='s-result on';
+      document.getElementById('s'+stepNum+'-res').innerHTML=`✅ ${explanation}`;
+      if(stepNum===6) setTimeout(()=>document.getElementById('g5-invest').classList.remove('hidden'),400);
+    } else {
+      document.getElementById('s'+stepNum+'-res').className='s-result on';
+      document.getElementById('s'+stepNum+'-res').innerHTML=`❌ Not quite. Expected: $${answer.toLocaleString()}. Check your formula.`;
+      document.getElementById('s'+stepNum+'-res').style.background='#FEE2E2';
+      document.getElementById('s'+stepNum+'-res').style.color='#991B1B';
+    }
+  },
+  mcOpt(el,isCorrect){
+    if(this.s5done) return;
+    if(!isCorrect){ el.classList.add('bad'); return; }
+    el.classList.add('ok');
+    this.s5done=true;
+    this.score+=100;
+    document.getElementById('g5-score').textContent=this.score;
+    document.getElementById('s5-res').className='s-result on';
+    document.getElementById('s5-res').innerHTML='✅ Correct! PVA factor for 8 years at 6% = 6.210 (from present value annuity tables)';
+    document.getElementById('s5').classList.add('done');
+  },
+  invest(el,isCorrect){
+    if(this.investDone) return;
+    this.investDone=true;
+    el.classList.add(isCorrect?'ok':'bad');
+    if(isCorrect){
+      this.score+=200;
+      document.getElementById('g5-score').textContent=this.score;
+      document.getElementById('g5-npv-result').classList.add('on');
+    } else {
+      el.textContent+=' — When NPV > 0 and IRR > required return, the investment creates value.';
+    }
+    State.scores.g5=this.score; State.done.g5=true; State.save(); updateSB();
+    document.getElementById('g5-earned').textContent=this.score.toLocaleString()+' pts';
+    setTimeout(()=>document.getElementById('g5-done').classList.add('on'),isCorrect?600:200);
+  }
+};
+window.G5=G5;
+
+// ═══════════════════════════════════════════════
+//  GAME 6 — BALANCED SCORECARD
+// ═══════════════════════════════════════════════
+const G6 = {
+  score:0, placed:0,
+  kpis:[
+    {t:'Revenue growth rate',         q:'fin'},
+    {t:'Return on investment (ROI)',   q:'fin'},
+    {t:'Cost per unit produced',       q:'fin'},
+    {t:'Operating income margin',      q:'fin'},
+    {t:'Customer satisfaction score',  q:'cus'},
+    {t:'Customer retention rate',      q:'cus'},
+    {t:'On-time delivery rate',        q:'cus'},
+    {t:'Market share percentage',      q:'cus'},
+    {t:'Defects per batch',            q:'int'},
+    {t:'Production cycle time',        q:'int'},
+    {t:'Inventory turnover',           q:'int'},
+    {t:'Equipment downtime hours',     q:'int'},
+    {t:'Employee training hours',      q:'lea'},
+    {t:'Employee satisfaction score',  q:'lea'},
+    {t:'New product development rate', q:'lea'},
+    {t:'Employee turnover rate',       q:'lea'},
+  ],
+
+  init(){
+    this.score=0; this.placed=0;
+    document.getElementById('g6-done').classList.remove('on');
+    document.getElementById('g6-score').textContent='0';
+    ['fin','cus','int','lea'].forEach(q=>document.getElementById('pc-'+q).innerHTML='');
+    const pool=document.getElementById('g6-pool');
+    pool.innerHTML='';
+    this.kpis.forEach((k,i)=>{
+      const c=document.createElement('div');
+      c.className='kc'; c.textContent=k.t; c.dataset.idx=i;
+      initDrag(c,(el,target,cx,cy)=>{
+        if(el.classList.contains('gone')) return;
+        const quad=closest(target,'[data-q]');
+        if(!quad) return;
+        const q=quad.dataset.q;
+        const correct=this.kpis[parseInt(el.dataset.idx)].q===q;
+        if(correct){
+          el.classList.add('gone');
+          this.score+=75; this.placed++;
+          document.getElementById('g6-score').textContent=this.score;
+          const chip=document.createElement('span');
+          chip.className='pchip'; chip.textContent=el.textContent;
+          document.getElementById('pc-'+q).appendChild(chip);
+          fb(true,'✅ +75 pts',cx,cy);
+        } else {
+          const labels={fin:'Financial',cus:'Customer',int:'Internal Process',lea:'Learning & Growth'};
+          fb(false,`❌ Try again — which perspective fits "${el.textContent}"?`,cx,cy);
+        }
+      });
+      pool.appendChild(c);
+    });
+    // Drop zones
+    ['fin','cus','int','lea'].forEach(q=>{
+      const quad=document.getElementById('bq-'+q);
+      quad.addEventListener('pointerover',()=>quad.classList.add('hover'));
+      quad.addEventListener('pointerout',()=>quad.classList.remove('hover'));
+    });
+    this.updateTP();
+  },
+
+  updateTP(){
+    const tp=parseFloat(document.getElementById('g6tp').value);
+    document.getElementById('g6-tp-lbl').textContent='$'+tp.toFixed(2);
+    const asmIncome=tp-5;
+    const distIncome=12-tp;
+    document.getElementById('tp-asm').textContent='$'+asmIncome.toFixed(2);
+    document.getElementById('tp-dist').textContent='$'+distIncome.toFixed(2);
+    const insight=document.getElementById('g6-tp-insight');
+    if(tp===5) insight.textContent='⚠️ Transfer price = variable cost. Assembly earns $0 — no incentive to transfer!';
+    else if(tp===12) insight.textContent='⚠️ Transfer price = market price. Distribution earns $0 — no incentive to buy internally!';
+    else if(tp<8.5) insight.textContent='💡 Transfer price favors Distribution — Assembly earns less than Distribution.';
+    else if(tp>8.5) insight.textContent='💡 Transfer price favors Assembly — Assembly earns more than Distribution.';
+    else insight.textContent='✅ Equal split — Assembly and Distribution each earn $3.50 per chair.';
+  },
+
+  finish(){
+    if(this.placed<this.kpis.length){
+      const rem=this.kpis.length-this.placed;
+      if(!confirm(`${rem} KPI cards still unplaced. Finish anyway?`)) return;
+    }
+    State.scores.g6=this.score; State.done.g6=true; State.save(); updateSB();
+    document.getElementById('g6-earned').textContent=this.score.toLocaleString()+' pts';
+    document.getElementById('g6-done').classList.add('on');
+  }
+};
+window.G6=G6;
+
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+State.load();
+updateSB();
+updateHubCards();
+</script>
+</body>
+</html>
