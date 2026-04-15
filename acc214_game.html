@@ -940,6 +940,7 @@ const G1 = {
 
   init(){
     this.round=0; this.idx=0; this.score=0; this.streak=0;
+    this._token=0; this._ac=null;
     document.getElementById('g1-done').classList.remove('on');
     document.getElementById('g1-score').textContent='0';
     this.loadRound();
@@ -966,11 +967,13 @@ const G1 = {
   showCard(){
     const r=this.rounds[this.round];
     if(this.idx>=r.items.length){ this.nextRound(); return; }
-    const item=r.items[this.idx];  // captured in closure below
+    const item=r.items[this.idx];       // item captured in closures below
+    const token = ++this._token;        // unique token for THIS card — stale closures will fail the check
+
     document.getElementById('g1-counter').textContent=`Card ${this.idx+1} of ${r.items.length}`;
     document.getElementById('g1-streak').textContent=this.streak>=3?`🔥 Streak ×${this.streak>=5?2:1.5}!`:'';
 
-    // Abort ALL previous listeners on this card before adding new ones
+    // Kill every listener the previous card registered
     if(this._ac){ this._ac.abort(); }
     this._ac = new AbortController();
     const sig = this._ac.signal;
@@ -998,11 +1001,23 @@ const G1 = {
       updateDragPos(e);
     }, {signal:sig});
 
+    // pointercancel: clean up dangling clone/state if drag is interrupted
+    card.addEventListener('pointercancel', ()=>{
+      dragClone?.remove(); dragClone=null;
+      card.classList.remove('drag-ghost');
+      dragEl=null;
+    }, {signal:sig});
+
     card.addEventListener('pointerup', e=>{
       if(dragEl!==card) return;
       dragClone?.remove(); dragClone=null;
       card.classList.remove('drag-ghost');
       dragEl=null;
+
+      // Token guard: if showCard() was already called for the next card,
+      // this._token will have advanced — discard the stale event entirely.
+      if(this._token !== token) return;
+
       const under=document.elementFromPoint(e.clientX, e.clientY);
       const bin=closest(under,'.bin');
       if(!bin) return;
