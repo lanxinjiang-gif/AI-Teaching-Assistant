@@ -969,10 +969,13 @@ const G1 = {
     const item=r.items[this.idx];
     document.getElementById('g1-counter').textContent=`Card ${this.idx+1} of ${r.items.length}`;
     document.getElementById('g1-streak').textContent=this.streak>=3?`🔥 Streak ×${this.streak>=5?2:1.5}!`:'';
-    const card=document.getElementById('g1-card');
+    // Clone the card to remove all accumulated event listeners from previous cards
+    const oldCard=document.getElementById('g1-card');
+    const card=oldCard.cloneNode(false);
+    card.id='g1-card';
+    oldCard.parentNode.replaceChild(card,oldCard);
     card.textContent=item.t;
     card.style.borderColor='var(--bd)';
-    const r2=this.rounds[this.round];
     initDrag(card,(el,target,cx,cy)=>{
       const bin=closest(target,'.bin');
       if(!bin){ return; }
