@@ -966,37 +966,64 @@ const G1 = {
   showCard(){
     const r=this.rounds[this.round];
     if(this.idx>=r.items.length){ this.nextRound(); return; }
-    const item=r.items[this.idx];
+    const item=r.items[this.idx];  // captured in closure below
     document.getElementById('g1-counter').textContent=`Card ${this.idx+1} of ${r.items.length}`;
     document.getElementById('g1-streak').textContent=this.streak>=3?`🔥 Streak ×${this.streak>=5?2:1.5}!`:'';
-    // Clone the card to remove all accumulated event listeners from previous cards
-    const oldCard=document.getElementById('g1-card');
-    const card=oldCard.cloneNode(false);
-    card.id='g1-card';
-    oldCard.parentNode.replaceChild(card,oldCard);
-    card.textContent=item.t;
-    card.style.borderColor='var(--bd)';
-    initDrag(card,(el,target,cx,cy)=>{
-      const bin=closest(target,'.bin');
-      if(!bin){ return; }
-      const isOk = bin.id===item.a;
+
+    // Abort ALL previous listeners on this card before adding new ones
+    if(this._ac){ this._ac.abort(); }
+    this._ac = new AbortController();
+    const sig = this._ac.signal;
+
+    const card = document.getElementById('g1-card');
+    card.textContent = item.t;
+    card.style.borderColor = 'var(--bd)';
+
+    card.addEventListener('pointerdown', e=>{
+      if(e.button && e.button!==0) return;
+      e.preventDefault();
+      dragEl=card; card.classList.add('drag-ghost');
+      dragClone=card.cloneNode(true);
+      dragClone.className='drag-clone ccard';
+      dragClone.style.width=card.offsetWidth+'px';
+      const rc=card.getBoundingClientRect();
+      dragOffX=e.clientX-rc.left; dragOffY=e.clientY-rc.top;
+      updateDragPos(e);
+      document.body.appendChild(dragClone);
+      card.setPointerCapture(e.pointerId);
+    }, {signal:sig});
+
+    card.addEventListener('pointermove', e=>{
+      if(dragEl!==card) return;
+      updateDragPos(e);
+    }, {signal:sig});
+
+    card.addEventListener('pointerup', e=>{
+      if(dragEl!==card) return;
+      dragClone?.remove(); dragClone=null;
+      card.classList.remove('drag-ghost');
+      dragEl=null;
+      const under=document.elementFromPoint(e.clientX, e.clientY);
+      const bin=closest(under,'.bin');
+      if(!bin) return;
+      const isOk=bin.id===item.a;
       if(isOk){
         this.streak++;
         const mult=this.streak>=5?2:this.streak>=3?1.5:1;
         const pts=Math.round(100*mult);
         this.score+=pts;
         document.getElementById('g1-score').textContent=this.score;
-        fb(true,`✅ Correct! +${pts} pts — ${item.hint}`,cx,cy);
+        fb(true,`✅ Correct! +${pts} pts — ${item.hint}`,e.clientX,e.clientY);
         if(window.gsap) gsap.from(card,{scale:1.15,duration:.2});
       } else {
         this.streak=0;
         this.score=Math.max(0,this.score-25);
         document.getElementById('g1-score').textContent=this.score;
-        fb(false,`❌ Not quite. ${item.hint}`,cx,cy);
+        fb(false,`❌ Not quite. ${item.hint}`,e.clientX,e.clientY);
       }
       this.idx++;
-      setTimeout(()=>this.showCard(),400);
-    });
+      setTimeout(()=>this.showCard(), 400);
+    }, {signal:sig});
   },
 
   nextRound(){
