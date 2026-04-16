@@ -11,56 +11,170 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --pr:#2C3E50;--pr2:#34495E;--ac:#E74C3C;--gr:#27AE60;--bl:#3498DB;
-  --or:#F39C12;--gy:#95A5A6;--fav:#2ECC71;--unf:#E74C3C;
-  --bg:#ECF0F1;--cb:#fff;--bd:#BDC3C7;--tx:#2C3E50;--tm:#7F8C8D;
-  --sh:0 4px 20px rgba(0,0,0,.12);--ss:0 2px 8px rgba(0,0,0,.08);
+  --bg:#0d1117;--cb:#161b22;--bd:#30363d;--tx:#e6edf3;--tm:#8b949e;
+  --pr:#1f6feb;--pr2:#388bfd;--ac:#f0a500;--ok:#3fb950;--bad:#f85149;
+  --fav:#3fb950;--unf:#f85149;--gr:#3fb950;--bl:#58a6ff;--or:#d29922;
+  --sh:0 4px 20px rgba(0,0,0,.5);--ss:0 2px 8px rgba(0,0,0,.4);
   --r:12px;--r2:8px
 }
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-top:56px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-top:60px}
+
+/* ── FLASH ── */
+#flash{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0}
+
+/* ── MISSION OVERLAY ── */
+#mo{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.92);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#mo.hidden{display:none}
+.mo-card{background:var(--cb);border:1px solid var(--bd);border-radius:20px;
+  padding:36px 44px;max-width:520px;width:90%;text-align:center;
+  box-shadow:0 0 80px rgba(240,165,0,.18)}
+.mo-char{font-size:4rem;line-height:1;margin-bottom:8px;
+  animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.mo-name{font-size:1.1rem;font-weight:800;color:var(--ac);margin-bottom:2px}
+.mo-dept{font-size:.78rem;color:var(--tm);margin-bottom:18px;text-transform:uppercase;letter-spacing:.6px}
+.mo-text{font-size:.92rem;line-height:1.7;color:var(--tx);min-height:90px;margin-bottom:22px;text-align:left}
+.mo-cursor{display:inline-block;width:2px;height:1em;background:var(--ac);
+  margin-left:2px;vertical-align:text-bottom;animation:blink .7s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.mo-btns{display:flex;gap:10px;justify-content:center}
+.mo-btns button{padding:10px 22px;border-radius:8px;border:none;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s}
+#mo-start{background:var(--ac);color:#0d1117}
+#mo-start:hover{background:#ffc107;transform:scale(1.04)}
+#mo-skip{background:transparent;color:var(--tm);border:1px solid var(--bd)}
+#mo-skip:hover{color:var(--tx)}
+
+/* ── COMPLETE OVERLAY ── */
+#co{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.88);
+  display:flex;align-items:center;justify-content:center}
+#co.hidden{display:none}
+.co-card{background:var(--cb);border:1px solid var(--bd);border-radius:20px;
+  padding:36px 44px;max-width:440px;width:90%;text-align:center;
+  box-shadow:0 0 80px rgba(63,185,80,.18)}
+.co-title{font-size:1.4rem;font-weight:800;margin-bottom:4px;color:var(--tx)}
+.co-sub{font-size:.82rem;color:var(--tm);margin-bottom:22px}
+.co-stars{display:flex;justify-content:center;gap:10px;margin-bottom:18px}
+.star{font-size:2.8rem;opacity:.15;filter:grayscale(1);transition:all .3s}
+.star.lit{opacity:1;filter:none;text-shadow:0 0 20px #f0a500}
+.co-score{font-size:2rem;font-weight:800;color:var(--ac);margin-bottom:4px}
+.co-max{font-size:.82rem;color:var(--tm);margin-bottom:22px}
+.co-hub{background:var(--ac);color:#0d1117;border:none;border-radius:8px;
+  padding:11px 28px;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .15s}
+.co-hub:hover{background:#ffc107;transform:scale(1.04)}
 
 /* ── SCORE BAR ── */
-#sb{position:fixed;top:0;left:0;right:0;height:56px;background:var(--pr);color:#fff;
+#sb{position:fixed;top:0;left:0;right:0;height:60px;
+  background:linear-gradient(180deg,#1c2128,#0d1117);color:#fff;
   display:flex;align-items:center;padding:0 20px;gap:12px;z-index:1000;
-  box-shadow:0 2px 8px rgba(0,0,0,.3)}
-#sb .brand{font-weight:700;font-size:.95rem;white-space:nowrap}
-#sb .brand b{color:var(--ac)}
-#sb .si{margin-left:auto;display:flex;gap:16px;align-items:center;font-size:.85rem}
-#sb .ts{font-size:1.05rem;font-weight:700;color:#F1C40F}
-#sb .pr{opacity:.75}
-#btnHub{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:5px 13px;
-  font-size:.82rem;font-weight:700;cursor:pointer;display:none}
-#btnHub:hover{background:#C0392B}
+  border-bottom:1px solid var(--bd)}
+.brand{font-weight:800;font-size:.95rem;white-space:nowrap}
+.brand b{color:var(--ac)}
+#combo-wrap{display:flex;align-items:center;gap:6px}
+#combo-bar{width:64px;height:7px;background:#21262d;border-radius:4px;overflow:hidden}
+#combo-fill{height:100%;width:0%;background:var(--ac);border-radius:4px;transition:width .3s}
+#combo-label{font-size:.75rem;font-weight:800;color:var(--ac);min-width:20px}
+.si{margin-left:auto;display:flex;gap:14px;align-items:center;font-size:.85rem}
+.ts{font-size:1.05rem;font-weight:800;color:var(--ac)}
+.pr-txt{opacity:.65}
+#btnHub{background:var(--pr);color:#fff;border:none;border-radius:6px;padding:5px 13px;
+  font-size:.82rem;font-weight:700;cursor:pointer;display:none;transition:background .15s}
+#btnHub:hover{background:var(--pr2)}
+
+/* ── SCORE POPUP ── */
+.score-pop{position:fixed;z-index:3000;font-size:1.4rem;font-weight:900;pointer-events:none;
+  color:var(--ac);text-shadow:0 0 12px rgba(240,165,0,.6)}
+
+/* ── CHARACTER HUD ── */
+#char-hud{position:fixed;bottom:20px;right:20px;z-index:900;
+  display:none;align-items:flex-end;gap:10px;pointer-events:none}
+.ch-portrait{width:72px;height:72px;border-radius:50%;
+  background:var(--cb);border:2px solid var(--ac);
+  font-size:2.4rem;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(240,165,0,.35);flex-shrink:0}
+.ch-bubble{background:var(--cb);border:1px solid var(--bd);border-radius:12px 12px 2px 12px;
+  padding:10px 13px;max-width:220px;font-size:.8rem;line-height:1.5;
+  color:var(--tx);box-shadow:var(--sh);position:relative}
+.ch-bubble::after{content:'';position:absolute;bottom:12px;right:-7px;
+  border:7px solid transparent;border-left-color:var(--bd)}
+.ch-bubble::before{content:'';position:absolute;bottom:13px;right:-5px;
+  border:6px solid transparent;border-left-color:var(--cb);z-index:1}
+.ch-name{font-size:.68rem;font-weight:800;color:var(--ac);margin-bottom:4px;display:block;
+  text-transform:uppercase;letter-spacing:.5px}
+
+/* ── HUB REDESIGN ── */
+.hub-alert{font-size:.72rem;font-weight:800;color:var(--bad);letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:10px;
+  animation:pa 1.6s ease-in-out infinite}
+@keyframes pa{0%,100%{opacity:1}50%{opacity:.35}}
+.hub-h h1{font-size:2.4rem;font-weight:900;letter-spacing:-.5px}
+.hub-xp-wrap{margin-top:14px;max-width:400px;margin-inline:auto}
+.hub-xp-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--tm);margin-bottom:6px}
+.hub-xp-bar{height:10px;background:#21262d;border-radius:5px;overflow:hidden;border:1px solid var(--bd)}
+.hub-xp-fill{height:100%;background:linear-gradient(90deg,var(--pr),var(--ac));
+  border-radius:5px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.dc.pulse{animation:cardPulse 2.4s ease-in-out infinite}
+@keyframes cardPulse{0%,100%{box-shadow:0 0 0 0 rgba(240,165,0,0)}60%{box-shadow:0 0 0 6px rgba(240,165,0,.18)}}
+/* hub background: dark grid */
+#hub{background-image:radial-gradient(circle,#21262d 1px,transparent 1px);
+  background-size:32px 32px}
+
+/* ── TERMINAL OBJECTIVE BOX ── */
+.ib{background:#080f0a;border:1px solid #1a3a20;border-left:3px solid var(--ok);
+  border-radius:var(--r2);padding:14px 16px;margin-bottom:18px;font-size:.84rem;
+  line-height:1.7;color:#7ee787;font-family:'Courier New',monospace;
+  position:relative;overflow:hidden}
+.ib::before{content:'▶ OBJECTIVE  ';font-weight:800;color:var(--ac);font-size:.75rem;
+  letter-spacing:1px;display:block;margin-bottom:5px}
+.ib strong{color:#fff;font-weight:700}
+
+/* ── MISSION STATUS BADGE ── */
+.ms-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  border-radius:6px;font-size:.72rem;font-weight:800;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:16px;border:1px solid}
+.ms-active{background:#0d2149;color:var(--bl);border-color:var(--bl)}
+.ms-phase{background:#21262d;color:var(--ac);border-color:var(--ac);font-size:.7rem}
+.ph-badge{background:var(--pr);color:#fff;border-radius:6px;padding:3px 11px;
+  font-size:.72rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
 
 /* ── SCREENS ── */
-.scr{display:none;min-height:calc(100vh - 56px);padding:20px}
-.scr.on{display:block}
+.scr{display:none;min-height:calc(100vh - 60px);padding:20px}
+.scr.on{display:block;animation:screenIn .3s ease-out}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* subtle dot-grid background on game screens */
+#g1,#g2,#g3,#g4,#g5,#g6{
+  background-image:radial-gradient(circle,#21262d 1px,transparent 1px);
+  background-size:28px 28px;
+  background-position:0 0}
 
 /* ── HUB ── */
 #hub{max-width:1080px;margin:0 auto}
-.hub-h{text-align:center;margin-bottom:32px}
-.hub-h h1{font-size:2rem;font-weight:800;color:var(--pr)}
+.hub-h{text-align:center;margin-bottom:32px;padding-top:6px}
+.hub-h h1{font-size:2rem;font-weight:900;color:var(--tx)}
 .hub-h h1 b{color:var(--ac)}
 .hub-h p{color:var(--tm);margin-top:6px}
-.hub-tot{display:inline-flex;align-items:center;gap:8px;background:var(--pr);color:#fff;
+.hub-tot{display:inline-flex;align-items:center;gap:8px;
+  background:#1c2128;border:1px solid var(--bd);color:var(--tx);
   padding:7px 18px;border-radius:20px;margin-top:10px;font-weight:600}
-.hub-tot .v{color:#F1C40F;font-size:1.15rem}
+.hub-tot .v{color:var(--ac);font-size:1.15rem;font-weight:800}
 .dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
-.dc{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:22px;cursor:pointer;
-  transition:transform .2s,box-shadow .2s;border:2px solid transparent;position:relative}
-.dc:hover{transform:translateY(-4px);box-shadow:var(--sh);border-color:var(--pr)}
-.dc.done{border-color:var(--fav)}
-.dc.done::after{content:'✓';position:absolute;top:12px;right:14px;color:var(--fav);font-size:1.1rem;font-weight:700}
-.dc .ico{font-size:2.2rem;margin-bottom:10px}
-.dc .dn{font-size:1rem;font-weight:700;color:var(--pr)}
-.dc .dt{font-size:.82rem;color:var(--tm);margin:3px 0 10px}
-.sbar{background:var(--bg);border-radius:4px;height:7px;margin-bottom:6px;overflow:hidden}
-.sfill{height:100%;background:var(--pr);border-radius:4px;transition:width .6s}
+.dc{background:var(--cb);border-radius:var(--r);box-shadow:var(--ss);padding:22px;cursor:pointer;
+  transition:transform .2s,box-shadow .2s,border-top-color .2s;
+  border:1px solid var(--bd);border-top:3px solid transparent;position:relative;overflow:hidden}
+.dc:hover{transform:translateY(-5px);box-shadow:var(--sh);border-top-color:var(--ac)}
+.dc.done{border-top-color:var(--ok)}
+.dc.done::after{content:'✓';position:absolute;top:12px;right:14px;color:var(--ok);font-size:1.1rem;font-weight:700}
+.dc .ico{font-size:2.4rem;margin-bottom:10px}
+.dc .dn{font-size:1rem;font-weight:700;color:var(--tx)}
+.dc .dt{font-size:.82rem;color:var(--tm);margin:3px 0 8px}
+.dc .dc-stars{min-height:18px;font-size:1rem;letter-spacing:2px;margin-bottom:4px}
+.sbar{background:#21262d;border-radius:4px;height:7px;margin-bottom:6px;overflow:hidden}
+.sfill{height:100%;background:var(--ac);border-radius:4px;transition:width .6s}
 .stext{font-size:.77rem;color:var(--tm);display:flex;justify-content:space-between}
 .badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.72rem;font-weight:600;margin-top:8px}
-.b0{background:#eee;color:var(--tm)}
-.b1{background:#FEF9C3;color:#92400E}
-.b2{background:#D1FAE5;color:#065F46}
+.b0{background:#21262d;color:var(--tm)}
+.b1{background:#2d2617;color:#d29922}
+.b2{background:#122d1f;color:#3fb950}
 .btn-e{display:block;width:100%;margin-top:12px;background:var(--pr);color:#fff;border:none;
   border-radius:var(--r2);padding:9px;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s}
 .btn-e:hover{background:var(--pr2)}
@@ -68,77 +182,79 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 /* ── GAME COMMON ── */
 .gc{max-width:980px;margin:0 auto}
 .gh{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
-.gt{font-size:1.5rem;font-weight:800;color:var(--pr)}
+.gt{font-size:1.4rem;font-weight:800;color:var(--tx)}
 .gs{font-size:.82rem;color:var(--tm)}
-.gb{margin-left:auto;background:var(--pr);color:#fff;padding:5px 14px;border-radius:18px;font-weight:700}
-.gb span{color:#F1C40F}
-.ib{background:#EBF5FB;border-left:4px solid var(--bl);border-radius:var(--r2);
-  padding:12px 16px;margin-bottom:18px;font-size:.87rem;line-height:1.6}
+.gb{margin-left:auto;background:#21262d;color:var(--tx);padding:5px 14px;
+  border-radius:18px;font-weight:700;border:1px solid var(--bd)}
+.gb span{color:var(--ac)}
+.ib{background:#161b22;border-left:4px solid var(--bl);border-radius:var(--r2);
+  padding:12px 16px;margin-bottom:18px;font-size:.87rem;line-height:1.6;color:var(--tm)}
 .btn{background:var(--pr);color:#fff;border:none;border-radius:var(--r2);padding:9px 22px;
-  font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s}
-.btn:hover{background:var(--pr2)}
-.btn.g{background:var(--gr)}.btn.g:hover{background:#219A52}
-.btn.s{background:#fff;color:var(--pr);border:2px solid var(--bd)}.btn.s:hover{border-color:var(--pr)}
-.cbanner{background:linear-gradient(135deg,var(--gr),#219A52);color:#fff;border-radius:var(--r);
-  padding:24px;text-align:center;box-shadow:var(--sh);display:none;margin-top:20px}
-.cbanner.on{display:block}
-.cbanner h2{font-size:1.4rem;font-weight:800;margin-bottom:8px}
-.cbanner .pts{font-size:2rem;font-weight:800;color:#F1C40F}
+  font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--pr2);transform:translateY(-1px)}
+.btn.g{background:var(--ok)}.btn.g:hover{background:#2ea043}
+.btn.s{background:transparent;color:var(--tx);border:1px solid var(--bd)}.btn.s:hover{border-color:var(--pr)}
+.cbanner{display:none!important}
 .fb{position:fixed;z-index:2000;padding:10px 18px;border-radius:var(--r2);font-weight:600;
   font-size:.87rem;box-shadow:var(--sh);pointer-events:none;max-width:300px;line-height:1.4}
-.fb.ok{background:#D1FAE5;color:#065F46;border:2px solid var(--fav)}
-.fb.bad{background:#FEE2E2;color:#991B1B;border:2px solid var(--unf)}
+.fb.ok{background:#122d1f;color:var(--ok);border:1px solid var(--ok)}
+.fb.bad{background:#2d1215;color:var(--bad);border:1px solid var(--bad)}
 
 /* ── GAME 1 CLASSIFICATION ── */
 .g1-scene{display:flex;gap:20px;justify-content:center;align-items:flex-start;
-  flex-wrap:wrap;margin:20px 0}
-.ccard{background:#fff;border:2px solid var(--bd);border-radius:var(--r2);padding:13px 16px;
-  cursor:grab;font-size:.88rem;font-weight:600;text-align:center;box-shadow:var(--ss);
-  width:200px;user-select:none;transition:transform .15s,box-shadow .15s;min-height:60px;
-  display:flex;align-items:center;justify-content:center}
-.ccard:hover{transform:scale(1.04);box-shadow:var(--sh)}
-.ccard.drag-ghost{opacity:.35;transform:scale(.95)}
-.bins{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-.bin{width:200px;min-height:160px;border-radius:var(--r);border:3px dashed var(--bd);
+  flex-wrap:wrap;margin:20px 0;padding:18px;border-radius:var(--r);position:relative;
+  background:repeating-linear-gradient(90deg,#161b22 0,#161b22 36px,#1c2128 36px,#1c2128 54px);
+  background-size:54px 100%;animation:belt 1.8s linear infinite}
+@keyframes belt{from{background-position:0 0}to{background-position:54px 0}}
+.g1-card-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;z-index:1}
+.ccard{background:var(--cb);border:2px solid var(--bd);border-radius:var(--r2);padding:13px 16px;
+  cursor:grab;font-size:.88rem;font-weight:600;text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+  width:200px;user-select:none;min-height:60px;
+  display:flex;align-items:center;justify-content:center;color:var(--tx)}
+.ccard:hover{border-color:var(--ac);box-shadow:0 4px 24px rgba(240,165,0,.25)}
+.ccard.drag-ghost{opacity:.3;transform:scale(.95)}
+.bins{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.bin{width:200px;min-height:160px;border-radius:var(--r);border:2px dashed var(--bd);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;padding:14px;text-align:center;transition:all .2s}
-.bin.pr-bin{border-color:var(--gr);background:rgba(39,174,96,.06)}
-.bin.pe-bin{border-color:var(--bl);background:rgba(52,152,219,.06)}
-.bin.va-bin{border-color:var(--fav);background:rgba(46,204,113,.06)}
-.bin.fi-bin{border-color:var(--or);background:rgba(243,156,18,.06)}
-.bin.pm-bin{border-color:#9B59B6;background:rgba(155,89,182,.06)}
-.bin.cv-bin{border-color:#1ABC9C;background:rgba(26,188,156,.06)}
-.bin.hover{border-style:solid;transform:scale(1.03)}
+  gap:6px;padding:14px;text-align:center;transition:all .2s;background:rgba(255,255,255,.03)}
+.bin.pr-bin{border-color:var(--ok);background:rgba(63,185,80,.07)}
+.bin.pe-bin{border-color:var(--bl);background:rgba(88,166,255,.07)}
+.bin.va-bin{border-color:var(--ok);background:rgba(63,185,80,.07)}
+.bin.fi-bin{border-color:var(--or);background:rgba(210,153,34,.07)}
+.bin.pm-bin{border-color:#bc8cff;background:rgba(188,140,255,.07)}
+.bin.cv-bin{border-color:#39d353;background:rgba(57,211,83,.07)}
+.bin.hover{border-style:solid;transform:scale(1.04);box-shadow:0 0 20px rgba(240,165,0,.2)}
 .bin .bi{font-size:2.2rem}
-.bin .bl{font-size:.95rem;font-weight:700;color:var(--pr)}
+.bin .bl{font-size:.95rem;font-weight:700;color:var(--tx)}
 .bin .bs{font-size:.75rem;color:var(--tm)}
-.rl{font-size:.95rem;font-weight:700;color:var(--pr);margin-bottom:10px}
+.rl{font-size:.95rem;font-weight:700;color:var(--ac);margin-bottom:10px}
 .cc{font-size:.82rem;color:var(--tm);margin-top:6px}
-.stk{font-size:.88rem;font-weight:600;color:var(--or);min-height:22px}
+.stk{font-size:.88rem;font-weight:600;color:var(--ac);min-height:22px}
 
 /* ── GAME 2 COST BEHAVIOR ── */
 .g2-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
 @media(max-width:768px){.g2-layout{grid-template-columns:1fr}}
 .chart-wrap{perspective:500px}
 .chart-tilt{transform:rotateX(7deg) rotateY(-2deg);transform-origin:center bottom;
-  background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:14px}
-#g2svg{display:block;width:100%}
-.cp{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px}
-.cp h3{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--pr)}
+  background:var(--cb);border-radius:var(--r);box-shadow:var(--sh);padding:14px;border:1px solid var(--bd)}
+#g2svg{display:block;width:100%;background:#1c2128;border-radius:8px}
+.cp{background:var(--cb);border-radius:var(--r);box-shadow:var(--ss);padding:18px;border:1px solid var(--bd)}
+.cp h3{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--tx)}
 .sl-g{margin-bottom:18px}
-.sl-l{font-size:.82rem;font-weight:600;display:flex;justify-content:space-between;margin-bottom:5px}
+.sl-l{font-size:.82rem;font-weight:600;display:flex;justify-content:space-between;margin-bottom:5px;color:var(--tm)}
 .sl-l .sv{color:var(--ac);font-weight:700}
-input[type=range]{width:100%;accent-color:var(--pr)}
-.eq{background:var(--bg);border-radius:var(--r2);padding:10px;text-align:center;
-  font-size:.95rem;font-weight:700;color:var(--pr);margin:10px 0;font-family:'Courier New',monospace}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.eq{background:#21262d;border-radius:var(--r2);padding:10px;text-align:center;
+  font-size:.95rem;font-weight:700;color:var(--ac);margin:10px 0;font-family:'Courier New',monospace;border:1px solid var(--bd)}
 .pred{margin-top:14px;border-top:1px solid var(--bd);padding-top:14px}
-.pred label{font-size:.85rem;font-weight:600;display:block;margin-bottom:6px}
-.pred input{width:100%;padding:7px 10px;border:2px solid var(--bd);border-radius:6px;font-size:.88rem;margin-bottom:8px}
-.pred input:focus{outline:none;border-color:var(--pr)}
+.pred label{font-size:.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--tx)}
+.pred input{width:100%;padding:7px 10px;background:#21262d;border:1px solid var(--bd);color:var(--tx);border-radius:6px;font-size:.88rem;margin-bottom:8px}
+.pred input:focus{outline:none;border-color:var(--ac)}
 .dtab{font-size:.77rem;width:100%;border-collapse:collapse;margin-top:10px}
-.dtab th{background:var(--pr);color:#fff;padding:5px 8px;text-align:center}
-.dtab td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--bd)}
-.dtab tr:nth-child(even) td{background:var(--bg)}
+.dtab th{background:#21262d;color:var(--tx);padding:5px 8px;text-align:center}
+.dtab td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--bd);color:var(--tm)}
+.dtab tr:nth-child(even) td{background:#1c2128}
 .rr-msg{margin-top:10px;font-size:.82rem;font-weight:600;color:var(--tm);min-height:20px}
 
 /* ── GAME 3 ABC TOWER ── */
@@ -151,161 +267,161 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 .tower-3d:hover{animation-play-state:paused}
 @keyframes tr{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
 .tf{position:absolute;width:100%;height:72px;border-radius:8px;padding:10px;text-align:center;
-  font-weight:700;font-size:.82rem;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.2);
-  border:2px solid rgba(255,255,255,.25);display:flex;flex-direction:column;justify-content:center}
-.tf-fa{bottom:240px;background:linear-gradient(135deg,#566573,#95A5A6)}
-.tf-pr{bottom:160px;background:linear-gradient(135deg,#1A5276,#3498DB)}
-.tf-ba{bottom:80px;background:linear-gradient(135deg,#784212,#F39C12)}
-.tf-un{bottom:0;background:linear-gradient(135deg,#145A32,#27AE60)}
+  font-weight:700;font-size:.82rem;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;justify-content:center}
+.tf-fa{bottom:240px;background:linear-gradient(135deg,#30363d,#484f58)}
+.tf-pr{bottom:160px;background:linear-gradient(135deg,#1f3a5f,#1f6feb)}
+.tf-ba{bottom:80px;background:linear-gradient(135deg,#4a2d00,#d29922)}
+.tf-un{bottom:0;background:linear-gradient(135deg,#122d1f,#3fb950)}
 .tf .fc{font-size:.68rem;font-weight:400;opacity:.8}
 .g3-right{display:flex;flex-direction:column;gap:14px}
 .dz-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dz{border-radius:var(--r2);border:3px dashed transparent;padding:10px;min-height:80px;
+.dz{border-radius:var(--r2);border:2px dashed transparent;padding:10px;min-height:80px;
   font-size:.78rem;font-weight:600;transition:all .2s}
-.dz-fa{background:rgba(149,165,166,.15);border-color:#95A5A6;color:#566573}
-.dz-pr{background:rgba(52,152,219,.1);border-color:#3498DB;color:#1A5276}
-.dz-ba{background:rgba(243,156,18,.1);border-color:#F39C12;color:#784212}
-.dz-un{background:rgba(39,174,96,.1);border-color:#27AE60;color:#145A32}
-.dz.hover{transform:scale(1.03);box-shadow:var(--ss)}
+.dz-fa{background:#1c2128;border-color:#484f58;color:var(--tx)}
+.dz-pr{background:#0d1926;border-color:#1f6feb;color:var(--tx)}
+.dz-ba{background:#1c1500;border-color:#d29922;color:var(--tx)}
+.dz-un{background:#0d1f16;border-color:#3fb950;color:var(--tx)}
+.dz.hover{transform:scale(1.03);box-shadow:0 0 16px rgba(240,165,0,.2)}
 .dz .zt{font-size:.85rem;margin-bottom:5px;display:block}
 .dz .placed-list{display:flex;flex-wrap:wrap;gap:3px}
-.placed-tag{background:rgba(255,255,255,.7);border-radius:4px;padding:2px 6px;
-  font-size:.68rem;border:1px solid rgba(0,0,0,.1)}
+.placed-tag{background:rgba(255,255,255,.08);border-radius:4px;padding:2px 6px;
+  font-size:.68rem;border:1px solid var(--bd);color:var(--tm)}
 .cards-pool{display:flex;flex-wrap:wrap;gap:6px}
-.acard{background:#fff;border:2px solid var(--bd);border-radius:6px;padding:6px 10px;
-  font-size:.77rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s;box-shadow:var(--ss)}
-.acard:hover{border-color:var(--pr);transform:translateY(-2px)}
-.acard.gone{opacity:.25;pointer-events:none}
+.acard{background:var(--cb);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;
+  font-size:.77rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s;box-shadow:var(--ss);color:var(--tx)}
+.acard:hover{border-color:var(--ac);transform:translateY(-2px)}
+.acard.gone{opacity:.2;pointer-events:none}
 /* Phase 2 driver matching */
 .dm-grid{display:flex;flex-direction:column;gap:10px}
 .dm-row{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:8px}
-.dm-act{background:var(--bg);border-radius:6px;padding:8px 10px;font-size:.83rem;font-weight:600;text-align:center}
-.dm-sel{padding:7px 8px;border:2px solid var(--bd);border-radius:6px;font-size:.8rem;
-  width:100%;background:#fff;cursor:pointer}
-.dm-sel.ok{border-color:var(--fav);background:#D1FAE5}
-.dm-sel.bad{border-color:var(--unf);background:#FEE2E2}
+.dm-act{background:#21262d;border-radius:6px;padding:8px 10px;font-size:.83rem;font-weight:600;text-align:center;color:var(--tx)}
+.dm-sel{padding:7px 8px;border:1px solid var(--bd);border-radius:6px;font-size:.8rem;
+  width:100%;background:var(--cb);color:var(--tx);cursor:pointer}
+.dm-sel.ok{border-color:var(--ok);background:#122d1f}
+.dm-sel.bad{border-color:var(--bad);background:#2d1215}
 
 /* ── GAME 4 VARIANCE ── */
 .vtbl-wrap{overflow-x:auto;margin-bottom:16px}
-.vtbl{width:100%;border-collapse:collapse;font-size:.88rem;background:#fff;
-  border-radius:var(--r);overflow:hidden;box-shadow:var(--ss)}
-.vtbl th{padding:11px 14px;font-size:.82rem;font-weight:700;text-align:center;border-bottom:2px solid var(--bd)}
-.vtbl th.c0{background:var(--pr);color:#fff;text-align:left}
-.vtbl th.c1{background:#2980B9;color:#fff}
-.vtbl th.c2{background:#E67E22;color:#fff}
-.vtbl th.c3{background:#27AE60;color:#fff}
-.vtbl td{padding:9px 14px;border-bottom:1px solid var(--bd);text-align:center}
-.vtbl td.lbl{text-align:left;font-weight:600;color:var(--pr)}
+.vtbl{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--cb);
+  border-radius:var(--r);overflow:hidden;box-shadow:var(--ss);border:1px solid var(--bd)}
+.vtbl th{padding:11px 14px;font-size:.82rem;font-weight:700;text-align:center;border-bottom:1px solid var(--bd)}
+.vtbl th.c0{background:#21262d;color:var(--tx);text-align:left}
+.vtbl th.c1{background:#0d2149;color:var(--bl)}
+.vtbl th.c2{background:#2d1f00;color:var(--or)}
+.vtbl th.c3{background:#122d1f;color:var(--ok)}
+.vtbl td{padding:9px 14px;border-bottom:1px solid var(--bd);text-align:center;color:var(--tm)}
+.vtbl td.lbl{text-align:left;font-weight:600;color:var(--tx)}
 .vtbl tr:last-child td{border-bottom:none}
-.vi{width:105px;padding:5px 7px;border:2px solid var(--bd);border-radius:6px;font-size:.85rem;text-align:center;font-family:inherit}
-.vi:focus{outline:none;border-color:var(--or)}
-.vi.ok{border-color:var(--fav);background:#D1FAE5}
-.vi.bad{border-color:var(--unf);background:#FEE2E2}
-.vfav{color:var(--fav);font-weight:700}
-.vunf{color:var(--unf);font-weight:700}
-#g4chart{width:100%;height:360px;background:#1a252f;border-radius:var(--r);overflow:hidden;margin:16px 0;position:relative}
+.vi{width:105px;padding:5px 7px;border:1px solid var(--bd);border-radius:6px;font-size:.85rem;text-align:center;font-family:inherit;background:#21262d;color:var(--tx)}
+.vi:focus{outline:none;border-color:var(--ac)}
+.vi.ok{border-color:var(--ok);background:#122d1f;color:var(--ok)}
+.vi.bad{border-color:var(--bad);background:#2d1215;color:var(--bad)}
+.vfav{color:var(--ok);font-weight:700}
+.vunf{color:var(--bad);font-weight:700}
+#g4chart{width:100%;height:360px;background:#0d1117;border-radius:var(--r);overflow:hidden;margin:16px 0;position:relative;border:1px solid var(--bd)}
 #g4chart canvas{border-radius:var(--r)}
 .chart-legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;font-size:.82rem}
-.li{display:flex;align-items:center;gap:5px}
+.li{display:flex;align-items:center;gap:5px;color:var(--tm)}
 .ld{width:12px;height:12px;border-radius:3px}
 .formula-box{background:var(--pr);color:#fff;border-radius:var(--r2);padding:11px 18px;
   text-align:center;font-size:.95rem;font-weight:700;margin:14px 0}
-.formula-box span{color:#F1C40F}
-.mcq-box{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px;margin-bottom:14px}
-.mcq-box h3{font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--pr)}
+.formula-box span{color:var(--ac)}
+.mcq-box{background:var(--cb);border-radius:var(--r);box-shadow:var(--ss);padding:18px;margin-bottom:14px;border:1px solid var(--bd)}
+.mcq-box h3{font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--tx)}
 .mcq-opts{display:flex;flex-direction:column;gap:7px}
-.mo{padding:9px 13px;border:2px solid var(--bd);border-radius:var(--r2);cursor:pointer;font-size:.87rem;transition:all .2s}
-.mo:hover{border-color:var(--pr);background:rgba(44,62,80,.04)}
-.mo.sel{border-color:var(--pr);background:rgba(44,62,80,.08)}
-.mo.ok{border-color:var(--fav);background:#D1FAE5;pointer-events:none}
-.mo.bad{border-color:var(--unf);background:#FEE2E2}
-.dd-box{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px}
-.dd-box h3{font-size:.95rem;font-weight:700;margin-bottom:8px;color:var(--pr)}
-.given{background:var(--bg);border-radius:6px;padding:10px 14px;font-family:monospace;
-  font-size:.85rem;line-height:1.9;margin:10px 0}
+.mo{padding:9px 13px;border:1px solid var(--bd);border-radius:var(--r2);cursor:pointer;font-size:.87rem;transition:all .2s;color:var(--tm)}
+.mo:hover{border-color:var(--pr);color:var(--tx);background:#0d2149}
+.mo.sel{border-color:var(--pr);background:#0d2149;color:var(--tx)}
+.mo.ok{border-color:var(--ok);background:#122d1f;pointer-events:none;color:var(--ok)}
+.mo.bad{border-color:var(--bad);background:#2d1215;color:var(--bad)}
+.dd-box{background:var(--cb);border-radius:var(--r);box-shadow:var(--ss);padding:18px;border:1px solid var(--bd)}
+.dd-box h3{font-size:.95rem;font-weight:700;margin-bottom:8px;color:var(--tx)}
+.given{background:#21262d;border-radius:6px;padding:10px 14px;font-family:monospace;
+  font-size:.85rem;line-height:1.9;margin:10px 0;color:var(--tm);border:1px solid var(--bd)}
 .vc-row{display:flex;align-items:center;gap:8px;margin:7px 0;flex-wrap:wrap}
-.vc-lbl{font-size:.85rem;font-weight:600;min-width:160px}
-.vc-amt{width:110px;padding:6px 8px;border:2px solid var(--bd);border-radius:6px;
-  font-size:.85rem;text-align:center}
-.vc-amt:focus{outline:none;border-color:var(--pr)}
-.vc-amt.ok{border-color:var(--fav);background:#D1FAE5}
-.vc-amt.bad{border-color:var(--unf);background:#FEE2E2}
-.vc-sel{padding:6px 9px;border:2px solid var(--bd);border-radius:6px;font-size:.82rem;cursor:pointer}
-.vc-sel.ok{border-color:var(--fav)}
-.vc-sel.bad{border-color:var(--unf)}
+.vc-lbl{font-size:.85rem;font-weight:600;min-width:160px;color:var(--tx)}
+.vc-amt{width:110px;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;
+  font-size:.85rem;text-align:center;background:#21262d;color:var(--tx)}
+.vc-amt:focus{outline:none;border-color:var(--ac)}
+.vc-amt.ok{border-color:var(--ok);background:#122d1f;color:var(--ok)}
+.vc-amt.bad{border-color:var(--bad);background:#2d1215;color:var(--bad)}
+.vc-sel{padding:6px 9px;border:1px solid var(--bd);border-radius:6px;font-size:.82rem;cursor:pointer;background:var(--cb);color:var(--tx)}
+.vc-sel.ok{border-color:var(--ok)}
+.vc-sel.bad{border-color:var(--bad)}
 
 /* ── GAME 5 CAPBUDGET ── */
-.scenario-box{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;
-  border-radius:var(--r);padding:18px 22px;margin-bottom:20px}
+.scenario-box{background:linear-gradient(135deg,#0d2149,#1f3a5f);color:#fff;
+  border-radius:var(--r);padding:18px 22px;margin-bottom:20px;border:1px solid #2d4a7a}
 .scenario-box h3{font-size:1rem;font-weight:700;margin-bottom:6px}
 .scenario-box p{font-size:.85rem;opacity:.85;line-height:1.6}
 .s-data{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:12px}
-.sd{background:rgba(255,255,255,.15);border-radius:8px;padding:7px 11px;font-size:.8rem}
+.sd{background:rgba(255,255,255,.1);border-radius:8px;padding:7px 11px;font-size:.8rem}
 .sd .sl{opacity:.7;margin-bottom:2px;font-size:.75rem}
 .sd .sv{font-weight:700}
 .steps{display:flex;flex-direction:column;gap:14px}
-.step{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px 22px;
-  border:2px solid var(--bd);transition:border-color .3s}
-.step.done{border-color:var(--fav)}
+.step{background:var(--cb);border-radius:var(--r);box-shadow:var(--ss);padding:18px 22px;
+  border:1px solid var(--bd);transition:border-color .3s}
+.step.done{border-color:var(--ok);box-shadow:0 0 12px rgba(63,185,80,.15)}
 .step-num{display:inline-flex;width:26px;height:26px;background:var(--pr);color:#fff;
   border-radius:50%;align-items:center;justify-content:center;font-size:.77rem;font-weight:700;margin-bottom:8px}
-.step h4{font-size:.92rem;font-weight:700;color:var(--pr);margin-bottom:6px}
-.step-formula{background:var(--bg);border-radius:6px;padding:7px 12px;font-family:'Courier New',monospace;
-  font-size:.85rem;color:var(--pr);margin:7px 0}
+.step h4{font-size:.92rem;font-weight:700;color:var(--tx);margin-bottom:6px}
+.step-formula{background:#21262d;border-radius:6px;padding:7px 12px;font-family:'Courier New',monospace;
+  font-size:.85rem;color:var(--bl);margin:7px 0;border:1px solid var(--bd)}
 .s-inp-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
-.s-inp{padding:7px 11px;border:2px solid var(--bd);border-radius:6px;font-size:.88rem;width:140px}
-.s-inp:focus{outline:none;border-color:var(--pr)}
-.s-inp.ok{border-color:var(--fav);background:#D1FAE5}
-.s-inp.bad{border-color:var(--unf);background:#FEE2E2}
-.s-result{display:none;margin-top:10px;padding:9px 13px;background:#D1FAE5;border-radius:6px;
-  font-size:.85rem;color:#065F46;line-height:1.5}
+.s-inp{padding:7px 11px;border:1px solid var(--bd);border-radius:6px;font-size:.88rem;width:140px;background:#21262d;color:var(--tx)}
+.s-inp:focus{outline:none;border-color:var(--ac)}
+.s-inp.ok{border-color:var(--ok);background:#122d1f;color:var(--ok)}
+.s-inp.bad{border-color:var(--bad);background:#2d1215;color:var(--bad)}
+.s-result{display:none;margin-top:10px;padding:9px 13px;background:#122d1f;border-radius:6px;
+  font-size:.85rem;color:var(--ok);line-height:1.5;border:1px solid var(--ok)}
 .s-result.on{display:block}
-.npv-result{background:linear-gradient(135deg,#145A32,var(--gr));color:#fff;border-radius:var(--r);
+.npv-result{background:linear-gradient(135deg,#122d1f,#2ea043);color:#fff;border-radius:var(--r);
   padding:22px;text-align:center;box-shadow:var(--sh);display:none;margin-top:16px}
 .npv-result.on{display:block}
 .npv-result h2{font-size:1.7rem;font-weight:800;margin-bottom:6px}
 .npv-result p{opacity:.85;font-size:.88rem}
 .mc-opts{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-.mc-opt{padding:8px 16px;border:2px solid var(--bd);border-radius:var(--r2);cursor:pointer;
-  font-size:.88rem;font-weight:600;transition:all .2s}
-.mc-opt:hover{border-color:var(--pr)}
-.mc-opt.ok{border-color:var(--fav);background:#D1FAE5;pointer-events:none}
-.mc-opt.bad{border-color:var(--unf);background:#FEE2E2}
+.mc-opt{padding:8px 16px;border:1px solid var(--bd);border-radius:var(--r2);cursor:pointer;
+  font-size:.88rem;font-weight:600;transition:all .2s;background:var(--cb);color:var(--tm)}
+.mc-opt:hover{border-color:var(--pr);color:var(--tx)}
+.mc-opt.ok{border-color:var(--ok);background:#122d1f;pointer-events:none;color:var(--ok)}
+.mc-opt.bad{border-color:var(--bad);background:#2d1215;color:var(--bad)}
 
 /* ── GAME 6 BSC ── */
 .g6-top{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 @media(max-width:700px){.g6-top{grid-template-columns:1fr}}
-.bsc-quad{border-radius:var(--r);padding:13px;min-height:110px;border:3px dashed transparent;transition:all .2s}
-.bsc-fin{background:rgba(241,196,15,.12);border-color:#F1C40F}
-.bsc-cus{background:rgba(52,152,219,.1);border-color:#3498DB}
-.bsc-int{background:rgba(39,174,96,.1);border-color:#27AE60}
-.bsc-lea{background:rgba(155,89,182,.1);border-color:#9B59B6}
-.bsc-quad.hover{transform:scale(1.02);box-shadow:var(--ss)}
+.bsc-quad{border-radius:var(--r);padding:13px;min-height:110px;border:2px dashed transparent;transition:all .2s}
+.bsc-fin{background:rgba(210,153,34,.1);border-color:#d29922}
+.bsc-cus{background:rgba(88,166,255,.08);border-color:#58a6ff}
+.bsc-int{background:rgba(63,185,80,.08);border-color:#3fb950}
+.bsc-lea{background:rgba(188,140,255,.08);border-color:#bc8cff}
+.bsc-quad.hover{transform:scale(1.02);box-shadow:0 0 16px rgba(240,165,0,.15)}
 .bq-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
-.bsc-fin .bq-title{color:#7D6608}
-.bsc-cus .bq-title{color:#1A5276}
-.bsc-int .bq-title{color:#145A32}
-.bsc-lea .bq-title{color:#4A235A}
+.bsc-fin .bq-title{color:#d29922}
+.bsc-cus .bq-title{color:#58a6ff}
+.bsc-int .bq-title{color:#3fb950}
+.bsc-lea .bq-title{color:#bc8cff}
 .placed-chips{display:flex;flex-wrap:wrap;gap:3px}
-.pchip{background:rgba(255,255,255,.8);border-radius:4px;padding:2px 7px;font-size:.69rem;font-weight:600;border:1px solid rgba(0,0,0,.1)}
+.pchip{background:rgba(255,255,255,.08);border-radius:4px;padding:2px 7px;font-size:.69rem;font-weight:600;border:1px solid var(--bd);color:var(--tm)}
 .kpi-pool{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
-.kc{background:#fff;border:2px solid var(--bd);border-radius:6px;padding:6px 11px;font-size:.77rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s;box-shadow:var(--ss)}
-.kc:hover{border-color:var(--pr);transform:translateY(-2px)}
-.kc.gone{opacity:.25;pointer-events:none}
-.tp-section{background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px}
-.tp-section h3{font-size:.95rem;font-weight:700;color:var(--pr);margin-bottom:10px}
-.tp-scen{background:var(--bg);border-radius:6px;padding:11px;font-size:.83rem;line-height:1.6;margin-bottom:14px}
+.kc{background:var(--cb);border:1px solid var(--bd);border-radius:6px;padding:6px 11px;font-size:.77rem;font-weight:600;cursor:grab;user-select:none;transition:all .2s;box-shadow:var(--ss);color:var(--tx)}
+.kc:hover{border-color:var(--ac);transform:translateY(-2px)}
+.kc.gone{opacity:.2;pointer-events:none}
+.tp-section{background:var(--cb);border-radius:var(--r);box-shadow:var(--ss);padding:18px;border:1px solid var(--bd)}
+.tp-section h3{font-size:.95rem;font-weight:700;color:var(--tx);margin-bottom:10px}
+.tp-scen{background:#21262d;border-radius:6px;padding:11px;font-size:.83rem;line-height:1.6;margin-bottom:14px;color:var(--tm);border:1px solid var(--bd)}
 .tp-slider-wrap{padding:8px 0}
-.tp-slider-wrap label{font-size:.85rem;font-weight:600;display:block;margin-bottom:6px}
-#g6tp{width:100%;accent-color:var(--pr)}
-.tp-val{text-align:center;font-size:1.5rem;font-weight:800;color:var(--pr);margin:4px 0}
+.tp-slider-wrap label{font-size:.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--tx)}
+#g6tp{width:100%;accent-color:var(--ac)}
+.tp-val{text-align:center;font-size:1.5rem;font-weight:800;color:var(--ac);margin:4px 0}
 .tp-divs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.tp-div{background:var(--bg);border-radius:var(--r2);padding:11px;text-align:center}
+.tp-div{background:#21262d;border-radius:var(--r2);padding:11px;text-align:center;border:1px solid var(--bd)}
 .tp-div .dn{font-size:.77rem;font-weight:600;color:var(--tm);margin-bottom:3px}
-.tp-div .di{font-size:1.15rem;font-weight:700;color:var(--pr)}
+.tp-div .di{font-size:1.15rem;font-weight:700;color:var(--ac)}
 .phase-hdr{display:flex;align-items:center;gap:8px;margin:18px 0 10px}
 .ph-badge{background:var(--pr);color:#fff;border-radius:10px;padding:3px 11px;font-size:.75rem;font-weight:700}
-.ph-title{font-size:.95rem;font-weight:700;color:var(--pr)}
+.ph-title{font-size:.95rem;font-weight:700;color:var(--tx)}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
 .flex-g{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .hidden{display:none!important}
@@ -315,12 +431,59 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 </head>
 <body>
 
+<!-- FLASH -->
+<div id="flash"></div>
+
+<!-- MISSION OVERLAY -->
+<div id="mo" class="hidden">
+  <div class="mo-card">
+    <div class="mo-char" id="mo-char">👩‍💼</div>
+    <div class="mo-name" id="mo-name"></div>
+    <div class="mo-dept" id="mo-dept"></div>
+    <div class="mo-text"><span id="mo-typed"></span><span class="mo-cursor" id="mo-cursor"></span></div>
+    <div class="mo-btns">
+      <button id="mo-skip">Skip</button>
+      <button id="mo-start">Let's Go! →</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLETE OVERLAY -->
+<div id="co" class="hidden">
+  <div class="co-card" id="co-card">
+    <div class="co-title" id="co-title">Mission Complete!</div>
+    <div class="co-sub" id="co-sub"></div>
+    <div class="co-stars">
+      <span class="star" id="star1">★</span>
+      <span class="star" id="star2">★</span>
+      <span class="star" id="star3">★</span>
+    </div>
+    <div class="co-score" id="co-score">0 pts</div>
+    <div class="co-max" id="co-max"></div>
+    <button class="co-hub" onclick="Nav.hub()">← Back to HQ</button>
+  </div>
+</div>
+
+<!-- CHARACTER HUD — persistent during gameplay -->
+<div id="char-hud">
+  <div class="ch-bubble">
+    <span class="ch-name" id="ch-name"></span>
+    <span id="ch-text">Ready for your briefing.</span>
+    <button id="ch-hint" onclick="charHUD.giveHint()" title="Ask for a hint" style="display:block;margin-top:6px;background:none;border:1px solid var(--bd);color:var(--tm);border-radius:4px;padding:2px 8px;font-size:.68rem;cursor:pointer;pointer-events:all;transition:all .2s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">💡 Hint</button>
+  </div>
+  <div class="ch-portrait" id="ch-char">🍎</div>
+</div>
+
 <!-- SCORE BAR -->
 <div id="sb">
-  <div class="brand"><b>Saucy Apple</b> Mfg. Co.</div>
-  <button id="btnHub" onclick="Nav.hub()">← Hub</button>
+  <div class="brand"><b>Saucy Apple</b> Mfg.</div>
+  <button id="btnHub" onclick="Nav.hub()">← HQ</button>
+  <div id="combo-wrap">
+    <div id="combo-bar"><div id="combo-fill"></div></div>
+    <span id="combo-label">×1</span>
+  </div>
   <div class="si">
-    <span class="pr" id="sb-prog">0/6 complete</span>
+    <span class="pr-txt" id="sb-prog">0/6 done</span>
     <span class="ts" id="sb-total">0 pts</span>
   </div>
 </div>
@@ -329,11 +492,58 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="hub" class="scr on">
   <div class="gc">
     <div class="hub-h">
-      <h1>🍎 <b>Saucy Apple</b> Manufacturing Co.</h1>
-      <p>ACC 214 · Managerial Cost Analysis · Interactive Study Game</p>
-      <div class="hub-tot">Total Score: <span class="v" id="hub-score">0</span> / 9,125 pts</div>
+      <div class="hub-alert">⚡ OPERATIONS CENTER — ALL HANDS REQUIRED</div>
+      <h1>🍎 <b>SAUCY APPLE</b> MFG. CO.</h1>
+      <p style="color:var(--tm);margin-top:6px">New recruit — 6 departments are in crisis. Complete every mission to save the factory.</p>
+      <div class="hub-xp-wrap">
+        <div class="hub-xp-label">
+          <span>FIELD XP</span>
+          <span><span id="hub-score">0</span> / 9,125 pts</span>
+        </div>
+        <div class="hub-xp-bar"><div class="hub-xp-fill" id="hub-xp-fill" style="width:0%"></div></div>
+      </div>
     </div>
     <div class="dg" id="dept-grid"></div>
+    <div style="text-align:center;margin-top:24px;padding-bottom:24px">
+      <button onclick="showCheatSheet()" style="background:none;border:1px solid var(--bd);color:var(--tm);border-radius:6px;padding:8px 20px;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--pr2)';this.style.color='var(--pr2)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">📖 Quick Study Reference</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHEAT SHEET OVERLAY -->
+<div id="csOverlay" class="hidden" style="position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);overflow-y:auto;padding:32px 16px" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div style="max-width:680px;margin:0 auto;background:var(--cb);border-radius:12px;border:1px solid var(--bd);padding:28px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="font-size:1.2rem;font-weight:800;color:var(--tx)">📖 ACC 214 Quick Reference</h2>
+      <button onclick="document.getElementById('csOverlay').classList.add('hidden')" style="background:none;border:none;color:var(--tm);font-size:1.2rem;cursor:pointer">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:#080f0a;border-left:3px solid var(--ok);border-radius:6px;padding:12px;font-size:.79rem;color:#7ee787;font-family:monospace">
+        <div style="color:var(--ac);font-weight:800;margin-bottom:6px">CH 2 — COST TYPES</div>
+        Product Cost = DM + DL + MOH<br>Period Cost = SG&amp;A (expensed now)<br>Variable: changes ÷ per unit<br>Fixed: constant regardless of units
+      </div>
+      <div style="background:#080f0a;border-left:3px solid var(--bl);border-radius:6px;padding:12px;font-size:.79rem;color:#7ee787;font-family:monospace">
+        <div style="color:var(--ac);font-weight:800;margin-bottom:6px">CH 3 — COST BEHAVIOR</div>
+        Y = mX + b<br>Slope m = ΔCost ÷ ΔActivity<br>High-Low: use max &amp; min points<br>Predict: plug X into equation
+      </div>
+      <div style="background:#080f0a;border-left:3px solid var(--or);border-radius:6px;padding:12px;font-size:.79rem;color:#7ee787;font-family:monospace">
+        <div style="color:var(--ac);font-weight:800;margin-bottom:6px">CH 9 — ABC COSTING</div>
+        Unit → per unit (DM, DL)<br>Batch → per run (setup, QC)<br>Product → per product line<br>Facility → whole factory
+      </div>
+      <div style="background:#080f0a;border-left:3px solid var(--bad);border-radius:6px;padding:12px;font-size:.79rem;color:#7ee787;font-family:monospace">
+        <div style="color:var(--ac);font-weight:800;margin-bottom:6px">CH 10 — VARIANCES</div>
+        FB = Actual Vol × Std Rate<br>MBV = FBV + SAV<br>Price Var = (AP−SP) × AQ<br>Efficiency Var = (AQ−SQ) × SP
+      </div>
+      <div style="background:#080f0a;border-left:3px solid #bc8cff;border-radius:6px;padding:12px;font-size:.79rem;color:#7ee787;font-family:monospace">
+        <div style="color:var(--ac);font-weight:800;margin-bottom:6px">CH 7 — CAPITAL BUDGET</div>
+        After-tax CF = Pre-tax × (1−t)<br>Depr Shield = Depr × tax rate<br>NPV = PV inflows − PV outflows<br>Accept if NPV &gt; 0
+      </div>
+      <div style="background:#080f0a;border-left:3px solid var(--ac);border-radius:6px;padding:12px;font-size:.79rem;color:#7ee787;font-family:monospace">
+        <div style="color:var(--ac);font-weight:800;margin-bottom:6px">CH 17-18 — BSC &amp; TP</div>
+        Financial / Customer /<br>Internal Process / Learning<br>Transfer Price: VC ≤ TP ≤ Market<br>Both divisions must benefit
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px;font-size:.76rem;color:var(--tm)">Click anywhere outside to close · Press ESC to return to HQ</div>
   </div>
 </div>
 
@@ -341,15 +551,19 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="g1" class="scr">
   <div class="gc">
     <div class="gh">
-      <div><div class="gt">📦 Receiving Dept. — Cost Classification</div><div class="gs">Chapter 2 · 3 rounds</div></div>
-      <div class="gb">Score: <span id="g1-score">0</span></div>
+      <div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--bad);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;animation:pa 1.6s ease-in-out infinite">⚡ MISSION ACTIVE</div>
+        <div class="gt">📦 Receiving Dept. — Cost Classification</div>
+        <div class="gs">CHAPTER 2 · Rosa Chen · 3 Rounds</div>
+      </div>
+      <div class="gb">XP: <span id="g1-score">0</span></div>
     </div>
-    <div class="ib"><strong>How to play:</strong> Drag each cost card to the correct bin. Complete all 3 rounds to earn your score.</div>
+    <div class="ib"><strong>ORDERS:</strong> Drag each cost card to the correct bin. Complete all 3 rounds to earn your score.</div>
     <div class="rl" id="g1-rlabel"></div>
     <div class="cc" id="g1-counter"></div>
     <div class="stk" id="g1-streak"></div>
     <div class="g1-scene">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div class="g1-card-wrap">
         <div id="g1-card" class="ccard">Loading...</div>
       </div>
       <div class="bins" id="g1-bins"></div>
@@ -367,14 +581,18 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="g2" class="scr">
   <div class="gc">
     <div class="gh">
-      <div><div class="gt">⚙️ Operations Dept. — Cost Behavior</div><div class="gs">Chapter 3 · High-Low Method</div></div>
-      <div class="gb">Score: <span id="g2-score">0</span></div>
+      <div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--bad);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;animation:pa 1.6s ease-in-out infinite">⚡ MISSION ACTIVE</div>
+        <div class="gt">⚙️ Operations Dept. — Cost Behavior</div>
+        <div class="gs">CHAPTER 3 · Diego Ruiz · High-Low Method</div>
+      </div>
+      <div class="gb">XP: <span id="g2-score">0</span></div>
     </div>
-    <div class="ib"><strong>How to play:</strong> Adjust the sliders to fit a cost line through Zeffani's pottery data using the High-Low method. Then predict the cost at X = 350 mugs.</div>
+    <div class="ib"><strong>ORDERS:</strong> Adjust the sliders to fit a cost line through Zeffani's pottery data using the High-Low method. Then predict the cost at X = 350 mugs.</div>
     <div class="g2-layout">
       <div class="chart-wrap">
         <div class="chart-tilt">
-          <svg id="g2svg" viewBox="0 0 520 400" style="background:#FAFAFA;border-radius:8px"></svg>
+          <svg id="g2svg" viewBox="0 0 520 400" style="background:#1c2128;border-radius:8px"></svg>
         </div>
       </div>
       <div class="cp">
@@ -391,7 +609,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         <div class="pred" id="g2-pred-section">
           <label><strong>Phase 2:</strong> Predict cost at X = 350 mugs</label>
           <input type="number" id="g2-pred" placeholder="Enter $ amount" class="pred-inp" style="width:100%;padding:7px 10px;border:2px solid var(--bd);border-radius:6px;font-size:.88rem;margin-bottom:8px">
-          <button class="btn" onclick="G2.checkPred()">Check Prediction</button>
+          <button class="btn" onclick="G2.checkPred()">⚡ VERIFY PREDICTION</button>
           <div class="rr-msg" id="g2-rrmsg"></div>
         </div>
         <table class="dtab" style="margin-top:14px">
@@ -406,7 +624,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         </table>
         <p style="font-size:.72rem;color:var(--tm);margin-top:4px">* = High point</p>
         <div class="flex-g mt12">
-          <button class="btn" onclick="G2.lockIn()">🔒 Lock In Answer</button>
+          <button class="btn" onclick="G2.lockIn()">🔒 SUBMIT EQUATION</button>
         </div>
         <div id="g2-result" style="margin-top:10px;font-size:.85rem"></div>
       </div>
@@ -424,8 +642,12 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="g3" class="scr">
   <div class="gc">
     <div class="gh">
-      <div><div class="gt">🏭 Production Floor — ABC Costing</div><div class="gs">Chapter 9 · Cost Hierarchy</div></div>
-      <div class="gb">Score: <span id="g3-score">0</span></div>
+      <div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--bad);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;animation:pa 1.6s ease-in-out infinite">⚡ MISSION ACTIVE</div>
+        <div class="gt">🏭 Production Floor — ABC Costing</div>
+        <div class="gs">CHAPTER 9 · Fatima Al-Rashid · Cost Hierarchy</div>
+      </div>
+      <div class="gb">XP: <span id="g3-score">0</span></div>
     </div>
     <div class="ib"><strong>Phase 1:</strong> Drag each cost card to the correct level of the 5-level cost hierarchy. <strong>Phase 2:</strong> Match each activity to its cost driver.</div>
     <div id="g3-phase1">
@@ -458,10 +680,10 @@ input[type=range]{width:100%;accent-color:var(--pr)}
     </div>
     <div id="g3-phase2" class="hidden">
       <div class="phase-hdr"><span class="ph-badge">Phase 2</span><span class="ph-title">Match each activity to its cost driver (Maglie Co.)</span></div>
-      <div style="background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px">
+      <div style="background:var(--cb);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--ss);padding:18px">
         <p style="font-size:.85rem;color:var(--tm);margin-bottom:14px">Maglie Co. makes tomato sauce and alfredo sauce. Select the correct cost driver for each activity.</p>
         <div class="dm-grid" id="g3-dm"></div>
-        <button class="btn mt16" onclick="G3.checkDrivers()">Check Drivers</button>
+        <button class="btn mt16" onclick="G3.checkDrivers()">⚡ SUBMIT DRIVER MAP</button>
       </div>
     </div>
     <div class="cbanner" id="g3-done">
@@ -477,8 +699,12 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="g4" class="scr">
   <div class="gc">
     <div class="gh">
-      <div><div class="gt">🔍 Quality Control — Variance Analysis</div><div class="gs">Chapter 10 · The Saucy Apple</div></div>
-      <div class="gb">Score: <span id="g4-score">0</span></div>
+      <div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--bad);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;animation:pa 1.6s ease-in-out infinite">⚡ MISSION ACTIVE</div>
+        <div class="gt">🔍 Quality Control — Variance Analysis</div>
+        <div class="gs">CHAPTER 10 · Marcus Webb · The Saucy Apple</div>
+      </div>
+      <div class="gb">XP: <span id="g4-score">0</span></div>
     </div>
     <div class="ib"><strong>The Saucy Apple</strong> budgeted 2,800 jars but produced 2,400. Work through the 4 phases to diagnose every variance.</div>
 
@@ -496,7 +722,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         </table>
       </div>
       <p style="font-size:.78rem;color:var(--tm);margin-bottom:10px">Hint: Flexible Budget = Actual Volume × Budgeted Price/Rate (Fixed costs stay fixed)</p>
-      <button class="btn" onclick="G4.checkTable()">Check Flexible Budget</button>
+      <button class="btn" onclick="G4.checkTable()">⚡ SUBMIT FLEXIBLE BUDGET</button>
     </div>
 
     <div id="g4-p2" class="hidden">
@@ -509,7 +735,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
       <div id="g4chart"></div>
       <p style="font-size:.77rem;color:var(--tm);text-align:center;margin-bottom:12px">Drag to rotate · Scroll to zoom</p>
       <div class="formula-box">MBV = <span>FBV</span> + <span>SAV</span> &nbsp;|&nbsp; Master Budget Variance = Flexible Budget Variance + Sales Activity Variance</div>
-      <button class="btn mt8" onclick="G4.showP3()">Continue to Diagnosis →</button>
+      <button class="btn mt8" onclick="G4.showP3()">→ PROCEED TO DIAGNOSIS</button>
     </div>
 
     <div id="g4-p3" class="hidden">
@@ -537,7 +763,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
           <div class="mo" onclick="G4.mcq(this,'0',3)">C) $0 — volume differences don't affect revenue SAV</div>
         </div>
       </div>
-      <button class="btn mt8 hidden" id="g4-p3-btn" onclick="G4.showP4()">Continue to Drill-Down →</button>
+      <button class="btn mt8 hidden" id="g4-p3-btn" onclick="G4.showP4()">→ DRILL DOWN ON APPLES</button>
     </div>
 
     <div id="g4-p4" class="hidden">
@@ -561,7 +787,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
           <input class="vc-amt" id="v-ev" placeholder="e.g. 560">
           <select class="vc-sel" id="v-evfu"><option value="">F/U</option><option value="F">Favorable</option><option value="U">Unfavorable</option></select>
         </div>
-        <button class="btn mt12" onclick="G4.checkDrill()">Check Variances</button>
+        <button class="btn mt12" onclick="G4.checkDrill()">⚡ SUBMIT VARIANCE REPORT</button>
         <div id="g4-drill-result" style="margin-top:10px;font-size:.85rem"></div>
       </div>
     </div>
@@ -579,8 +805,12 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="g5" class="scr">
   <div class="gc">
     <div class="gh">
-      <div><div class="gt">💼 Finance Office — Capital Budgeting</div><div class="gs">Chapter 7 · NPV Analysis</div></div>
-      <div class="gb">Score: <span id="g5-score">0</span></div>
+      <div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--bad);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;animation:pa 1.6s ease-in-out infinite">⚡ MISSION ACTIVE</div>
+        <div class="gt">💼 Finance Office — Capital Budgeting</div>
+        <div class="gs">CHAPTER 7 · Sandra Okafor · NPV Analysis</div>
+      </div>
+      <div class="gb">XP: <span id="g5-score">0</span></div>
     </div>
     <div class="ib"><strong>The Air-Porter Van:</strong> Walk through each NPV calculation step. Enter your answer and click Check to reveal the result and explanation.</div>
     <div class="scenario-box">
@@ -603,7 +833,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         <div class="step-formula">After-tax inflows = $34,200 × (1 − 0.22)</div>
         <div class="s-inp-row">
           <input class="s-inp" id="s1-inp" placeholder="$ answer" type="number">
-          <button class="btn" onclick="G5.check(1,26676,'After-tax inflows = $34,200 × 0.78 = $26,676. Tax reduces cash received from operations.')">Check</button>
+          <button class="btn" onclick="G5.check(1,26676,'After-tax inflows = $34,200 × 0.78 = $26,676. Tax reduces cash received from operations.')">VERIFY →</button>
         </div>
         <div class="s-result" id="s1-res"></div>
       </div>
@@ -613,7 +843,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         <div class="step-formula">After-tax outflows = $25,500 × (1 − 0.22)</div>
         <div class="s-inp-row">
           <input class="s-inp" id="s2-inp" placeholder="$ answer" type="number">
-          <button class="btn" onclick="G5.check(2,19890,'After-tax outflows = $25,500 × 0.78 = $19,890. Operating expenses reduce taxable income.')">Check</button>
+          <button class="btn" onclick="G5.check(2,19890,'After-tax outflows = $25,500 × 0.78 = $19,890. Operating expenses reduce taxable income.')">VERIFY →</button>
         </div>
         <div class="s-result" id="s2-res"></div>
       </div>
@@ -623,7 +853,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         <div class="step-formula">Depreciation = (Cost − Salvage) ÷ Life = ($33,000 − $1,000) ÷ 8</div>
         <div class="s-inp-row">
           <input class="s-inp" id="s3-inp" placeholder="$ answer" type="number">
-          <button class="btn" onclick="G5.check(3,4000,'Depreciation = $32,000 ÷ 8 = $4,000/year. Non-cash expense but creates a tax shield.')">Check</button>
+          <button class="btn" onclick="G5.check(3,4000,'Depreciation = $32,000 ÷ 8 = $4,000/year. Non-cash expense but creates a tax shield.')">VERIFY →</button>
         </div>
         <div class="s-result" id="s3-res"></div>
       </div>
@@ -633,7 +863,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         <div class="step-formula">Tax Shield = Depreciation × Tax Rate = $4,000 × 0.22</div>
         <div class="s-inp-row">
           <input class="s-inp" id="s4-inp" placeholder="$ answer" type="number">
-          <button class="btn" onclick="G5.check(4,880,'Tax Shield = $4,000 × 0.22 = $880/year. Depreciation reduces taxable income, saving $880 in taxes annually.')">Check</button>
+          <button class="btn" onclick="G5.check(4,880,'Tax Shield = $4,000 × 0.22 = $880/year. Depreciation reduces taxable income, saving $880 in taxes annually.')">VERIFY →</button>
         </div>
         <div class="s-result" id="s4-res"></div>
       </div>
@@ -655,13 +885,13 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         = ($26,676 − $19,890 + $880) × 6.210 − $33,000</div>
         <div class="s-inp-row">
           <input class="s-inp" id="s6-inp" placeholder="$ answer" type="number">
-          <button class="btn" onclick="G5.check(6,14178,'Net cash flow = $26,676 − $19,890 + $880 = $7,666. NPV = $7,666 × 6.210 − $33,000 ≈ $14,601. Positive NPV → ACCEPT the investment!')">Check</button>
+          <button class="btn" onclick="G5.check(6,14178,'Net cash flow = $26,676 − $19,890 + $880 = $7,666. NPV = $7,666 × 6.210 − $33,000 ≈ $14,601. Positive NPV → ACCEPT the investment!')">VERIFY →</button>
         </div>
         <div class="s-result" id="s6-res"></div>
       </div>
     </div>
-    <div id="g5-invest" class="hidden" style="background:#fff;border-radius:var(--r);box-shadow:var(--ss);padding:18px;margin-top:14px">
-      <h3 style="font-size:.95rem;font-weight:700;color:var(--pr);margin-bottom:8px">Final Decision: IRR = 16.56% vs. Required Return = 6%. Should the company invest?</h3>
+    <div id="g5-invest" class="hidden" style="background:var(--cb);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--ss);padding:18px;margin-top:14px">
+      <h3 style="font-size:.95rem;font-weight:700;color:var(--tx);margin-bottom:8px">Final Decision: IRR = 16.56% vs. Required Return = 6%. Should the company invest?</h3>
       <div class="mc-opts">
         <div class="mc-opt" onclick="G5.invest(this,true)">✅ Yes — NPV is positive and IRR exceeds the required rate of return</div>
         <div class="mc-opt" onclick="G5.invest(this,false)">❌ No — the investment is too risky</div>
@@ -685,8 +915,12 @@ input[type=range]{width:100%;accent-color:var(--pr)}
 <div id="g6" class="scr">
   <div class="gc">
     <div class="gh">
-      <div><div class="gt">📊 Executive Suite — Balanced Scorecard</div><div class="gs">Chapters 17–18 · BSC &amp; Transfer Pricing</div></div>
-      <div class="gb">Score: <span id="g6-score">0</span></div>
+      <div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--bad);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;animation:pa 1.6s ease-in-out infinite">⚡ MISSION ACTIVE</div>
+        <div class="gt">📊 Executive Suite — Balanced Scorecard</div>
+        <div class="gs">CHAPTERS 17–18 · Priya Nair · BSC &amp; Transfer Pricing</div>
+      </div>
+      <div class="gb">XP: <span id="g6-score">0</span></div>
     </div>
     <div class="ib"><strong>Phase 1:</strong> Drag each KPI to the correct BSC quadrant. <strong>Phase 2:</strong> Use the transfer pricing slider to see how price affects division income.</div>
     <div class="phase-hdr"><span class="ph-badge">Phase 1</span><span class="ph-title">Sort KPIs into the Balanced Scorecard</span></div>
@@ -721,7 +955,7 @@ input[type=range]{width:100%;accent-color:var(--pr)}
         <div class="tp-div"><div class="dn">Distribution Division Income</div><div class="di" id="tp-dist">$3.50</div><div style="font-size:.72rem;color:var(--tm)">(Selling Price − TP)</div></div>
       </div>
       <div id="g6-tp-insight" style="margin-top:10px;font-size:.83rem;color:var(--tm)"></div>
-      <button class="btn mt12" id="g6-finish-btn" onclick="G6.finish()">Complete Game</button>
+      <button class="btn mt12" id="g6-finish-btn" onclick="G6.finish()">📋 FILE FINAL REPORT</button>
     </div>
 
     <div class="cbanner" id="g6-done">
@@ -761,6 +995,9 @@ const Nav = {
     document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
     document.getElementById('hub').classList.add('on');
     document.getElementById('btnHub').style.display='none';
+    document.getElementById('co').classList.add('hidden');
+    updateCombo(0);
+    charHUD.hide();
     updateSB(); updateHubCards();
   },
   go(id,initFn){
@@ -775,9 +1012,331 @@ const Nav = {
 window.Nav = Nav;
 
 function updateSB(){
-  document.getElementById('sb-total').textContent=State.total().toLocaleString()+' pts';
-  document.getElementById('sb-prog').textContent=State.doneCount()+'/6 complete';
-  document.getElementById('hub-score').textContent=State.total().toLocaleString();
+  const total=State.total();
+  document.getElementById('sb-total').textContent=total.toLocaleString()+' pts';
+  document.getElementById('sb-prog').textContent=State.doneCount()+'/6 done';
+  const hs=document.getElementById('hub-score');
+  if(hs) tickScore(hs,total);
+  const xpPct=Math.min(total/9125*100,100);
+  const fill=document.getElementById('hub-xp-fill');
+  if(fill) fill.style.width=xpPct+'%';
+}
+
+// ═══════════════════════════════════════════════
+//  CHARACTER HUD — reactive in-game commentary
+// ═══════════════════════════════════════════════
+const charHUD = {
+  current: null,
+  lines: {
+    g1:{
+      open:["Alright rookie — conveyor's running! Sort those costs FAST.","Rosa Chen here. Product or Period — think before you drop!","New hire? Prove yourself. Those bins won't fill themselves."],
+      ok:["Nice one! Factory floor approves.","That's the one! Keep moving.","Correct — and the line keeps rolling!","Yes! You've got good instincts.","Boom! That's exactly right."],
+      streak3:["3 in a row! You're getting the hang of this!","Hat trick! Rosa Chen is impressed.","Streak bonus! The line is humming."],
+      streak5:["FIVE STRAIGHT — 2× MULTIPLIER! You're a natural!","Unstoppable! Rosa Chen wants you on the day shift."],
+      miss:["Hmm — factory costs attach to product. Office costs are period.","Not quite. Think: does it end up IN the product, or does it just run the business?","Try again. Product Cost → sticks to inventory. Period Cost → expensed now."],
+      finish:["Mission complete! Rosa Chen approves your classification work.","All costs sorted. The receiving dock is clear!"]
+    },
+    g2:{
+      open:["Diego Ruiz — Operations. I need that cost equation by end of shift.","Adjust the slope and intercept until that line fits the data.","High-Low method: use the highest and lowest activity points."],
+      ok:["That's the line! The data confirms it.","Excellent — slope and intercept are locked in.","Good eye! The regression fits."],
+      miss:["Keep adjusting — the line should pass through HIGH and LOW points.","Slope = rise over run. Check the formula.","Not there yet. High point: 467 mugs. Low point: 220 mugs."],
+      finish:["Diego Ruiz: cost equation confirmed. Sending to the plant manager.","Operations complete. Cost behavior mastered!"]
+    },
+    g3:{
+      open:["Fatima Al-Rashid, Production. Every cost belongs on a specific floor of this tower.","Unit-level costs attach to each item. Batch-level per production run.","Facility costs support the whole factory. Product costs support a product line."],
+      ok:["Correct level! The tower grows stronger.","That's the right floor. Fatima approves.","Good placement — ABC costing working as designed."],
+      miss:["Ask yourself: does this cost happen per unit, per batch, per product line, or for the whole facility?","Wrong floor. Think about what triggers this cost.","Almost — reconsider the scope of this cost."],
+      finish:["Fatima Al-Rashid: tower complete. ABC system is live!","Production floor is organized. Activity-Based Costing mastered!"]
+    },
+    g4:{
+      open:["Webb, QC. Fill in that flexible budget column — every number matters.","Remember: variable costs scale with units. Fixed costs stay fixed.","2,400 units produced. 2,800 budgeted. Explain every variance."],
+      ok:["Correct variance analysis. Webb nods.","That's the right diagnosis.","Confirmed — the numbers check out."],
+      miss:["Flexible budget = actual volume × standard rate. Try again.","Fixed costs don't change with volume. Variable costs do.","Check your calculation — compare FB to Actual, same volume."],
+      finish:["Webb, QC: all variances accounted for. Report filed.","Quality Control complete. Every variance explained!"]
+    },
+    g5:{
+      open:["Okafor, CFO. I need these NPV calculations verified before the board meeting.","Work each step carefully — one wrong number cascades into the whole NPV.","After-tax cash flows first. Then depreciation shield. Then PVA factor."],
+      ok:["Correct. Okafor checks it off.","That calculation is confirmed.","Board-ready number. Keep going."],
+      miss:["Check the formula — multiply by (1 − tax rate) for after-tax flows.","Not quite. Expected a different figure. Review the step formula.","Try again — every dollar counts in capital budgeting."],
+      finish:["CFO Okafor: NPV analysis approved. Sending to the board.","Finance Office complete. Capital budgeting mastered!"]
+    },
+    g6:{
+      open:["Priya Nair, CEO. Every KPI must land in the right BSC quadrant — no exceptions.","Financial, Customer, Internal Process, or Learning & Growth.","Drag each KPI carefully. Our strategic map depends on it."],
+      ok:["Correct quadrant. The scorecard takes shape.","That KPI belongs there. Priya Nair approves.","Strategic alignment confirmed."],
+      miss:["Wrong quadrant — does this measure money, customers, internal ops, or capability?","Think about which perspective this KPI serves.","Not there — reconsider what this metric is really tracking."],
+      finish:["CEO Nair: Balanced Scorecard complete. Strategy is live.","Executive Suite mission done. Strategy & control mastered!"]
+    }
+  },
+
+  show(gameId){
+    this.current=gameId;
+    const m=MISSIONS[gameId];
+    document.getElementById('ch-char').textContent=m.char;
+    document.getElementById('ch-name').textContent=m.name;
+    const hud=document.getElementById('char-hud');
+    hud.style.display='flex';
+    if(window.gsap) gsap.from(hud,{x:80,opacity:0,duration:.4,ease:'back.out(1.4)'});
+    this._say(this._pick('open'));
+  },
+
+  react(isOk, streak){
+    if(!this.current) return;
+    if(isOk){
+      if(streak>=5)      this._say(this._pick('streak5'));
+      else if(streak>=3) this._say(this._pick('streak3'));
+      else               this._say(this._pick('ok'));
+    } else {
+      this._say(this._pick('miss'));
+    }
+  },
+
+  finish(){
+    if(!this.current) return;
+    this._say(this._pick('finish'));
+    setTimeout(()=>{ document.getElementById('char-hud').style.display='none'; },3200);
+  },
+
+  hide(){
+    this.current=null;
+    document.getElementById('char-hud').style.display='none';
+  },
+
+  _say(text){
+    const el=document.getElementById('ch-text');
+    const bubble=document.querySelector('.ch-bubble');
+    // Show typing dots briefly, then typewrite message
+    el.innerHTML='<span style="letter-spacing:3px;opacity:.7">●●●</span>';
+    if(window.gsap) gsap.fromTo(bubble,{scale:.88,opacity:.5},{scale:1,opacity:1,duration:.18,ease:'back.out(1.7)'});
+    clearTimeout(this._sayTimer);
+    this._sayTimer=setTimeout(()=>{
+      el.textContent='';
+      let i=0;
+      const iv=setInterval(()=>{
+        if(i<text.length){ el.textContent=text.slice(0,++i); }
+        else clearInterval(iv);
+      },22);
+    },420);
+  },
+
+  hints:{
+    g1:["Product Costs (DM, DL, MOH) attach to the product and flow through inventory. Period Costs (selling & admin) are expensed immediately.",
+        "Ask: does this cost end up IN the jar of applesauce? → Product Cost. Does it run the business office? → Period Cost.",
+        "Variable costs change with output. Fixed costs stay constant regardless of units produced."],
+    g2:["High-Low: slope = (High $ − Low $) ÷ (High units − Low units). Then: b = Y − mX using either point.",
+        "Slope ≈ $12.04 per mug. Plug into Y = mX + b using the high point (467 mugs, $9,094) to find b.",
+        "Relevant range: the prediction is only reliable within the range of observed data (220–467 mugs)."],
+    g3:["Unit-level: occurs every unit made (DM, DL). Batch-level: occurs per production run (setup, QC per batch). Product-level: supports one product line. Facility-level: supports the whole factory.",
+        "If the cost goes away when you stop making ONE product entirely → Product-level. If it stays no matter what → Facility-level.",
+        "Each cost driver measures what CAUSES that activity's cost to change."],
+    g4:["Flexible Budget = Standard Rate × Actual Units. It answers: 'what SHOULD we have spent at the actual volume?'",
+        "MBV (Master Budget Variance) = FB Variance + Sales Activity Variance. Separate the volume effect from the efficiency effect.",
+        "Price Variance = (AP − SP) × AQ. Efficiency Variance = (AQ − SQ) × SP. AQ/AP = actual; SQ/SP = standard."],
+    g5:["After-tax cash flow = Pre-tax amount × (1 − tax rate). Apply this to both inflows AND outflows.",
+        "Depreciation Tax Shield = Annual Depreciation × Tax Rate. This is a BENEFIT — it reduces your tax bill.",
+        "NPV > 0 → Accept. The PVA (annuity) factor converts annual cash flows into a present value lump sum."],
+    g6:["Financial: profit, ROI, revenue. Customer: satisfaction, retention, delivery. Internal Process: defects, cycle time, inventory. Learning: training hours, employee satisfaction.",
+        "Transfer price must be ≥ variable cost of selling division AND ≤ market price buyer could get externally.",
+        "A good transfer price motivates BOTH divisions. If it's too low, the seller won't cooperate. Too high, the buyer won't either."]
+  },
+
+  giveHint(){
+    if(!this.current) return;
+    const arr=this.hints[this.current]||[];
+    if(!arr.length) return;
+    const text=arr[Math.floor(Math.random()*arr.length)];
+    this._say('💡 '+text);
+    SFX.correct();
+  },
+
+  _pick(key){
+    const arr=(this.lines[this.current]||{})[key]||['Good work!'];
+    return arr[Math.floor(Math.random()*arr.length)];
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  ANIMATED SCORE COUNTER
+// ═══════════════════════════════════════════════
+function tickScore(el, newVal){
+  if(!el) return;
+  const old = parseInt(el.textContent)||0;
+  if(old===newVal){ el.textContent=newVal; return; }
+  const dur = Math.min(600, Math.abs(newVal-old)*1.5);
+  const start = performance.now();
+  const step = ts=>{
+    const p = Math.min((ts-start)/dur,1);
+    el.textContent = Math.round(old + (newVal-old)*p);
+    if(p<1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ═══════════════════════════════════════════════
+//  PHASE UNLOCK FLASH
+// ═══════════════════════════════════════════════
+function showPhaseUnlock(label){
+  const el = document.createElement('div');
+  el.style.cssText=`position:fixed;inset:0;z-index:3500;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;pointer-events:none;
+    background:rgba(0,0,0,.7);backdrop-filter:blur(3px)`;
+  el.innerHTML=`
+    <div style="font-size:.8rem;font-weight:800;color:var(--ac);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">PHASE UNLOCKED</div>
+    <div style="font-size:2.2rem;font-weight:900;color:#fff;letter-spacing:-1px">${label}</div>
+    <div style="width:60px;height:3px;background:var(--ac);margin-top:14px;border-radius:2px"></div>`;
+  document.body.appendChild(el);
+  if(window.gsap){
+    gsap.fromTo(el,{opacity:0},{opacity:1,duration:.2})
+      .then(()=>gsap.to(el,{opacity:0,delay:.9,duration:.3,onComplete:()=>el.remove()}));
+  } else { setTimeout(()=>el.remove(),1400); }
+}
+
+// ═══════════════════════════════════════════════
+//  MISSIONS — character data for each game
+// ═══════════════════════════════════════════════
+const MISSIONS = {
+  g1:{char:'👩‍💼',name:'Rosa Chen',dept:'Receiving Dept. Manager',
+    text:`Welcome to the Receiving Dock! I'm Rosa Chen. Cost cards are piling up on the conveyor — we need to sort them FAST or production grinds to a halt. Drag each cost to the right bin. Product Costs attach to inventory; Period Costs get expensed immediately. Ready? Let's classify!`},
+  g2:{char:'📊',name:'Diego Ruiz',dept:'Operations Analyst',
+    text:`Diego Ruiz, Operations. We've got 7 months of pottery data from Zeffani's studio and I need a cost equation by end of shift. Use the sliders to fit the High-Low line through the data, then predict what 350 mugs will cost. The plant manager is waiting.`},
+  g3:{char:'🏭',name:'Fatima Al-Rashid',dept:'Production Supervisor',
+    text:`Salaam! I'm Fatima, Production Supervisor. Our old costing system lumps everything into overhead — and it's lying to us. We're switching to Activity-Based Costing. Sort every cost card into the right hierarchy level, then match each activity to its cost driver. Let's build this tower right.`},
+  g4:{char:'🔍',name:'Marcus Webb',dept:'Quality Control Inspector',
+    text:`Webb, QC. We budgeted 2,800 jars of Saucy Apple applesauce but only ran 2,400. The CFO wants every variance explained by end of day. Fill the Flexible Budget column, rotate the 3D chart to see the gaps, then drill down to the apple price and efficiency variances. Miss nothing.`},
+  g5:{char:'💼',name:'Sandra Okafor',dept:'Chief Financial Officer',
+    text:`Good morning — Sandra Okafor, CFO. The board wants a capital investment recommendation on the Air-Porter Van by noon. Work through every NPV step: after-tax cash flows, depreciation shield, PVA factor, net present value. Get it right and the company gains $14k in value.`},
+  g6:{char:'📈',name:'Priya Nair',dept:'Chief Executive Officer',
+    text:`I'm Priya Nair, CEO. Our strategy lives or dies by what we measure. Sort all sixteen KPIs into the right Balanced Scorecard quadrant, then set the transfer price for Sip and Tip Co. so both divisions stay motivated. Get this right and we scale the whole business.`}
+};
+
+// ═══════════════════════════════════════════════
+//  MISSION INTRO — typewriter overlay
+// ═══════════════════════════════════════════════
+const MissionIntro = {
+  show(gameId){
+    return new Promise(resolve=>{
+      const m=MISSIONS[gameId];
+      document.getElementById('mo-char').textContent=m.char;
+      document.getElementById('mo-name').textContent=m.name;
+      document.getElementById('mo-dept').textContent=m.dept;
+      const typed=document.getElementById('mo-typed');
+      typed.textContent='';
+      document.getElementById('mo').classList.remove('hidden');
+      if(window.gsap) gsap.from('.mo-card',{scale:.85,opacity:0,duration:.35,ease:'back.out(1.7)'});
+      let i=0;
+      const iv=setInterval(()=>{
+        if(i<m.text.length){ typed.textContent=m.text.slice(0,++i); }
+        else clearInterval(iv);
+      },18);
+      const done=()=>{ clearInterval(iv); document.getElementById('mo').classList.add('hidden'); resolve(); };
+      document.getElementById('mo-start').onclick=done;
+      document.getElementById('mo-skip').onclick=done;
+    });
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  SFX — Web Audio API procedural sounds
+// ═══════════════════════════════════════════════
+const SFX=(()=>{
+  let ctx;
+  function init(){ if(!ctx) try{ctx=new AudioContext();}catch(e){} }
+  function tone(freq,type,dur,vol=0.28){
+    if(!ctx) return;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.start(); o.stop(ctx.currentTime+dur);
+  }
+  return {
+    correct(){ init(); tone(440,'sine',.12); setTimeout(()=>tone(554,'sine',.12),90); setTimeout(()=>tone(659,'sine',.22),180); },
+    wrong(){   init(); tone(220,'sawtooth',.09,.2); setTimeout(()=>tone(165,'sawtooth',.14,.2),70); },
+    complete(){ init(); [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.28),i*110)); }
+  };
+})();
+
+// ═══════════════════════════════════════════════
+//  SCORE POPUP — floating +pts label
+// ═══════════════════════════════════════════════
+function showScorePopup(pts,x,y){
+  const el=document.createElement('div');
+  el.className='score-pop';
+  el.textContent='+'+pts;
+  el.style.left=x+'px'; el.style.top=y+'px';
+  document.body.appendChild(el);
+  if(window.gsap){
+    gsap.fromTo(el,{y:0,opacity:1,scale:1},{y:-70,opacity:0,scale:1.4,duration:.9,ease:'power2.out',onComplete:()=>el.remove()});
+  } else { setTimeout(()=>el.remove(),900); }
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN FLASH + SHAKE
+// ═══════════════════════════════════════════════
+function screenFlash(isOk){
+  const fl=document.getElementById('flash');
+  fl.style.background=isOk?'rgba(63,185,80,.18)':'rgba(248,81,73,.22)';
+  if(window.gsap){
+    gsap.fromTo(fl,{opacity:0},{opacity:1,duration:.08,yoyo:true,repeat:1,onComplete:()=>{fl.style.opacity=0;}});
+    if(!isOk){
+      gsap.timeline()
+        .to(document.body,{x:7,duration:.05})
+        .to(document.body,{x:-7,duration:.05})
+        .to(document.body,{x:4,duration:.05})
+        .to(document.body,{x:-4,duration:.05})
+        .to(document.body,{x:0,duration:.04});
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  COMBO METER
+// ═══════════════════════════════════════════════
+function updateCombo(streak){
+  const mult=streak>=5?2:streak>=3?1.5:1;
+  const pct=streak>=5?100:streak>=3?Math.min(60+(streak-3)*13,99):streak>0?Math.min(streak/3*55,54):0;
+  document.getElementById('combo-fill').style.width=pct+'%';
+  document.getElementById('combo-label').textContent='×'+mult;
+}
+
+// ═══════════════════════════════════════════════
+//  MISSION COMPLETE OVERLAY
+// ═══════════════════════════════════════════════
+function showMissionComplete(gameId,score,maxScore){
+  const pct=score/maxScore;
+  const stars=pct>=.8?3:pct>=.45?2:1;
+  const m=MISSIONS[gameId];
+  const grade=pct>=.8?'S RANK':'pct>=.45?"A RANK":"B RANK"';
+  document.getElementById('co-title').textContent=m.name.split(' ')[0]+"'s Mission: Complete!";
+  document.getElementById('co-sub').textContent=m.char+' '+m.dept;
+  document.getElementById('co-score').textContent=score.toLocaleString()+' pts';
+  document.getElementById('co-max').textContent='/ '+maxScore.toLocaleString()+' max · '+(pct>=.8?'S-Rank 🏅':pct>=.45?'A-Rank 🥈':'B-Rank 🥉');
+  ['star1','star2','star3'].forEach(id=>document.getElementById(id).classList.remove('lit'));
+  document.getElementById('co').classList.remove('hidden');
+  SFX.complete();
+  if(window.gsap) gsap.from('#co-card',{scale:.7,opacity:0,duration:.4,ease:'back.out(1.7)'});
+  // Burst star particles on 3-star
+  if(stars===3 && window.gsap){
+    for(let i=0;i<8;i++){
+      const sp=document.createElement('div');
+      sp.textContent='★';
+      sp.style.cssText=`position:fixed;z-index:10500;font-size:1.4rem;color:var(--ac);
+        pointer-events:none;left:50%;top:50%;transform:translate(-50%,-50%)`;
+      document.body.appendChild(sp);
+      const angle=(i/8)*Math.PI*2;
+      gsap.to(sp,{x:Math.cos(angle)*160,y:Math.sin(angle)*120,opacity:0,scale:1.8,
+        duration:1.1,ease:'power2.out',delay:.3+i*.04,onComplete:()=>sp.remove()});
+    }
+  }
+  // Check if all 6 complete (delayed so complete overlay shows first)
+  if(State.doneCount()>=6) setTimeout(checkAllComplete, 3500);
+  for(let i=1;i<=stars;i++){
+    setTimeout(()=>{
+      const s=document.getElementById('star'+i);
+      s.classList.add('lit');
+      if(window.gsap) gsap.from(s,{scale:0,rotation:-40,duration:.38,ease:'back.out(2.2)'});
+    },i*280);
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -800,26 +1359,50 @@ function updateHubCards(){
     const mx = State.max[d.id];
     const pct = Math.round(sc/mx*100);
     const done = State.done[d.id];
-    const badge = done?'<span class="badge b2">Completed</span>':sc>0?'<span class="badge b1">In Progress</span>':'<span class="badge b0">Not Started</span>';
     const startFn = `G${d.id.slice(1)}_start`;
+    const starPct = sc/mx;
+    const starCount = done ? (starPct>=.8?3:starPct>=.45?2:1) : 0;
+    const starStr = '★'.repeat(starCount)+'☆'.repeat(3-starCount);
+    const statusLabel = done ? '✔ COMPLETE' : sc>0 ? '⚡ IN PROGRESS' : '📋 AWAITING RECRUIT';
+    const statusColor = done ? 'var(--ok)' : sc>0 ? 'var(--ac)' : 'var(--pr2)';
+    const pulseClass = (!done && sc===0) ? 'pulse' : '';
+    const m = MISSIONS[d.id];
+    const charEmoji = m ? m.char : d.ico;
+    const charName = m ? m.name : '';
     grid.innerHTML+=`
-    <div class="dc ${done?'done':''}" onclick="${startFn}()">
-      <div class="ico">${d.ico}</div>
+    <div class="dc ${done?'done':''} ${pulseClass}" onclick="${startFn}()" style="opacity:0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--cb);border:2px solid ${done?'var(--ok)':sc>0?'var(--ac)':'var(--bd)'};
+            display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;
+            ${done?'box-shadow:0 0 12px rgba(63,185,80,.4)':''}">${charEmoji}</div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:var(--tx)">${charName}</div>
+            <div style="font-size:.64rem;color:var(--tm)">${m?m.dept:''}</div>
+          </div>
+        </div>
+        <span style="font-size:.62rem;font-weight:800;color:${statusColor};letter-spacing:.4px;text-transform:uppercase;text-align:right;margin-top:2px">${statusLabel}</span>
+      </div>
       <div class="dn">${d.name}</div>
       <div class="dt">${d.topic}</div>
+      <div class="dc-stars" style="color:${starCount>0?'var(--ac)':'var(--bd)'};margin:4px 0">${starStr}</div>
       <div class="sbar"><div class="sfill" style="width:${pct}%"></div></div>
-      <div class="stext"><span>${sc.toLocaleString()} pts</span><span>Max: ${mx.toLocaleString()}</span></div>
-      ${badge}
-      <button class="btn-e">${done?'🔄 Replay':'▶ Enter'}</button>
+      <div class="stext"><span>${sc.toLocaleString()} XP</span><span>Max: ${mx.toLocaleString()}</span></div>
+      <button class="btn-e" style="margin-top:14px">${done?'↩ Replay Mission':'▶ Enter Department'}</button>
     </div>`;
   });
+  if(window.gsap){
+    gsap.fromTo('.dc',{opacity:0,y:32},{opacity:1,y:0,duration:.42,stagger:.09,ease:'power2.out'});
+  } else {
+    document.querySelectorAll('.dc').forEach(c=>c.style.opacity='1');
+  }
 }
-window.G1_start=()=>Nav.go('g1',G1.init.bind(G1));
-window.G2_start=()=>Nav.go('g2',G2.init.bind(G2));
-window.G3_start=()=>Nav.go('g3',G3.init.bind(G3));
-window.G4_start=()=>Nav.go('g4',G4.init.bind(G4));
-window.G5_start=()=>Nav.go('g5',G5.init.bind(G5));
-window.G6_start=()=>Nav.go('g6',G6.init.bind(G6));
+window.G1_start=()=>MissionIntro.show('g1').then(()=>{Nav.go('g1',G1.init.bind(G1));charHUD.show('g1');});
+window.G2_start=()=>MissionIntro.show('g2').then(()=>{Nav.go('g2',G2.init.bind(G2));charHUD.show('g2');});
+window.G3_start=()=>MissionIntro.show('g3').then(()=>{Nav.go('g3',G3.init.bind(G3));charHUD.show('g3');});
+window.G4_start=()=>MissionIntro.show('g4').then(()=>{Nav.go('g4',G4.init.bind(G4));charHUD.show('g4');});
+window.G5_start=()=>MissionIntro.show('g5').then(()=>{Nav.go('g5',G5.init.bind(G5));charHUD.show('g5');});
+window.G6_start=()=>MissionIntro.show('g6').then(()=>{Nav.go('g6',G6.init.bind(G6));charHUD.show('g6');});
 
 // ═══════════════════════════════════════════════
 //  FEEDBACK BUBBLE
@@ -981,6 +1564,7 @@ const G1 = {
     const card = document.getElementById('g1-card');
     card.textContent = item.t;
     card.style.borderColor = 'var(--bd)';
+    if(window.gsap) gsap.fromTo(card,{x:-60,opacity:0,rotation:-3},{x:0,opacity:1,rotation:0,duration:.35,ease:'back.out(1.4)'});
 
     card.addEventListener('pointerdown', e=>{
       if(e.button && e.button!==0) return;
@@ -1024,20 +1608,29 @@ const G1 = {
       const isOk=bin.id===item.a;
       if(isOk){
         this.streak++;
+        updateCombo(this.streak);
         const mult=this.streak>=5?2:this.streak>=3?1.5:1;
         const pts=Math.round(100*mult);
         this.score+=pts;
-        document.getElementById('g1-score').textContent=this.score;
-        fb(true,`✅ Correct! +${pts} pts — ${item.hint}`,e.clientX,e.clientY);
-        if(window.gsap) gsap.from(card,{scale:1.15,duration:.2});
+        tickScore(document.getElementById('g1-score'),this.score);
+        fb(true,`✅ ${item.hint}`,e.clientX,e.clientY);
+        showScorePopup(pts, e.clientX, e.clientY-40);
+        SFX.correct();
+        screenFlash(true);
+        charHUD.react(true, this.streak);
+        if(window.gsap) gsap.timeline().to(card,{scale:1.18,duration:.1}).to(card,{scale:1,duration:.15});
       } else {
         this.streak=0;
+        updateCombo(0);
         this.score=Math.max(0,this.score-25);
-        document.getElementById('g1-score').textContent=this.score;
-        fb(false,`❌ Not quite. ${item.hint}`,e.clientX,e.clientY);
+        tickScore(document.getElementById('g1-score'),this.score);
+        fb(false,`❌ ${item.hint}`,e.clientX,e.clientY);
+        SFX.wrong();
+        screenFlash(false);
+        charHUD.react(false, 0);
       }
       this.idx++;
-      setTimeout(()=>this.showCard(), 400);
+      setTimeout(()=>this.showCard(), 420);
     }, {signal:sig});
   },
 
@@ -1053,9 +1646,9 @@ const G1 = {
     State.scores.g1=this.score;
     State.done.g1=true;
     State.save();
-    updateSB();
-    document.getElementById('g1-earned').textContent=this.score.toLocaleString()+' pts';
-    document.getElementById('g1-done').classList.add('on');
+    updateSB(); updateCombo(0);
+    charHUD.finish();
+    setTimeout(()=>showMissionComplete('g1',this.score,State.max.g1),1800);
   }
 };
 window.G1=G1;
@@ -1097,24 +1690,24 @@ const G2 = {
     const ns='http://www.w3.org/2000/svg';
     const mk=(t,a)=>{const e=document.createElementNS(ns,t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));return e;};
     // Axes
-    svg.appendChild(mk('line',{x1:30,y1:10,x2:30,y2:375,'stroke':'#BDC3C7','stroke-width':1}));
-    svg.appendChild(mk('line',{x1:25,y1:370,x2:495,y2:370,'stroke':'#BDC3C7','stroke-width':1}));
+    svg.appendChild(mk('line',{x1:30,y1:10,x2:30,y2:375,'stroke':'#30363d','stroke-width':1}));
+    svg.appendChild(mk('line',{x1:25,y1:370,x2:495,y2:370,'stroke':'#30363d','stroke-width':1}));
     // X-axis labels
     [0,100,200,300,400,500,600].forEach(v=>{
       const x=this.xScale(v);
-      svg.appendChild(mk('text',{x,y:390,'text-anchor':'middle','font-size':10,'fill':'#7F8C8D'})).textContent=v;
-      if(v) svg.appendChild(mk('line',{x1:x,y1:368,x2:x,y2:372,'stroke':'#BDC3C7','stroke-width':1}));
+      svg.appendChild(mk('text',{x,y:390,'text-anchor':'middle','font-size':10,'fill':'#8b949e'})).textContent=v;
+      if(v) svg.appendChild(mk('line',{x1:x,y1:368,x2:x,y2:372,'stroke':'#30363d','stroke-width':1}));
     });
     // Y-axis labels
     [0,3000,6000,9000,12000].forEach(v=>{
       const y=this.yScale(v);
-      svg.appendChild(mk('text',{x:25,y:y+4,'text-anchor':'end','font-size':10,'fill':'#7F8C8D'})).textContent='$'+v/1000+'k';
-      if(v) svg.appendChild(mk('line',{x1:28,y1:y,x2:32,y2:y,'stroke':'#BDC3C7','stroke-width':1}));
+      svg.appendChild(mk('text',{x:25,y:y+4,'text-anchor':'end','font-size':10,'fill':'#8b949e'})).textContent='$'+v/1000+'k';
+      if(v) svg.appendChild(mk('line',{x1:28,y1:y,x2:32,y2:y,'stroke':'#30363d','stroke-width':1}));
     });
     // Axis labels
-    const xl=mk('text',{x:265,y:400,'text-anchor':'middle','font-size':11,'fill':'#566573','font-weight':'bold'});
+    const xl=mk('text',{x:265,y:400,'text-anchor':'middle','font-size':11,'fill':'#8b949e','font-weight':'bold'});
     xl.textContent='Mugs Produced (X)'; svg.appendChild(xl);
-    const yl=mk('text',{x:10,y:200,'text-anchor':'middle','font-size':11,'fill':'#566573','font-weight':'bold',transform:'rotate(-90,10,200)'});
+    const yl=mk('text',{x:10,y:200,'text-anchor':'middle','font-size':11,'fill':'#8b949e','font-weight':'bold',transform:'rotate(-90,10,200)'});
     yl.textContent='Total Cost (Y)'; svg.appendChild(yl);
     // Student's line (orange)
     const lx1=this.xScale(0), ly1=this.yScale(b);
@@ -1149,7 +1742,8 @@ const G2 = {
     this.locked=true;
     document.getElementById('g2-m').disabled=true;
     document.getElementById('g2-b').disabled=true;
-    document.getElementById('g2-score').textContent=this.score;
+    tickScore(document.getElementById('g2-score'),this.score);
+    if(pts>0){ SFX.correct(); charHUD.react(true,0); } else { SFX.wrong(); charHUD.react(false,0); }
     if(mOk&&bOk){
       msg=`✅ Excellent! Slope ✓ Intercept ✓ +${pts} pts`;
     } else if(mOk||bOk){
@@ -1157,7 +1751,7 @@ const G2 = {
     } else {
       msg=`❌ Not quite. HL answer: Y = $12.04X + $3,471. Slope: (9094−6120)÷(467−220) = $12.04`;
     }
-    document.getElementById('g2-result').innerHTML=`<div style="padding:8px 12px;background:${pts>0?'#D1FAE5':'#FEE2E2'};border-radius:6px;font-size:.85rem">${msg}</div>`;
+    document.getElementById('g2-result').innerHTML=`<div style="padding:8px 12px;background:${pts>0?'#122d1f':'#2d1215'};color:${pts>0?'#3fb950':'#f85149'};border-radius:6px;font-size:.85rem">${msg}</div>`;
     this.draw();
   },
   checkPred(){
@@ -1169,15 +1763,17 @@ const G2 = {
     const pts=ok?200:0;
     this.score+=pts;
     this.predDone=true;
-    document.getElementById('g2-score').textContent=this.score;
+    tickScore(document.getElementById('g2-score'),this.score);
+    if(ok){ SFX.correct(); charHUD.react(true,0); showScorePopup(200,window.innerWidth/2,300); }
+    else { SFX.wrong(); charHUD.react(false,0); }
     document.getElementById('g2-rrmsg').textContent=ok?
       `✅ Correct! At 350 mugs: Y = $12.04(350) + $3,471 = $7,685. +200 pts` :
       `❌ Not quite. Y = $12.04(350) + $3,471.32 = $7,685.32. Relevant range: 220–467 mugs.`;
     document.getElementById('g2-rrmsg').style.color=ok?'var(--gr)':'var(--unf)';
     if(this.score>0){
       State.scores.g2=this.score; State.done.g2=true; State.save(); updateSB();
-      document.getElementById('g2-earned').textContent=this.score.toLocaleString()+' pts';
-      setTimeout(()=>document.getElementById('g2-done').classList.add('on'),600);
+      charHUD.finish();
+      setTimeout(()=>showMissionComplete('g2',this.score,State.max.g2),1800);
     }
   }
 };
@@ -1245,12 +1841,16 @@ const G3 = {
           document.getElementById('pl-'+z).appendChild(tag);
           this.score+=75;
           this.placed++;
-          document.getElementById('g3-score').textContent=this.score;
-          fb(true,'✅ Correct! +75 pts',cx,cy);
-          if(this.placed===this.items.length) setTimeout(()=>this.showPhase2(),500);
+          tickScore(document.getElementById('g3-score'),this.score);
+          fb(true,'✅ +75 XP',cx,cy);
+          showScorePopup(75,cx,cy-40);
+          SFX.correct();
+          charHUD.react(true,0);
+          if(this.placed===this.items.length) setTimeout(()=>{ showPhaseUnlock('Phase 2 — Driver Matching'); setTimeout(()=>this.showPhase2(),400); },500);
         } else {
-          const labels={fa:'Facility',pr:'Product',ba:'Batch',un:'Unit'};
-          fb(false,`❌ Try again. Hint: ${this.getHint(parseInt(el.dataset.idx))}`,cx,cy);
+          fb(false,`❌ ${this.getHint(parseInt(el.dataset.idx))}`,cx,cy);
+          SFX.wrong();
+          charHUD.react(false,0);
         }
       });
       pool.appendChild(c);
@@ -1300,10 +1900,12 @@ const G3 = {
     if(!allDone){ alert('Please select a driver for every activity.'); return; }
     this.p2done=true;
     this.score+=pts;
-    document.getElementById('g3-score').textContent=this.score;
+    tickScore(document.getElementById('g3-score'),this.score);
+    if(pts>0){ SFX.correct(); charHUD.react(true,0); showScorePopup(pts,window.innerWidth/2,300); }
+    else { SFX.wrong(); charHUD.react(false,0); }
     State.scores.g3=this.score; State.done.g3=true; State.save(); updateSB();
-    document.getElementById('g3-earned').textContent=this.score.toLocaleString()+' pts';
-    setTimeout(()=>document.getElementById('g3-done').classList.add('on'),600);
+    charHUD.finish();
+    setTimeout(()=>showMissionComplete('g3',this.score,State.max.g3),1800);
   }
 };
 window.G3=G3;
@@ -1351,13 +1953,14 @@ const G4 = {
       if(ok){ pts+=50; inp.disabled=true; }
     }
     this.score+=pts;
-    document.getElementById('g4-score').textContent=this.score;
+    tickScore(document.getElementById('g4-score'),this.score);
     const allOk=[...Array(6)].every((_,i)=>{
       const v=parseFloat(document.getElementById('v'+i).value.replace(/[$,]/g,''));
       return Math.abs(v-answers[i])<=1;
     });
     if(allOk){
-      setTimeout(()=>{ document.getElementById('g4-p1').classList.add('hidden'); this.showChart(); },400);
+      SFX.correct(); charHUD.react(true,0);
+      setTimeout(()=>{ showPhaseUnlock('Phase 2 — 3D Variance Chart'); setTimeout(()=>{ document.getElementById('g4-p1').classList.add('hidden'); this.showChart(); },400); },400);
     } else {
       const wrong=answers.filter((_,i)=>{
         const v=parseFloat(document.getElementById('v'+i).value.replace(/[$,]/g,''));
@@ -1461,7 +2064,10 @@ const G4 = {
     el.classList.add(isOk?'ok':'bad');
     if(isOk){
       this.score+=100; this.mcqAns[qn]=true;
-      document.getElementById('g4-score').textContent=this.score;
+      tickScore(document.getElementById('g4-score'),this.score);
+      SFX.correct(); charHUD.react(true,0);
+    } else {
+      SFX.wrong(); charHUD.react(false,0);
     }
     this.mcqDone[qn]=true;
     const allDone=Object.values(this.mcqDone).every(Boolean);
@@ -1488,16 +2094,18 @@ const G4 = {
     if(pvOk&&evOk){ pts+=250; }
     this.score+=pts;
     this.drillDone=true;
-    document.getElementById('g4-score').textContent=this.score;
+    tickScore(document.getElementById('g4-score'),this.score);
+    if(pts>0){ SFX.correct(); charHUD.react(true,0); showScorePopup(pts,window.innerWidth/2,window.innerHeight/2); }
+    else { SFX.wrong(); charHUD.react(false,0); }
     const res=document.getElementById('g4-drill-result');
-    res.innerHTML=`<div style="padding:10px;background:${pts>0?'#D1FAE5':'#FEE2E2'};border-radius:6px;font-size:.85rem">
+    res.innerHTML=`<div style="padding:10px;background:${pts>0?'#122d1f':'#2d1215'};color:${pts>0?'#3fb950':'#f85149'};border-radius:6px;font-size:.85rem;border:1px solid ${pts>0?'#3fb950':'#f85149'}">
       PV = (AP−SP)×AQ = ($0.15−$0.20)×19,600 = <strong>$980 Favorable</strong> (bought cheaper than standard)<br>
       EV = (AQ−SQ)×SP = (19,600−16,800)×$0.20 = <strong>$560 Unfavorable</strong> (used more apples than standard)<br>
       Net = $980F − $560U = <strong>$420 Favorable</strong><br>
       +${pts} pts earned</div>`;
     State.scores.g4=this.score; State.done.g4=true; State.save(); updateSB();
-    document.getElementById('g4-earned').textContent=this.score.toLocaleString()+' pts';
-    setTimeout(()=>document.getElementById('g4-done').classList.add('on'),800);
+    charHUD.finish();
+    setTimeout(()=>showMissionComplete('g4',this.score,State.max.g4),1800);
   }
 };
 window.G4=G4;
@@ -1531,16 +2139,19 @@ const G5 = {
     if(ok){
       inp.disabled=true;
       this.score+=100;
-      document.getElementById('g5-score').textContent=this.score;
+      tickScore(document.getElementById('g5-score'),this.score);
       document.getElementById('s'+stepNum).classList.add('done');
       document.getElementById('s'+stepNum+'-res').className='s-result on';
       document.getElementById('s'+stepNum+'-res').innerHTML=`✅ ${explanation}`;
-      if(stepNum===6) setTimeout(()=>document.getElementById('g5-invest').classList.remove('hidden'),400);
+      SFX.correct(); charHUD.react(true,0);
+      showScorePopup(100, inp.getBoundingClientRect().left+70, inp.getBoundingClientRect().top);
+      if(stepNum===6) setTimeout(()=>{ showPhaseUnlock('Final Decision'); setTimeout(()=>document.getElementById('g5-invest').classList.remove('hidden'),400); },600);
     } else {
       document.getElementById('s'+stepNum+'-res').className='s-result on';
       document.getElementById('s'+stepNum+'-res').innerHTML=`❌ Not quite. Expected: $${answer.toLocaleString()}. Check your formula.`;
-      document.getElementById('s'+stepNum+'-res').style.background='#FEE2E2';
-      document.getElementById('s'+stepNum+'-res').style.color='#991B1B';
+      document.getElementById('s'+stepNum+'-res').style.background='#2d1215';
+      document.getElementById('s'+stepNum+'-res').style.color='#f85149';
+      SFX.wrong(); charHUD.react(false,0);
     }
   },
   mcOpt(el,isCorrect){
@@ -1549,7 +2160,8 @@ const G5 = {
     el.classList.add('ok');
     this.s5done=true;
     this.score+=100;
-    document.getElementById('g5-score').textContent=this.score;
+    tickScore(document.getElementById('g5-score'),this.score);
+    SFX.correct(); charHUD.react(true,0);
     document.getElementById('s5-res').className='s-result on';
     document.getElementById('s5-res').innerHTML='✅ Correct! PVA factor for 8 years at 6% = 6.210 (from present value annuity tables)';
     document.getElementById('s5').classList.add('done');
@@ -1560,14 +2172,15 @@ const G5 = {
     el.classList.add(isCorrect?'ok':'bad');
     if(isCorrect){
       this.score+=200;
-      document.getElementById('g5-score').textContent=this.score;
+      tickScore(document.getElementById('g5-score'),this.score);
+      SFX.correct(); showScorePopup(200,window.innerWidth/2,window.innerHeight/2);
       document.getElementById('g5-npv-result').classList.add('on');
     } else {
       el.textContent+=' — When NPV > 0 and IRR > required return, the investment creates value.';
     }
     State.scores.g5=this.score; State.done.g5=true; State.save(); updateSB();
-    document.getElementById('g5-earned').textContent=this.score.toLocaleString()+' pts';
-    setTimeout(()=>document.getElementById('g5-done').classList.add('on'),isCorrect?600:200);
+    charHUD.finish();
+    setTimeout(()=>showMissionComplete('g5',this.score,State.max.g5),1800);
   }
 };
 window.G5=G5;
@@ -1615,14 +2228,16 @@ const G6 = {
         if(correct){
           el.classList.add('gone');
           this.score+=75; this.placed++;
-          document.getElementById('g6-score').textContent=this.score;
+          tickScore(document.getElementById('g6-score'),this.score);
           const chip=document.createElement('span');
           chip.className='pchip'; chip.textContent=el.textContent;
           document.getElementById('pc-'+q).appendChild(chip);
-          fb(true,'✅ +75 pts',cx,cy);
+          fb(true,'✅ +75 XP',cx,cy);
+          showScorePopup(75,cx,cy-40);
+          SFX.correct(); charHUD.react(true,0);
         } else {
-          const labels={fin:'Financial',cus:'Customer',int:'Internal Process',lea:'Learning & Growth'};
-          fb(false,`❌ Try again — which perspective fits "${el.textContent}"?`,cx,cy);
+          fb(false,`❌ Wrong quadrant — does this measure money, customers, ops, or capability?`,cx,cy);
+          SFX.wrong(); charHUD.react(false,0);
         }
       });
       pool.appendChild(c);
@@ -1657,11 +2272,76 @@ const G6 = {
       if(!confirm(`${rem} KPI cards still unplaced. Finish anyway?`)) return;
     }
     State.scores.g6=this.score; State.done.g6=true; State.save(); updateSB();
-    document.getElementById('g6-earned').textContent=this.score.toLocaleString()+' pts';
-    document.getElementById('g6-done').classList.add('on');
+    charHUD.finish();
+    setTimeout(()=>showMissionComplete('g6',this.score,State.max.g6),1800);
   }
 };
 window.G6=G6;
+
+// ═══════════════════════════════════════════════
+//  ALL-COMPLETE CELEBRATION
+// ═══════════════════════════════════════════════
+function checkAllComplete(){
+  if(State.doneCount()<6) return;
+  const key='acc214_allcomplete_shown';
+  if(sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key,'1');
+  setTimeout(()=>{
+    const el=document.createElement('div');
+    el.style.cssText=`position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);
+      cursor:pointer`;
+    el.innerHTML=`
+      <div style="font-size:4rem;margin-bottom:12px;animation:bob 1.2s ease-in-out infinite">🍎</div>
+      <div style="font-size:.85rem;font-weight:800;color:var(--ac);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">ALL DEPARTMENTS CLEARED</div>
+      <div style="font-size:2.6rem;font-weight:900;color:#fff;text-align:center;max-width:500px;line-height:1.2">Saucy Apple<br>is Saved!</div>
+      <div style="margin:18px 0 6px;font-size:1.1rem;color:var(--tm)">Total Score</div>
+      <div style="font-size:3rem;font-weight:900;color:var(--ac)">${State.total().toLocaleString()} pts</div>
+      <div style="margin-top:28px;font-size:.8rem;color:var(--tm);letter-spacing:.5px">CLICK TO RETURN TO HQ</div>`;
+    document.body.appendChild(el);
+    SFX.complete(); setTimeout(()=>SFX.complete(),700);
+    if(window.gsap){
+      // burst stars
+      for(let i=0;i<12;i++){
+        const s=document.createElement('div');
+        s.textContent='★';
+        s.style.cssText=`position:fixed;z-index:10000;font-size:${1.5+Math.random()*1.5}rem;
+          color:var(--ac);pointer-events:none;left:${Math.random()*100}%;top:${Math.random()*100}%`;
+        document.body.appendChild(s);
+        gsap.fromTo(s,{opacity:1,y:0,scale:0},{opacity:0,y:-120-Math.random()*80,scale:1.5,
+          duration:1.4+Math.random(),ease:'power2.out',delay:Math.random()*.5,onComplete:()=>s.remove()});
+      }
+      gsap.from(el.children,{opacity:0,y:40,stagger:.12,duration:.5,ease:'power2.out'});
+    }
+    el.onclick=()=>{ if(window.gsap) gsap.to(el,{opacity:0,duration:.3,onComplete:()=>el.remove()}); else el.remove(); };
+  },600);
+}
+
+// ═══════════════════════════════════════════════
+//  QUICK STUDY REFERENCE
+// ═══════════════════════════════════════════════
+function showCheatSheet(){
+  const el=document.getElementById('csOverlay');
+  el.classList.remove('hidden');
+  if(window.gsap) gsap.from(el.children[0],{scale:.92,opacity:0,duration:.3,ease:'back.out(1.4)'});
+}
+
+// ═══════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    // Close cheat sheet if open
+    const cs=document.getElementById('csOverlay');
+    if(cs&&!cs.classList.contains('hidden')){ cs.classList.add('hidden'); return; }
+    // Close mission overlay
+    const mo=document.getElementById('mo');
+    if(mo&&!mo.classList.contains('hidden')){ document.getElementById('mo-skip').click(); return; }
+    // Return to hub
+    const hub=document.getElementById('hub');
+    if(!hub.classList.contains('on')) Nav.hub();
+  }
+});
 
 // ═══════════════════════════════════════════════
 //  BOOT
@@ -1669,6 +2349,12 @@ window.G6=G6;
 State.load();
 updateSB();
 updateHubCards();
+// Hook checkAllComplete into Nav.hub
+const _origHub = Nav.hub.bind(Nav);
+Nav.hub = function(){
+  _origHub();
+  checkAllComplete();
+};
 </script>
 </body>
 </html>
