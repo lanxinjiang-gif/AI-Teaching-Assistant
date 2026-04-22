@@ -1154,6 +1154,8 @@ const charHUD = {
   }
 };
 
+window.charHUD = charHUD;
+
 // ═══════════════════════════════════════════════
 //  ANIMATED SCORE COUNTER
 // ═══════════════════════════════════════════════
@@ -2325,6 +2327,7 @@ function showCheatSheet(){
   el.classList.remove('hidden');
   if(window.gsap) gsap.from(el.children[0],{scale:.92,opacity:0,duration:.3,ease:'back.out(1.4)'});
 }
+window.showCheatSheet=showCheatSheet;
 
 // ═══════════════════════════════════════════════
 //  KEYBOARD SHORTCUTS
