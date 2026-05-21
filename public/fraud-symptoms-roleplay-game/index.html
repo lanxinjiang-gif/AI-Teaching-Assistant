@@ -1,0 +1,3948 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud Signal Briefing</title>
+  <style>
+:root {
+  --bg-night: #0d1722;
+  --bg-deep: #09121a;
+  --ink: #16222f;
+  --ink-soft: #4c5b67;
+  --paper: #f6f1e8;
+  --paper-strong: #fffaf2;
+  --linen: #efe6d8;
+  --line: rgba(22, 34, 47, 0.12);
+  --line-strong: rgba(22, 34, 47, 0.26);
+  --teal: #1b7286;
+  --teal-soft: #d9eef1;
+  --brass: #b98230;
+  --coral: #c86d4a;
+  --olive: #657e50;
+  --danger: #b4473e;
+  --shadow: 0 24px 60px rgba(5, 12, 18, 0.28);
+  --shadow-soft: 0 12px 28px rgba(5, 12, 18, 0.14);
+  --radius: 18px;
+  --radius-soft: 12px;
+  color-scheme: light;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 14% 12%, rgba(185, 130, 48, 0.18), transparent 22rem),
+    radial-gradient(circle at 84% 14%, rgba(27, 114, 134, 0.22), transparent 26rem),
+    linear-gradient(180deg, #f8f4ec 0%, #efe7d8 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(13, 23, 34, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 23, 34, 0.05) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 78%);
+}
+
+button {
+  font: inherit;
+}
+
+button,
+.repo-link {
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+button:focus-visible,
+.repo-link:focus-visible {
+  outline: 3px solid rgba(27, 114, 134, 0.28);
+  outline-offset: 2px;
+}
+
+.repo-link {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 20;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 14px;
+  border: 1px solid rgba(255, 250, 242, 0.18);
+  border-radius: 999px;
+  background: rgba(13, 23, 34, 0.88);
+  color: #fffaf2;
+  text-decoration: none;
+  box-shadow: 0 16px 36px rgba(5, 12, 18, 0.24);
+  backdrop-filter: blur(16px);
+}
+
+.repo-link:hover {
+  transform: translateY(-1px);
+  background: rgba(9, 18, 26, 0.96);
+}
+
+.app-shell {
+  width: min(1450px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 92px 0 34px;
+}
+
+.hero-panel,
+.role-strip,
+.workspace,
+.summary-panel {
+  animation: rise-fade 720ms ease both;
+}
+
+.hero-panel {
+  min-height: 240px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.8fr);
+  gap: 28px;
+  padding: 28px 30px;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(27, 114, 134, 0.18), transparent 14rem),
+    linear-gradient(130deg, rgba(9, 18, 26, 0.96), rgba(13, 23, 34, 0.92));
+  color: #fffaf2;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.hero-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(110deg, transparent 0 48%, rgba(255, 250, 242, 0.08) 48% 50%, transparent 50% 100%);
+  opacity: 0.8;
+}
+
+.hero-panel,
+.stage-panel,
+.symptom-panel,
+.evidence-panel,
+.summary-panel {
+  position: relative;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--brass);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-copy h1,
+.role-card h2,
+.panel-head h2,
+.stage-top h2,
+.summary-copy h2 {
+  font-family: "Iowan Old Style", "Palatino Linotype", serif;
+}
+
+.hero-copy h1 {
+  margin: 0 0 14px;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 0.92;
+}
+
+.hero-text {
+  max-width: 42rem;
+  margin: 0;
+  color: rgba(255, 250, 242, 0.82);
+  font-size: 1.08rem;
+  line-height: 1.62;
+}
+
+.hero-meta {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  align-content: end;
+}
+
+.meta-block {
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 250, 242, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.meta-label {
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(255, 250, 242, 0.66);
+  font-size: 0.76rem;
+  font-weight: 780;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.meta-block strong {
+  font-size: 1.12rem;
+}
+
+.role-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.role-card {
+  min-height: 182px;
+  padding: 18px;
+  border: 1px solid rgba(255, 250, 242, 0.14);
+  border-radius: 24px;
+  background: rgba(255, 250, 242, 0.72);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(8px);
+}
+
+.role-card.is-student {
+  background: linear-gradient(180deg, rgba(27, 114, 134, 0.1), rgba(255, 250, 242, 0.86));
+}
+
+.role-card.is-active {
+  border-color: rgba(27, 114, 134, 0.4);
+  box-shadow: 0 18px 34px rgba(27, 114, 134, 0.12);
+  transform: translateY(-2px);
+}
+
+.role-tag {
+  margin: 0 0 8px;
+  color: var(--teal);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.role-card h2 {
+  margin: 0 0 10px;
+  font-size: 1.4rem;
+  line-height: 1.02;
+}
+
+.role-card p:last-child {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.75fr) minmax(0, 1.6fr) minmax(290px, 0.82fr);
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.symptom-panel,
+.stage-panel,
+.evidence-panel,
+.summary-panel {
+  border: 1px solid rgba(255, 250, 242, 0.12);
+  border-radius: 28px;
+  background: rgba(255, 250, 242, 0.86);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+}
+
+.symptom-panel,
+.evidence-panel {
+  padding: 22px;
+}
+
+.stage-panel {
+  padding: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 242, 0.92), rgba(246, 241, 232, 0.88));
+  overflow: visible;
+  z-index: 3;
+}
+
+.panel-head h2,
+.stage-top h2,
+.summary-copy h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.02;
+}
+
+.stage-top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.case-brief {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(22, 34, 47, 0.08);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 84% 18%, rgba(27, 114, 134, 0.12), transparent 16rem),
+    linear-gradient(180deg, rgba(239, 230, 216, 0.8), rgba(255, 250, 242, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+}
+
+.case-brief-head h3 {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.35rem;
+  line-height: 1.12;
+}
+
+.case-brief-head p:last-child {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  line-height: 1.58;
+}
+
+.case-brief-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.case-brief-item {
+  padding: 15px 16px;
+  border: 1px solid rgba(22, 34, 47, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.84);
+  box-shadow: 0 8px 20px rgba(5, 12, 18, 0.05);
+}
+
+.case-brief-item[data-role="accounting"] {
+  border-color: rgba(27, 114, 134, 0.22);
+  background: linear-gradient(180deg, rgba(217, 238, 241, 0.74), rgba(255, 250, 242, 0.92));
+}
+
+.case-brief-item[data-role="purchasing"] {
+  border-color: rgba(185, 130, 48, 0.22);
+}
+
+.case-brief-item[data-role="hr"] {
+  border-color: rgba(101, 126, 80, 0.22);
+}
+
+.case-brief-tag {
+  display: inline-flex;
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.case-brief-item p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.scene-prompt {
+  margin: 0;
+  color: rgba(255, 250, 242, 0.82);
+  font-size: 0.96rem;
+  line-height: 1.48;
+}
+
+.meeting-launch {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(22, 34, 47, 0.08);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 250, 242, 0.92), rgba(239, 230, 216, 0.74));
+}
+
+.meeting-launch-note {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  text-align: center;
+}
+
+.meeting-popout {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  padding: 28px 20px 24px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+  background: transparent;
+}
+
+.meeting-popout.is-open {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.meeting-float {
+  width: min(1180px, calc(100vw - 160px));
+  display: grid;
+  gap: 14px;
+  background: transparent;
+}
+
+.meeting-float-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.meeting-float-head h3 {
+  margin: 0;
+  color: #0d1722;
+  font-family: "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.7rem;
+  line-height: 1.02;
+  text-shadow: none;
+}
+
+.meeting-float-head .eyebrow {
+  color: rgba(13, 23, 34, 0.72);
+}
+
+.meeting-room-shell {
+  position: relative;
+  margin-top: 0;
+  display: grid;
+  grid-template-rows: minmax(500px, 1fr) auto;
+  width: 100%;
+  border: 1px solid rgba(255, 250, 242, 0.1);
+  border-radius: 24px;
+  overflow: visible;
+  background: rgba(14, 22, 30, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 250, 242, 0.12);
+  z-index: 5;
+  backdrop-filter: blur(3px);
+}
+
+.meeting-scene {
+  position: relative;
+  min-height: 500px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 248, 228, 0.12), transparent 18rem),
+    linear-gradient(180deg, #1a2632 0%, #111a22 100%);
+  border-bottom: 1px solid rgba(255, 250, 242, 0.1);
+  border-radius: 24px 24px 0 0;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.meeting-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
+.dialog-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.dialog-bubble {
+  position: absolute;
+  max-width: min(280px, 26vw);
+  padding: 12px 13px 13px;
+  border: 1px solid rgba(22, 34, 47, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 250, 242, 0.98);
+  color: var(--ink);
+  box-shadow: 0 20px 36px rgba(5, 12, 18, 0.24);
+  transform: translate3d(-50%, -100%, 0);
+  backdrop-filter: blur(10px);
+  z-index: 7;
+  opacity: 1;
+}
+
+.dialog-bubble::after {
+  content: "";
+  position: absolute;
+  left: var(--bubble-tail-left, 22px);
+  bottom: -10px;
+  width: 18px;
+  height: 18px;
+  background: inherit;
+  border-right: inherit;
+  border-bottom: inherit;
+  transform: rotate(45deg);
+}
+
+.dialog-bubble[data-role="accounting"] {
+  border-color: rgba(27, 114, 134, 0.3);
+}
+
+.dialog-bubble[data-role="purchasing"] {
+  border-color: rgba(185, 130, 48, 0.32);
+}
+
+.dialog-bubble[data-role="hr"] {
+  border-color: rgba(101, 126, 80, 0.32);
+}
+
+.dialog-speaker {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.76rem;
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dialog-bubble[data-role="accounting"] .dialog-speaker {
+  color: var(--teal);
+}
+
+.dialog-bubble[data-role="purchasing"] .dialog-speaker {
+  color: var(--brass);
+}
+
+.dialog-bubble[data-role="hr"] .dialog-speaker {
+  color: var(--olive);
+}
+
+.dialog-bubble p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.93rem;
+  line-height: 1.42;
+}
+
+.dialog-bubble.is-preview {
+  background: rgba(217, 238, 241, 0.94);
+  border-color: rgba(27, 114, 134, 0.44);
+  box-shadow: 0 22px 40px rgba(16, 53, 64, 0.28);
+}
+
+.dialog-bubble.is-hidden {
+  opacity: 0;
+}
+
+.scene-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 248, 228, 0.08), transparent 16rem),
+    linear-gradient(180deg, rgba(9, 18, 26, 0.92), rgba(9, 18, 26, 0.98));
+}
+
+.scene-fallback-card {
+  max-width: 30rem;
+  padding: 18px;
+  border: 1px solid rgba(255, 250, 242, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.08);
+  color: #fffaf2;
+  backdrop-filter: blur(8px);
+}
+
+.scene-fallback-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.02rem;
+}
+
+.scene-fallback-card p {
+  margin: 0;
+  color: rgba(255, 250, 242, 0.8);
+  line-height: 1.55;
+}
+
+.meeting-console {
+  width: 100%;
+  margin: 0;
+  z-index: 4;
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  border: 0;
+  border-top: 1px solid rgba(255, 250, 242, 0.1);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(9, 18, 26, 0.92), rgba(9, 18, 26, 0.98));
+  color: #fffaf2;
+  backdrop-filter: blur(14px);
+}
+
+.console-kicker {
+  margin: 0 0 7px;
+  color: rgba(255, 250, 242, 0.64);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.speaker-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.speaker-chip {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 250, 242, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.08);
+  color: #fffaf2;
+}
+
+.speaker-chip.is-active {
+  background: rgba(255, 250, 242, 0.14);
+  box-shadow: 0 10px 20px rgba(5, 12, 18, 0.2);
+}
+
+.speaker-chip[data-role="accounting"] {
+  border-color: rgba(27, 114, 134, 0.36);
+}
+
+.speaker-chip[data-role="purchasing"] {
+  border-color: rgba(185, 130, 48, 0.36);
+}
+
+.speaker-chip[data-role="hr"] {
+  border-color: rgba(101, 126, 80, 0.36);
+}
+
+.speaker-chip-label {
+  color: rgba(255, 250, 242, 0.62);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.speaker-chip-name {
+  font-size: 0.86rem;
+  font-weight: 760;
+}
+
+.transcript {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  max-height: 250px;
+  padding-right: 6px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(27, 114, 134, 0.3) transparent;
+}
+
+.transcript::-webkit-scrollbar {
+  width: 8px;
+}
+
+.transcript::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(27, 114, 134, 0.28);
+}
+
+.transcript-card {
+  padding: 14px 16px;
+  border-left: 3px solid transparent;
+  border-radius: 14px;
+  background: rgba(239, 230, 216, 0.56);
+}
+
+.transcript-card[data-role="accounting"] {
+  border-left-color: var(--teal);
+}
+
+.transcript-card[data-role="purchasing"] {
+  border-left-color: var(--brass);
+}
+
+.transcript-card[data-role="hr"] {
+  border-left-color: var(--olive);
+}
+
+.transcript-speaker {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 820;
+}
+
+.transcript-card p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.58;
+}
+
+.choice-form {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+}
+
+.choice-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  max-height: min(244px, 34vh);
+  overflow: auto;
+  padding: 4px 8px 10px 2px;
+}
+
+.choice-button {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: start;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px 18px 17px;
+  border: 1px solid rgba(27, 114, 134, 0.14);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(239, 230, 216, 0.88));
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 10px 22px rgba(5, 12, 18, 0.08);
+  overflow: visible;
+}
+
+.choice-button::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  bottom: -10px;
+  width: 18px;
+  height: 18px;
+  background: inherit;
+  border-right: inherit;
+  border-bottom: inherit;
+  transform: rotate(45deg);
+}
+
+.choice-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(27, 114, 134, 0.32);
+}
+
+.choice-button.is-selected {
+  border-color: rgba(27, 114, 134, 0.54);
+  background: linear-gradient(180deg, rgba(217, 238, 241, 0.9), rgba(255, 250, 242, 0.92));
+  box-shadow: 0 12px 22px rgba(27, 114, 134, 0.12);
+}
+
+.choice-button.is-selected::after {
+  border-color: rgba(27, 114, 134, 0.54);
+}
+
+.choice-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.choice-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+.choice-hint {
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.38;
+}
+
+.choice-marker {
+  margin-left: auto;
+  min-width: 42px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(27, 114, 134, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 820;
+}
+
+.choice-button.is-selected .choice-marker {
+  background: var(--teal);
+  color: #fffaf2;
+  border-color: var(--teal);
+}
+
+.stage-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.primary-button {
+  background: var(--teal);
+  color: #fffaf2;
+  box-shadow: 0 10px 20px rgba(27, 114, 134, 0.22);
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(27, 114, 134, 0.24);
+}
+
+.secondary-button {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.secondary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(27, 114, 134, 0.28);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.feedback-card {
+  margin-top: 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(27, 114, 134, 0.16);
+  background: linear-gradient(180deg, rgba(217, 238, 241, 0.56), rgba(255, 250, 242, 0.92));
+}
+
+.feedback-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.02rem;
+}
+
+.feedback-card p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.feedback-card .point-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: rgba(27, 114, 134, 0.12);
+  color: var(--teal);
+  font-size: 0.88rem;
+  font-weight: 780;
+}
+
+.meeting-notes {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.meeting-notes-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.symptom-list,
+.evidence-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.symptom-item,
+.evidence-item,
+.objective-panel {
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.symptom-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.symptom-item::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: transparent;
+}
+
+.symptom-item[data-state="present"]::before {
+  background: var(--danger);
+}
+
+.symptom-item[data-state="monitor"]::before {
+  background: var(--brass);
+}
+
+.symptom-item[data-state="dormant"]::before {
+  background: rgba(22, 34, 47, 0.12);
+}
+
+.symptom-row,
+.evidence-row {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.symptom-item h3,
+.evidence-item h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.24;
+}
+
+.symptom-item p,
+.evidence-item p,
+.panel-note,
+.objective-panel p,
+.summary-copy p,
+.summary-bullets li {
+  color: var(--ink-soft);
+  line-height: 1.58;
+}
+
+.symptom-state,
+.evidence-strength {
+  flex-shrink: 0;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 780;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.symptom-state[data-state="present"],
+.evidence-strength[data-strength="high"] {
+  background: rgba(180, 71, 62, 0.12);
+  color: var(--danger);
+}
+
+.symptom-state[data-state="monitor"],
+.evidence-strength[data-strength="medium"] {
+  background: rgba(185, 130, 48, 0.12);
+  color: var(--brass);
+}
+
+.symptom-state[data-state="dormant"],
+.evidence-strength[data-strength="low"] {
+  background: rgba(22, 34, 47, 0.08);
+  color: var(--ink-soft);
+}
+
+.panel-note,
+.objective-panel p {
+  margin: 16px 0 0;
+  font-size: 0.96rem;
+}
+
+.objective-panel {
+  margin-top: 18px;
+  background: linear-gradient(180deg, rgba(239, 230, 216, 0.86), rgba(255, 255, 255, 0.72));
+}
+
+.evidence-item {
+  animation: card-pop 320ms ease both;
+}
+
+.summary-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 0.9fr);
+  gap: 18px;
+  margin-top: 18px;
+  padding: 22px;
+}
+
+.summary-copy h2 {
+  margin-bottom: 10px;
+}
+
+.summary-copy p {
+  margin: 0;
+}
+
+.summary-bullets {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summary-bullets li {
+  padding: 12px 14px;
+  border-left: 3px solid var(--teal);
+  border-radius: 14px;
+  background: rgba(239, 230, 216, 0.56);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes rise-fade {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 1180px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .symptom-panel,
+  .evidence-panel {
+    order: 2;
+  }
+
+  .stage-panel {
+    order: 1;
+  }
+}
+
+@media (max-width: 880px) {
+  .app-shell {
+    width: min(100%, calc(100% - 24px));
+    padding-top: 82px;
+  }
+
+  .hero-panel {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    padding: 24px 22px;
+  }
+
+  .role-strip,
+  .summary-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .case-brief-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stage-top,
+  .stage-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .meeting-room-shell {
+    grid-template-rows: minmax(470px, 1fr) auto;
+  }
+
+  .meeting-scene {
+    min-height: 470px;
+  }
+
+  .dialog-bubble {
+    max-width: min(240px, 62vw);
+  }
+
+  .meeting-float {
+    width: min(calc(100vw - 32px), 980px);
+  }
+}
+
+@media (max-width: 620px) {
+  .repo-link {
+    right: 12px;
+    top: 12px;
+  }
+
+  .app-shell {
+    width: min(100%, calc(100% - 16px));
+    padding-top: 74px;
+    padding-bottom: 18px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.2rem, 12vw, 3.3rem);
+  }
+
+  .hero-panel,
+  .symptom-panel,
+  .stage-panel,
+  .evidence-panel,
+  .summary-panel,
+  .role-card {
+    border-radius: 22px;
+  }
+
+  .meeting-room-shell {
+    border-radius: 20px;
+    grid-template-rows: minmax(430px, 1fr) auto;
+  }
+
+  .meeting-scene {
+    min-height: 430px;
+  }
+
+  .meeting-console {
+    width: 100%;
+    padding: 14px;
+    border-radius: 0;
+  }
+
+  .meeting-popout {
+    padding: 16px 12px 18px;
+  }
+
+  .meeting-float {
+    width: 100%;
+  }
+
+  .meeting-float-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dialog-bubble {
+    max-width: min(220px, 72vw);
+    padding: 11px 12px 12px;
+  }
+
+  .stage-panel,
+  .symptom-panel,
+  .evidence-panel,
+  .summary-panel {
+    padding: 18px;
+  }
+
+  .choice-button {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px 16px 16px;
+  }
+
+  .choice-marker {
+    min-width: 42px;
+    width: auto;
+    height: 34px;
+  }
+}
+
+</style>
+</head>
+<body>
+  <a id="repoLink" class="repo-link" href="/">Back to home</a>
+
+  <main class="app-shell">
+    <section class="hero-panel" aria-labelledby="game-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Fraud and forensic accounting</p>
+        <h1 id="game-title">Fraud Signal Briefing</h1>
+        <p class="hero-text">You are the accounting manager. Use focused questions, cross-functional communication, and symptom recognition to decide whether the vendor case should trigger an immediate fraud response.</p>
+      </div>
+
+      <div class="hero-meta" aria-label="Game status">
+        <div class="meta-block">
+          <span class="meta-label">Student role</span>
+          <strong>Accounting manager</strong>
+        </div>
+        <div class="meta-block">
+          <span class="meta-label">Progress</span>
+          <strong id="progressLabel">Scene 1 of 7</strong>
+        </div>
+        <div class="meta-block">
+          <span class="meta-label">Fraud readiness</span>
+          <strong id="scoreLabel">0 / 100</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="role-strip" aria-label="Meeting roles">
+      <article class="role-card is-student is-active" data-role-card="accounting">
+        <p class="role-tag">You</p>
+        <h2>Accounting manager</h2>
+        <p>Raises the audit issue, compares clues across departments, and decides what should happen next.</p>
+      </article>
+
+      <article class="role-card" data-role-card="purchasing">
+        <p class="role-tag">Partner role</p>
+        <h2>Purchasing manager</h2>
+        <p>Tracks vendor additions, approvals, and purchase-cycle activity that may explain or deepen the red flags.</p>
+      </article>
+
+      <article class="role-card" data-role-card="hr">
+        <p class="role-tag">Partner role</p>
+        <h2>Human resource manager</h2>
+        <p>Surfaces leave, behavior, and personnel patterns that might reveal control problems or concealment risk.</p>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <aside class="symptom-panel" aria-labelledby="symptom-title">
+        <div class="panel-head">
+          <p class="eyebrow">Framework</p>
+          <h2 id="symptom-title">Six symptom groups</h2>
+        </div>
+        <div id="symptomList" class="symptom-list"></div>
+        <p class="panel-note">Mark what the case already shows, and what the team should monitor as the investigation continues.</p>
+      </aside>
+
+      <section class="stage-panel" aria-labelledby="sceneTitle">
+        <div class="stage-top">
+          <div>
+            <p class="eyebrow">Live meeting</p>
+            <h2 id="sceneTitle">Open the monthly meeting</h2>
+          </div>
+          <button id="restartButton" class="secondary-button" type="button">Restart game</button>
+        </div>
+
+        <section class="case-brief" aria-label="Case background">
+          <div class="case-brief-head">
+            <p class="eyebrow">Case background</p>
+            <p>You are leading a proactive fraud-detection meeting. Your job is to connect separate observations before they get dismissed as ordinary business activity.</p>
+          </div>
+
+          <div class="case-brief-grid">
+            <article class="case-brief-item" data-role="accounting">
+              <span class="case-brief-tag">Accounting</span>
+              <p>Your last audit found large payments made to a new vendor with a suspicious address.</p>
+            </article>
+
+            <article class="case-brief-item" data-role="purchasing">
+              <span class="case-brief-tag">Purchasing</span>
+              <p>The purchasing manager has seen that a new vendor was added just before the suspicious payments started.</p>
+            </article>
+
+            <article class="case-brief-item" data-role="hr">
+              <span class="case-brief-tag">Human resources</span>
+              <p>The HR manager has noted that a purchasing employee requested pay in lieu of taking vacation.</p>
+            </article>
+          </div>
+        </section>
+
+        <div class="meeting-launch">
+          <button id="openMeetingButton" class="primary-button" type="button">Start the monthly vendor review meeting</button>
+          <p class="meeting-launch-note">Open the live boardroom, question the managers, then end the meeting to return to the case columns.</p>
+        </div>
+
+        <section class="meeting-notes" aria-labelledby="meeting-notes-title">
+          <div class="meeting-notes-head">
+            <p class="eyebrow">Meeting record</p>
+            <h3 id="meeting-notes-title">Conversation log</h3>
+          </div>
+          <div id="transcript" class="transcript" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <aside class="evidence-panel" aria-labelledby="evidence-title">
+        <div class="panel-head">
+          <p class="eyebrow">Evidence board</p>
+          <h2 id="evidence-title">Clues collected</h2>
+        </div>
+        <div id="evidenceList" class="evidence-list"></div>
+        <div class="objective-panel">
+          <p class="eyebrow">Objective</p>
+          <p>Turn scattered observations into an early fraud signal before the team dismisses them as isolated exceptions.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="summary-panel" aria-labelledby="summary-title">
+      <div class="summary-copy">
+        <p class="eyebrow">Instructor board</p>
+        <h2 id="summary-title">Awaiting your conclusion</h2>
+        <p id="summaryText">Finish the meeting to see whether you connected the clues the same way the case debrief does.</p>
+      </div>
+      <ul id="summaryBullets" class="summary-bullets"></ul>
+    </section>
+  </main>
+
+  <div id="meetingPopout" class="meeting-popout" aria-hidden="true">
+    <section class="meeting-float" aria-label="Live meeting popup">
+      <div class="meeting-float-head">
+        <div>
+          <p class="eyebrow">Live meeting</p>
+          <h3>Monthly vendor review meeting</h3>
+        </div>
+        <button id="closeMeetingButton" class="secondary-button" type="button">End the meeting</button>
+      </div>
+
+      <div class="meeting-room-shell" aria-label="3D live meeting scene">
+        <div class="meeting-scene">
+          <canvas id="sceneCanvas" class="meeting-canvas"></canvas>
+
+          <div id="sceneFallback" class="scene-fallback hidden">
+            <div class="scene-fallback-card">
+              <strong>3D meeting view unavailable</strong>
+              <p id="sceneFallbackText">The live meeting will stay readable in 2D if WebGL or the 3D module cannot load.</p>
+            </div>
+          </div>
+
+          <div id="dialogLayer" class="dialog-layer" aria-live="polite"></div>
+        </div>
+
+        <div id="meetingConsole" class="meeting-console">
+          <div class="console-copy">
+            <p id="sceneModeLabel" class="console-kicker">Choose the accounting manager's next line</p>
+            <p id="scenePrompt" class="scene-prompt"></p>
+          </div>
+
+          <div id="speakerRail" class="speaker-rail" aria-live="polite"></div>
+
+          <form id="choiceForm" class="choice-form">
+            <div id="choiceArea" class="choice-area"></div>
+
+            <div class="stage-actions">
+              <button id="submitButton" class="primary-button" type="submit">Lock answer</button>
+              <button id="nextButton" class="secondary-button hidden" type="button">Next scene</button>
+            </div>
+          </form>
+
+          <section id="feedbackCard" class="feedback-card hidden" aria-live="polite"></section>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+const symptoms = [
+  {
+    id: "accounting",
+    title: "Accounting anomalies",
+    detail: "Suspicious payments, addresses, or record irregularities."
+  },
+  {
+    id: "controls",
+    title: "Internal control weaknesses",
+    detail: "Weak approvals, override risk, or duties that cannot be independently checked."
+  },
+  {
+    id: "analytical",
+    title: "Analytical anomalies",
+    detail: "Relationships or trends that do not make business sense."
+  },
+  {
+    id: "lifestyle",
+    title: "Extravagant lifestyle",
+    detail: "Lavish spending that seems out of step with known compensation."
+  },
+  {
+    id: "behavior",
+    title: "Unusual behavior",
+    detail: "Noticeable stress, avoidance, or other out-of-character conduct."
+  },
+  {
+    id: "tips",
+    title: "Tips and complaints",
+    detail: "Reports from coworkers, vendors, or outsiders that point to possible fraud."
+  }
+];
+
+const evidenceCatalog = {
+  payments: {
+    title: "Large payments to a new vendor with a suspicious address",
+    detail: "This is the first red flag. It is an accounting anomaly, but it still might have a normal explanation.",
+    strength: "low"
+  },
+  vendorTiming: {
+    title: "A new vendor was added just before the suspicious payments began",
+    detail: "Timing makes the anomaly more serious because it links the payments to a recent vendor-file change.",
+    strength: "medium"
+  },
+  vacation: {
+    title: "A purchasing employee petitioned for pay in lieu of vacation",
+    detail: "This is the strongest clue because skipping vacation can prevent independent checks and hide a scheme.",
+    strength: "high"
+  }
+};
+
+const THREE_CDN = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+let rendererAdapter = null;
+const dialogBubbleAnchors = {
+  accounting: { x: 0.77, y: 0.68, tail: 24 },
+  purchasing: { x: 0.22, y: 0.68, tail: 24 },
+  hr: { x: 0.5, y: 0.44, tail: 50 }
+};
+
+const scenes = [
+  {
+    id: "opener",
+    role: "accounting",
+    title: "Open the monthly meeting",
+    prompt: "Raise the audit issue in a way that encourages evidence sharing instead of blame.",
+    type: "single",
+    choices: [
+      {
+        id: "share-evidence",
+        label: "My audit found large payments to a new vendor with a suspicious address. I want to compare that with any vendor setup or employee signals you have noticed.",
+        hint: "Evidence first, collaboration second.",
+        value: "A"
+      },
+      {
+        id: "accuse-purchasing",
+        label: "Purchasing seems to have caused a problem, so explain who approved this vendor.",
+        hint: "Jumps to blame before the facts are connected.",
+        value: "B"
+      },
+      {
+        id: "delay-discussion",
+        label: "This looks odd, but I will wait for another month of data before involving anyone else.",
+        hint: "Delays communication even though the program is supposed to be proactive.",
+        value: "C"
+      }
+    ]
+  },
+  {
+    id: "purchasing-question",
+    role: "purchasing",
+    title: "Question the purchasing manager",
+    prompt: "Which question best connects your audit finding to a meaningful fraud symptom?",
+    type: "single",
+    choices: [
+      {
+        id: "vendor-added",
+        label: "Was any vendor added to the vendor list shortly before these suspicious payments began?",
+        hint: "Targets timing and file maintenance.",
+        value: "A"
+      },
+      {
+        id: "personal-opinion",
+        label: "Do you personally trust the employee who handled this vendor?",
+        hint: "Asks for a feeling instead of a checkable fact.",
+        value: "B"
+      },
+      {
+        id: "general-volume",
+        label: "Has the department felt busier than normal lately?",
+        hint: "Too broad to connect directly to the anomaly.",
+        value: "C"
+      }
+    ]
+  },
+  {
+    id: "vendor-assessment",
+    role: "accounting",
+    title: "Rate the purchasing clue",
+    prompt: "Now that you know the vendor was added just before the suspicious payments, how should you interpret that new information?",
+    type: "single",
+    choices: [
+      {
+        id: "normal",
+        label: "It removes the concern because adding vendors is a normal business task.",
+        hint: "Treats the timing link as meaningless.",
+        value: "A"
+      },
+      {
+        id: "stronger-indication",
+        label: "It is a stronger indication of potential fraud, but it is still not direct proof.",
+        hint: "Matches the debrief language.",
+        value: "B"
+      },
+      {
+        id: "direct-proof",
+        label: "It is direct proof that fraud already occurred.",
+        hint: "Symptoms are not the same thing as proof.",
+        value: "C"
+      }
+    ]
+  },
+  {
+    id: "hr-question",
+    role: "hr",
+    title: "Question the human resource manager",
+    prompt: "Which follow-up question is most likely to uncover a control-related red flag in the purchasing area?",
+    type: "single",
+    choices: [
+      {
+        id: "leave-irregularities",
+        label: "Have you noticed any unusual vacation, leave, or payroll requests from purchasing staff?",
+        hint: "Connects personnel patterns to fraud concealment risk.",
+        value: "A"
+      },
+      {
+        id: "training-hours",
+        label: "Which purchasing employees attended the most training this quarter?",
+        hint: "Useful for staffing, but not for this fraud case.",
+        value: "B"
+      },
+      {
+        id: "parking-updates",
+        label: "Did anyone in purchasing request a change to parking or badge access recently?",
+        hint: "Possible admin detail, but too weak for this case.",
+        value: "C"
+      }
+    ]
+  },
+  {
+    id: "clue-ranking",
+    role: "accounting",
+    title: "Rank the clues",
+    prompt: "Select the three clues from weakest to strongest fraud signal.",
+    type: "order",
+    choices: [
+      {
+        id: "payments",
+        label: "Large payments to a new vendor with a suspicious address",
+        hint: "This is the first red flag."
+      },
+      {
+        id: "vendorTiming",
+        label: "A new vendor was added just before the suspicious payments began",
+        hint: "This makes the first clue more serious."
+      },
+      {
+        id: "vacation",
+        label: "A purchasing employee petitioned for pay in lieu of vacation",
+        hint: "This is the strongest current signal."
+      }
+    ]
+  },
+  {
+    id: "symptom-groups",
+    role: "accounting",
+    title: "Tag the symptom groups",
+    prompt: "Which fraud symptom groups are already represented in this case right now? Select all that apply.",
+    type: "multi",
+    choices: symptoms.map((symptom) => ({
+      id: symptom.id,
+      label: symptom.title,
+      hint: symptom.detail
+    }))
+  },
+  {
+    id: "next-actions",
+    role: "accounting",
+    title: "Choose the next steps",
+    prompt: "Select the follow-up actions that match the case debrief and support early fraud detection.",
+    type: "multi",
+    choices: [
+      {
+        id: "investigate-payments",
+        label: "Investigate the questionable payments.",
+        hint: "Start where the anomaly was found."
+      },
+      {
+        id: "research-vendor",
+        label: "Research the services and goods provided by the new vendor.",
+        hint: "Verify whether the vendor activity makes sense."
+      },
+      {
+        id: "monitor-behavior",
+        label: "Watch for suspicious employee behavioral symptoms.",
+        hint: "The debrief specifically calls this out."
+      },
+      {
+        id: "monitor-lifestyle",
+        label: "Watch for suspicious employee lifestyle symptoms.",
+        hint: "The debrief specifically calls this out too."
+      },
+      {
+        id: "accuse-now",
+        label: "Accuse the purchasing employee immediately because the symptoms prove guilt.",
+        hint: "Symptoms are warning signs, not proof."
+      },
+      {
+        id: "close-case",
+        label: "Close the matter because some clues could still have a normal explanation.",
+        hint: "Normal explanations are possible, but the combined pattern still calls for follow-up."
+      }
+    ]
+  }
+];
+
+const elements = {
+  progressLabel: document.getElementById("progressLabel"),
+  scoreLabel: document.getElementById("scoreLabel"),
+  repoLink: document.getElementById("repoLink"),
+  openMeetingButton: document.getElementById("openMeetingButton"),
+  closeMeetingButton: document.getElementById("closeMeetingButton"),
+  meetingPopout: document.getElementById("meetingPopout"),
+  sceneCanvas: document.getElementById("sceneCanvas"),
+  sceneFallback: document.getElementById("sceneFallback"),
+  sceneFallbackText: document.getElementById("sceneFallbackText"),
+  sceneFocusLabel: document.getElementById("sceneFocusLabel"),
+  sceneModeLabel: document.getElementById("sceneModeLabel"),
+  sceneTitle: document.getElementById("sceneTitle"),
+  scenePrompt: document.getElementById("scenePrompt"),
+  meetingConsole: document.getElementById("meetingConsole"),
+  speakerRail: document.getElementById("speakerRail"),
+  dialogLayer: document.getElementById("dialogLayer"),
+  choiceArea: document.getElementById("choiceArea"),
+  choiceForm: document.getElementById("choiceForm"),
+  submitButton: document.getElementById("submitButton"),
+  nextButton: document.getElementById("nextButton"),
+  feedbackCard: document.getElementById("feedbackCard"),
+  transcript: document.getElementById("transcript"),
+  evidenceList: document.getElementById("evidenceList"),
+  symptomList: document.getElementById("symptomList"),
+  summaryTitle: document.getElementById("summary-title"),
+  summaryText: document.getElementById("summaryText"),
+  summaryBullets: document.getElementById("summaryBullets"),
+  restartButton: document.getElementById("restartButton"),
+  roleCards: Array.from(document.querySelectorAll("[data-role-card]"))
+};
+
+const initialState = () => ({
+  sceneIndex: 0,
+  score: 0,
+  selection: null,
+  orderedSelection: [],
+  locked: false,
+  transcript: [
+    {
+      role: "accounting",
+      speaker: "Case file",
+      text: "You are about to lead the monthly fraud-detection meeting. Your starting fact is an audit finding: large payments were made to a new vendor with a suspicious address."
+    }
+  ],
+  evidence: [],
+  symptomStates: Object.fromEntries(symptoms.map((symptom) => [symptom.id, "dormant"])),
+  insightTitle: "Awaiting your conclusion",
+  insightText: "Finish the meeting to see whether you connected the clues the same way the case debrief does.",
+  insightBullets: [
+    "Collect clues from accounting, purchasing, and human resources.",
+    "Treat symptoms as warning signs rather than proof.",
+    "Use communication to turn separate observations into one clear fraud signal."
+  ],
+  currentSceneDialog: [],
+  finished: false,
+  meetingOpen: false
+});
+
+let state = initialState();
+
+elements.choiceForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (state.locked || state.finished) {
+    return;
+  }
+
+  submitScene();
+});
+
+elements.nextButton.addEventListener("click", () => {
+  state.sceneIndex += 1;
+  state.selection = null;
+  state.orderedSelection = [];
+  state.currentSceneDialog = [];
+  state.locked = false;
+  render();
+});
+
+elements.restartButton.addEventListener("click", () => {
+  state = initialState();
+  render();
+});
+
+elements.openMeetingButton?.addEventListener("click", () => {
+  state.meetingOpen = true;
+  renderMeetingPopout();
+  rendererAdapter?.resize?.();
+  requestAnimationFrame(() => {
+    positionDialogBubbles();
+  });
+});
+
+elements.closeMeetingButton?.addEventListener("click", () => {
+  state.meetingOpen = false;
+  renderMeetingPopout();
+});
+
+function render() {
+  renderHeader();
+  renderRoleCards();
+  renderMeetingPopout();
+  renderScene();
+  renderMeetingViewport();
+  renderDialogLayer();
+  renderSymptoms();
+  renderTranscript();
+  renderEvidence();
+  renderSummary();
+}
+
+function renderMeetingPopout() {
+  if (!elements.meetingPopout) {
+    return;
+  }
+
+  elements.meetingPopout.classList.toggle("is-open", state.meetingOpen);
+  elements.meetingPopout.setAttribute("aria-hidden", String(!state.meetingOpen));
+}
+
+function renderHeader() {
+  const progress = state.finished
+    ? `Complete`
+    : `Scene ${state.sceneIndex + 1} of ${scenes.length}`;
+  elements.progressLabel.textContent = progress;
+  elements.scoreLabel.textContent = `${state.score} / 100`;
+}
+
+function renderRoleCards() {
+  const activeRole = state.finished ? "accounting" : scenes[state.sceneIndex].role;
+
+  elements.roleCards.forEach((card) => {
+    card.classList.toggle("is-active", card.dataset.roleCard === activeRole);
+  });
+}
+
+function getMeetingView(scene) {
+  if (state.finished) {
+    return {
+      focusRole: "overview",
+      focusLabel: "Whole meeting",
+      cameraPreset: "overview"
+    };
+  }
+
+  if (scene.id === "purchasing-question") {
+    if (state.locked) {
+      return {
+        focusRole: "purchasing",
+        focusLabel: "Purchasing manager responding",
+        cameraPreset: "purchasing-response"
+      };
+    }
+
+    const purchasingQuestionAngles = {
+      "vendor-added": "accounting-to-purchasing-tight",
+      "personal-opinion": "accounting-to-purchasing-side",
+      "general-volume": "accounting-to-purchasing-wide"
+    };
+
+    return {
+      focusRole: "accounting",
+      focusLabel: state.selection ? "Accounting manager questioning purchasing" : "Accounting manager speaking",
+      cameraPreset: purchasingQuestionAngles[state.selection] || "accounting-to-purchasing"
+    };
+  }
+
+  if (scene.id === "hr-question") {
+    if (state.locked) {
+      return {
+        focusRole: "hr",
+        focusLabel: "Human resource manager responding",
+        cameraPreset: "hr-response"
+      };
+    }
+
+    const hrQuestionAngles = {
+      "leave-irregularities": "accounting-to-hr-tight",
+      "training-hours": "accounting-to-hr-side",
+      "parking-updates": "accounting-to-hr-wide"
+    };
+
+    return {
+      focusRole: "accounting",
+      focusLabel: state.selection ? "Accounting manager questioning human resources" : "Accounting manager speaking",
+      cameraPreset: hrQuestionAngles[state.selection] || "accounting-to-hr"
+    };
+  }
+
+  if (scene.id === "opener") {
+    if (state.locked) {
+      return {
+        focusRole: "overview",
+        focusLabel: "Managers responding across the room",
+        cameraPreset: "overview"
+      };
+    }
+
+    const openerAngles = {
+      "share-evidence": "accounting-intro-direct",
+      "accuse-purchasing": "accounting-intro-hard",
+      "delay-discussion": "accounting-intro-wide"
+    };
+
+    return {
+      focusRole: "accounting",
+      focusLabel: "Accounting manager opening the meeting",
+      cameraPreset: openerAngles[state.selection] || "accounting-intro"
+    };
+  }
+
+  return {
+    focusRole: "accounting",
+    focusLabel: "Accounting manager leading the room",
+    cameraPreset: state.locked ? "accounting-decision-tight" : "accounting-decision"
+  };
+}
+
+function renderMeetingViewport() {
+  const scene = scenes[state.sceneIndex];
+  const meetingView = getMeetingView(scene);
+  if (elements.sceneFocusLabel) {
+    elements.sceneFocusLabel.textContent = meetingView.focusLabel;
+  }
+  rendererAdapter?.sync({
+    focusRole: meetingView.focusRole,
+    cameraPreset: meetingView.cameraPreset,
+    evidenceCount: state.evidence.length,
+    sceneIndex: state.sceneIndex,
+    finished: state.finished
+  });
+}
+
+function renderSymptoms() {
+  elements.symptomList.innerHTML = "";
+
+  symptoms.forEach((symptom) => {
+    const stateValue = state.symptomStates[symptom.id];
+    const wrapper = document.createElement("article");
+    wrapper.className = "symptom-item";
+    wrapper.dataset.state = stateValue;
+
+    const statusText = stateValue === "present"
+      ? "Present now"
+      : stateValue === "monitor"
+        ? "Monitor next"
+        : "Not observed";
+
+    wrapper.innerHTML = `
+      <div class="symptom-row">
+        <div>
+          <h3>${symptom.title}</h3>
+        </div>
+        <span class="symptom-state" data-state="${stateValue}">${statusText}</span>
+      </div>
+      <p>${symptom.detail}</p>
+    `;
+
+    elements.symptomList.appendChild(wrapper);
+  });
+}
+
+function renderTranscript() {
+  elements.transcript.innerHTML = "";
+
+  state.transcript.slice(-8).forEach((entry) => {
+    const card = document.createElement("article");
+    card.className = "transcript-card";
+    card.dataset.role = entry.role;
+    card.innerHTML = `
+      <span class="transcript-speaker">${entry.speaker}</span>
+      <p>${entry.text}</p>
+    `;
+    elements.transcript.appendChild(card);
+  });
+}
+
+function renderDialogLayer() {
+  if (!elements.dialogLayer) {
+    return;
+  }
+
+  const scene = scenes[state.sceneIndex];
+  const dialogTurns = state.locked
+    ? state.currentSceneDialog
+    : getPreviewDialog(scene);
+  const roleStacks = new Map();
+
+  elements.dialogLayer.innerHTML = "";
+
+  dialogTurns.forEach((turn) => {
+    const stackIndex = roleStacks.get(turn.role) || 0;
+    roleStacks.set(turn.role, stackIndex + 1);
+
+    const bubble = document.createElement("article");
+    bubble.className = `dialog-bubble${turn.preview ? " is-preview" : ""}`;
+    bubble.dataset.role = turn.role;
+    bubble.dataset.stack = String(stackIndex);
+    bubble.innerHTML = `<p>${turn.text}</p>`;
+    elements.dialogLayer.appendChild(bubble);
+  });
+
+  positionDialogBubbles();
+  requestAnimationFrame(() => {
+    positionDialogBubbles();
+  });
+}
+
+function positionDialogBubbles() {
+  if (rendererAdapter?.positionDialogBubbles) {
+    rendererAdapter.positionDialogBubbles();
+    return;
+  }
+
+  positionDialogBubblesFallback();
+}
+
+function positionDialogBubblesFallback() {
+  if (!elements.dialogLayer) {
+    return;
+  }
+
+  const layer = elements.dialogLayer;
+  const width = layer.clientWidth || layer.parentElement?.clientWidth || 1;
+  const height = layer.clientHeight || layer.parentElement?.clientHeight || 1;
+  const bubbles = layer.querySelectorAll(".dialog-bubble[data-role]");
+
+  bubbles.forEach((bubble, index) => {
+    const roleId = bubble.dataset.role;
+    const bubbleWidth = bubble.offsetWidth || 280;
+    const bubbleHeight = bubble.offsetHeight || 124;
+    const stackShift = Number(bubble.dataset.stack || index) * 98;
+    const base = dialogBubbleAnchors[roleId] || { x: 0.5, y: 0.5, tail: 24 };
+    const safeX = bubbleWidth * 0.5 + 18;
+    const safeY = bubbleHeight + 18;
+    const rawX = base.x * width;
+    const rawY = (base.y * height) - stackShift;
+    const x = clamp(rawX, safeX, width - safeX);
+    const y = clamp(rawY, safeY, height - 32);
+
+    bubble.style.setProperty("--bubble-tail-left", `${base.tail}px`);
+    bubble.style.left = `${x}px`;
+    bubble.style.top = `${y}px`;
+    bubble.classList.remove("is-hidden");
+  });
+}
+
+function renderEvidence() {
+  elements.evidenceList.innerHTML = "";
+
+  if (!state.evidence.length) {
+    const placeholder = document.createElement("article");
+    placeholder.className = "evidence-item";
+    placeholder.innerHTML = `
+      <div class="evidence-row">
+        <h3>No clues logged yet</h3>
+        <span class="evidence-strength" data-strength="low">Waiting</span>
+      </div>
+      <p>Your evidence board will fill as the meeting reveals connected symptoms.</p>
+    `;
+    elements.evidenceList.appendChild(placeholder);
+    return;
+  }
+
+  state.evidence.forEach((key) => {
+    const clue = evidenceCatalog[key];
+    const card = document.createElement("article");
+    card.className = "evidence-item";
+    card.innerHTML = `
+      <div class="evidence-row">
+        <h3>${clue.title}</h3>
+        <span class="evidence-strength" data-strength="${clue.strength}">${strengthLabel(clue.strength)}</span>
+      </div>
+      <p>${clue.detail}</p>
+    `;
+    elements.evidenceList.appendChild(card);
+  });
+}
+
+function renderSummary() {
+  elements.summaryTitle.textContent = state.insightTitle;
+  elements.summaryText.textContent = state.insightText;
+  elements.summaryBullets.innerHTML = "";
+
+  state.insightBullets.forEach((bullet) => {
+    const item = document.createElement("li");
+    item.textContent = bullet;
+    elements.summaryBullets.appendChild(item);
+  });
+}
+
+function renderScene() {
+  const scene = scenes[state.sceneIndex];
+
+  elements.sceneTitle.textContent = state.finished ? "Meeting complete" : scene.title;
+  elements.scenePrompt.textContent = state.finished
+    ? "Review the debrief, then restart if you want to run the case again."
+    : scene.prompt;
+  elements.sceneModeLabel.textContent = state.finished
+    ? "Case debrief"
+    : getSceneModeLabel(scene);
+  renderSpeakerRail(scene);
+  elements.choiceForm.classList.toggle("hidden", state.finished);
+
+  elements.choiceArea.innerHTML = "";
+
+  if (!state.finished) {
+    renderChoices(scene);
+  }
+
+  elements.submitButton.disabled = state.finished || state.locked || !isSelectionReady(scene);
+  elements.submitButton.classList.toggle("hidden", state.finished);
+  elements.nextButton.classList.toggle("hidden", !state.locked || state.finished);
+  elements.nextButton.textContent = state.sceneIndex === scenes.length - 1 ? "View debrief" : "Next scene";
+}
+
+function renderSpeakerRail(scene) {
+  if (!elements.speakerRail) {
+    return;
+  }
+
+  const status = getSpeakerStatus(scene);
+  elements.speakerRail.innerHTML = "";
+
+  status.forEach((item, index) => {
+    const chip = document.createElement("div");
+    chip.className = `speaker-chip${index === 0 ? " is-active" : ""}`;
+    chip.dataset.role = item.role || "room";
+    chip.innerHTML = `
+      <span class="speaker-chip-label">${item.label}</span>
+      <span class="speaker-chip-name">${item.name}</span>
+    `;
+    elements.speakerRail.appendChild(chip);
+  });
+}
+
+function getSpeakerStatus(scene) {
+  if (state.finished) {
+    return [
+      { role: "accounting", label: "Debrief", name: "Accounting manager" }
+    ];
+  }
+
+  if (state.locked && state.currentSceneDialog.length) {
+    const currentTurn = state.currentSceneDialog[state.currentSceneDialog.length - 1];
+    const previousTurn = [...state.currentSceneDialog]
+      .reverse()
+      .find((turn, index) => index > 0 && turn.role !== currentTurn.role);
+
+    const chips = [{
+      role: currentTurn.role,
+      label: "Now talking",
+      name: roleLabel(currentTurn.role)
+    }];
+
+    if (previousTurn) {
+      chips.push({
+        role: previousTurn.role,
+        label: "With",
+        name: roleLabel(previousTurn.role)
+      });
+    }
+
+    return chips;
+  }
+
+  const chips = [{
+    role: "accounting",
+    label: "Now talking",
+    name: "Accounting manager"
+  }];
+
+  if (scene.role !== "accounting") {
+    chips.push({
+      role: scene.role,
+      label: "Directed to",
+      name: roleLabel(scene.role)
+    });
+  } else {
+    chips.push({
+      role: "accounting",
+      label: "Meeting step",
+      name: "Accounting analysis"
+    });
+  }
+
+  return chips;
+}
+
+function getSceneModeLabel(scene) {
+  if (scene.id === "purchasing-question" || scene.id === "hr-question") {
+    return "Choose the accounting manager's next question";
+  }
+  if (scene.id === "opener") {
+    return "Choose the accounting manager's opening line";
+  }
+  if (scene.id === "vendor-assessment") {
+    return "Choose the accounting manager's interpretation";
+  }
+  if (scene.id === "symptom-groups") {
+    return "Choose the accounting manager's symptom diagnosis";
+  }
+  if (scene.id === "next-actions") {
+    return "Choose the accounting manager's follow-up actions";
+  }
+  if (scene.type === "order") {
+    return "Choose the accounting manager's ranking statement";
+  }
+  if (scene.type === "multi") {
+    return "Choose the accounting manager's response";
+  }
+  return "Choose the accounting manager's next line";
+}
+
+function getPreviewDialog(scene) {
+  const previewText = getChoicePreviewText(scene);
+  if (!previewText) {
+    return [];
+  }
+
+  return [{
+    role: "accounting",
+    speaker: "Accounting manager · selected answer",
+    text: previewText,
+    preview: true
+  }];
+}
+
+function getChoicePreviewText(scene) {
+  if (scene.type === "single") {
+    return state.selection ? sceneChoiceLabel(scene.id, state.selection) : "";
+  }
+
+  if (scene.type === "multi") {
+    const selected = Array.isArray(state.selection) ? state.selection : [];
+    if (!selected.length) {
+      return "";
+    }
+    const labels = scene.choices
+      .filter((choice) => selected.includes(choice.id))
+      .map((choice) => choice.label);
+    return `I want to emphasize these points: ${labels.join(" ")}`;
+  }
+
+  if (scene.type === "order") {
+    if (!state.orderedSelection.length) {
+      return "";
+    }
+    const labels = state.orderedSelection
+      .map((choiceId, index) => {
+        const choice = scene.choices.find((item) => item.id === choiceId);
+        return choice ? `${index + 1}. ${choice.label}` : "";
+      })
+      .filter(Boolean);
+    return `I would rank the clues like this: ${labels.join(" ")}`;
+  }
+
+  return "";
+}
+
+function renderChoices(scene) {
+  scene.choices.forEach((choice) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice-button";
+    button.dataset.choiceId = choice.id;
+    button.dataset.role = "accounting";
+    button.disabled = state.locked;
+
+    const marker = document.createElement("span");
+    marker.className = "choice-marker";
+
+    if (scene.type === "single") {
+      const selected = state.selection === choice.id;
+      button.classList.toggle("is-selected", selected);
+      marker.textContent = selected ? "Say" : choice.value;
+      button.setAttribute("aria-pressed", String(selected));
+      button.addEventListener("click", () => {
+        state.selection = choice.id;
+        render();
+      });
+    } else if (scene.type === "multi") {
+      const selected = Array.isArray(state.selection) && state.selection.includes(choice.id);
+      button.classList.toggle("is-selected", selected);
+      marker.textContent = selected ? "Add" : "+";
+      button.setAttribute("aria-pressed", String(selected));
+      button.addEventListener("click", () => {
+        const next = new Set(Array.isArray(state.selection) ? state.selection : []);
+        if (next.has(choice.id)) {
+          next.delete(choice.id);
+        } else {
+          next.add(choice.id);
+        }
+        state.selection = Array.from(next);
+        render();
+      });
+    } else if (scene.type === "order") {
+      const position = state.orderedSelection.indexOf(choice.id);
+      const selected = position !== -1;
+      button.classList.toggle("is-selected", selected);
+      marker.textContent = selected ? String(position + 1) : "+";
+      button.setAttribute("aria-pressed", String(selected));
+      button.addEventListener("click", () => {
+        const next = [...state.orderedSelection];
+        const currentIndex = next.indexOf(choice.id);
+        if (currentIndex !== -1) {
+          next.splice(currentIndex, 1);
+        } else {
+          next.push(choice.id);
+        }
+        state.orderedSelection = next;
+        render();
+      });
+    }
+
+    const copy = document.createElement("div");
+    copy.className = "choice-copy";
+    copy.innerHTML = `
+      <span class="choice-label">${choice.label}</span>
+      <span class="choice-hint">${choice.hint}</span>
+    `;
+
+    button.append(copy, marker);
+    elements.choiceArea.appendChild(button);
+  });
+
+  elements.feedbackCard.classList.toggle("hidden", !state.locked);
+}
+
+function isSelectionReady(scene) {
+  if (scene.type === "single") {
+    return Boolean(state.selection);
+  }
+  if (scene.type === "multi") {
+    return Array.isArray(state.selection) && state.selection.length > 0;
+  }
+  if (scene.type === "order") {
+    return state.orderedSelection.length === scene.choices.length;
+  }
+  return false;
+}
+
+function submitScene() {
+  const scene = scenes[state.sceneIndex];
+  const result = evaluateScene(scene);
+  const isLastScene = state.sceneIndex === scenes.length - 1;
+
+  state.score += result.points;
+  state.locked = true;
+  state.insightTitle = result.summaryTitle;
+  state.insightText = result.summaryText;
+  state.insightBullets = result.summaryBullets;
+  state.currentSceneDialog = result.dialogTurns?.length
+    ? result.dialogTurns
+    : result.transcriptEntries.length
+      ? result.transcriptEntries.map((entry) => ({
+        role: entry.role,
+        speaker: entry.speaker,
+        text: entry.text
+      }))
+      : getPreviewDialog(scene).map((turn) => ({ ...turn, preview: false }));
+
+  result.transcriptEntries.forEach((entry) => {
+    state.transcript.push(entry);
+  });
+
+  result.evidenceToAdd.forEach((key) => {
+    if (!state.evidence.includes(key)) {
+      state.evidence.push(key);
+    }
+  });
+
+  Object.entries(result.symptomUpdates).forEach(([key, value]) => {
+    state.symptomStates[key] = value;
+  });
+
+  elements.feedbackCard.innerHTML = `
+    <strong>${result.feedbackTitle}</strong>
+    <p>${result.feedbackText}</p>
+    <span class="point-chip">+${result.points} points</span>
+  `;
+  elements.feedbackCard.classList.remove("hidden");
+
+  if (isLastScene) {
+    state.finished = true;
+    applyFinalSummary();
+  }
+
+  render();
+}
+
+function evaluateScene(scene) {
+  switch (scene.id) {
+    case "opener":
+      return evaluateOpener();
+    case "purchasing-question":
+      return evaluatePurchasingQuestion();
+    case "vendor-assessment":
+      return evaluateVendorAssessment();
+    case "hr-question":
+      return evaluateHrQuestion();
+    case "clue-ranking":
+      return evaluateClueRanking();
+    case "symptom-groups":
+      return evaluateSymptomGroups();
+    case "next-actions":
+      return evaluateNextActions();
+    default:
+      return {
+        points: 0,
+        feedbackTitle: "No result",
+        feedbackText: "This scene did not return a case outcome.",
+        transcriptEntries: [],
+        evidenceToAdd: [],
+        symptomUpdates: {},
+        summaryTitle: state.insightTitle,
+        summaryText: state.insightText,
+        summaryBullets: state.insightBullets
+      };
+  }
+}
+
+function evaluateOpener() {
+  if (state.selection === "share-evidence") {
+    return {
+      points: 20,
+      feedbackTitle: "Strong opening",
+      feedbackText: "You shared a concrete accounting anomaly and invited the other managers to connect their own observations. That is exactly how early detection programs turn isolated facts into useful fraud signals.",
+      transcriptEntries: [
+        {
+          role: "accounting",
+          speaker: "Accounting manager",
+          text: "My audit found large payments to a new vendor with a suspicious address. I want to compare that with any vendor setup or employee signals you have noticed."
+        },
+        {
+          role: "purchasing",
+          speaker: "Purchasing manager",
+          text: "I can review the vendor setup file and trace any recent additions against those payment dates."
+        },
+        {
+          role: "hr",
+          speaker: "Human resource manager",
+          text: "I will also look for leave or payroll patterns that could point to control problems in purchasing."
+        }
+      ],
+      evidenceToAdd: ["payments"],
+      symptomUpdates: {
+        accounting: "present"
+      },
+      summaryTitle: "Communication matters",
+      summaryText: "The case starts with an accounting anomaly, but it only becomes more meaningful when other managers add related facts.",
+      summaryBullets: [
+        "Effective communication is part of fraud detection, not just reporting.",
+        "The suspicious vendor payments are the first symptom, not the final answer.",
+        "A proactive program depends on people sharing linked clues early."
+      ]
+    };
+  }
+
+  if (state.selection === "accuse-purchasing") {
+    return {
+      points: 9,
+      feedbackTitle: "You surfaced the issue, but the tone hurt the process",
+      feedbackText: "You involved the right team, but leading with blame can make people defensive and reduce the quality of information you get back. A fraud program works better when the first step is evidence sharing.",
+      transcriptEntries: [
+        {
+          role: "accounting",
+          speaker: "Accounting manager",
+          text: "Purchasing seems to have caused a problem, so explain who approved this vendor."
+        },
+        {
+          role: "purchasing",
+          speaker: "Purchasing manager",
+          text: "I can check the approvals, but we will get better facts if we start with the records instead of blame."
+        },
+        {
+          role: "hr",
+          speaker: "Human resource manager",
+          text: "I will review personnel patterns too, but an evidence-first tone will help the team surface more information."
+        }
+      ],
+      evidenceToAdd: ["payments"],
+      symptomUpdates: {
+        accounting: "present"
+      },
+      summaryTitle: "Symptoms need discussion",
+      summaryText: "The accounting anomaly is real, but accusatory communication can block the rest of the signal chain.",
+      summaryBullets: [
+        "You still surfaced the suspicious payments.",
+        "The best opening is concrete and collaborative, not personal.",
+        "Fraud symptoms need to be compared across functions."
+      ]
+    };
+  }
+
+  return {
+    points: 4,
+    feedbackTitle: "The delay weakens early detection",
+    feedbackText: "The slide case is built around a proactive program. Waiting for another month leaves the managers' related clues disconnected, which is exactly how a fraud can stay hidden longer.",
+    transcriptEntries: [
+      {
+        role: "accounting",
+        speaker: "Accounting manager",
+        text: "This looks odd, but I will wait for another month of data before involving anyone else."
+      },
+      {
+        role: "purchasing",
+        speaker: "Purchasing manager",
+        text: "If you want, I can still pull the vendor setup history now so we do not lose the timing details."
+      },
+      {
+        role: "hr",
+        speaker: "Human resource manager",
+        text: "I can also review leave records now if you want an early read on any control concerns."
+      }
+    ],
+    evidenceToAdd: ["payments"],
+    symptomUpdates: {
+      accounting: "present"
+    },
+    summaryTitle: "Speed matters too",
+    summaryText: "The accounting anomaly was already worth sharing. Delayed communication can postpone detection even when the red flag is visible.",
+    summaryBullets: [
+      "The suspicious payments are already a meaningful symptom.",
+      "Early discussion is what makes a proactive fraud program proactive.",
+      "Waiting keeps related clues scattered across departments."
+    ]
+  };
+}
+
+function evaluatePurchasingQuestion() {
+  const playerQuestion = sceneChoiceLabel("purchasing-question", state.selection);
+  const strong = state.selection === "vendor-added";
+
+  return {
+    points: strong ? 15 : 7,
+    feedbackTitle: strong ? "Good targeting" : "You still got the clue, but the question was too indirect",
+    feedbackText: strong
+      ? "You asked about the vendor file at the right moment. The answer directly links the suspicious payments to a recent vendor-list change."
+      : "The purchasing manager still revealed the important fact, but a better question would have targeted vendor setup timing immediately.",
+    transcriptEntries: [
+      {
+        role: "accounting",
+        speaker: "Accounting manager",
+        text: playerQuestion
+      },
+      {
+        role: "purchasing",
+        speaker: "Purchasing manager",
+        text: "A new vendor was added to our vendor list just before the suspicious payment activity started."
+      }
+    ],
+    evidenceToAdd: ["vendorTiming"],
+    symptomUpdates: {},
+    summaryTitle: "The signal is getting stronger",
+    summaryText: "A new vendor appearing just before the payments began is more suspicious than the accounting anomaly alone.",
+    summaryBullets: [
+      "The timing link strengthens the fraud concern.",
+      "It is still a symptom, not proof.",
+      "This is where cross-functional communication begins to pay off."
+    ]
+  };
+}
+
+function evaluateVendorAssessment() {
+  if (state.selection === "stronger-indication") {
+    return {
+      points: 15,
+      feedbackTitle: "Correct assessment",
+      feedbackText: "The new-vendor timing clue makes the case more suspicious, but it is still an indication of potential fraud rather than direct proof that fraud already occurred.",
+      transcriptEntries: [],
+      evidenceToAdd: [],
+      symptomUpdates: {},
+      summaryTitle: "Stronger, not conclusive",
+      summaryText: "This clue increases the fraud risk because it lines up with the suspicious payment pattern, but symptoms still require investigation.",
+      summaryBullets: [
+        "Fraud symptoms can have normal explanations.",
+        "The timing connection is what makes this clue stronger.",
+        "The next step is to keep gathering related facts."
+      ]
+    };
+  }
+
+  if (state.selection === "direct-proof") {
+    return {
+      points: 6,
+      feedbackTitle: "Too strong a conclusion",
+      feedbackText: "The clue is serious, but the chapter treats symptoms as warning signs that can have other explanations. Jumping from symptom to proof skips the investigation step.",
+      transcriptEntries: [],
+      evidenceToAdd: [],
+      symptomUpdates: {},
+      summaryTitle: "Avoid overclaiming",
+      summaryText: "The case is suspicious, but fraud symptoms still need to be tested and investigated.",
+      summaryBullets: [
+        "The signal is stronger than before.",
+        "Symptoms are not the same as guilt.",
+        "Effective fraud detection balances urgency with discipline."
+      ]
+    };
+  }
+
+  return {
+    points: 3,
+    feedbackTitle: "The new clue should not calm you down",
+    feedbackText: "Vendor additions can be normal, but the timing makes this case more suspicious, not less. Treating the clue as meaningless would cause the team to miss a stronger pattern.",
+    transcriptEntries: [],
+    evidenceToAdd: [],
+    symptomUpdates: {},
+    summaryTitle: "Timing matters",
+    summaryText: "The vendor-file change is not automatically fraudulent, but it is more concerning because it lines up with the questionable payments.",
+    summaryBullets: [
+      "Context changes the meaning of a fact.",
+      "The new-vendor clue strengthens the anomaly.",
+      "The case now deserves more focused follow-up."
+    ]
+  };
+}
+
+function evaluateHrQuestion() {
+  const playerQuestion = sceneChoiceLabel("hr-question", state.selection);
+  const strong = state.selection === "leave-irregularities";
+
+  return {
+    points: strong ? 15 : 8,
+    feedbackTitle: strong ? "Excellent follow-up" : "The clue surfaced, but the question could have been sharper",
+    feedbackText: strong
+      ? "You connected the case to a classic concealment risk: an employee who wants pay instead of vacation may be avoiding the independent checks that come with time away."
+      : "You still received the right personnel clue, but the strongest HR question would have focused on unusual leave or payroll arrangements tied to control risk.",
+    transcriptEntries: [
+      {
+        role: "accounting",
+        speaker: "Accounting manager",
+        text: playerQuestion
+      },
+      {
+        role: "hr",
+        speaker: "Human resource manager",
+        text: "One employee in purchasing has petitioned for pay in lieu of vacation instead of taking time off."
+      }
+    ],
+    evidenceToAdd: ["vacation"],
+    symptomUpdates: {
+      controls: "present"
+    },
+    summaryTitle: "The strongest current red flag",
+    summaryText: "The vacation issue points to internal control weakness because skipping leave can prevent independent review and help conceal a fraud.",
+    summaryBullets: [
+      "This is the strongest clue in the case debrief.",
+      "It connects the case to internal control weakness.",
+      "HR observations can turn a vendor anomaly into a much more urgent risk signal."
+    ]
+  };
+}
+
+function evaluateClueRanking() {
+  const expected = ["payments", "vendorTiming", "vacation"];
+  const exact = arraysEqual(state.orderedSelection, expected);
+
+  return {
+    points: exact ? 15 : 6,
+    feedbackTitle: exact ? "Right order" : "Review the case debrief order",
+    feedbackText: exact
+      ? "You matched the debrief exactly: the accounting anomaly comes first, the new-vendor timing is stronger, and the vacation request is the strongest clue."
+      : "The case debrief ranks the clues from weakest to strongest as payments first, vendor timing second, and the vacation request third.",
+    transcriptEntries: [],
+    evidenceToAdd: [],
+    symptomUpdates: {},
+    summaryTitle: "Clue strength matters",
+    summaryText: "Not every symptom carries the same weight. Fraud detection improves when you compare how strongly each fact points toward a scheme.",
+    summaryBullets: [
+      "The suspicious payments start the concern.",
+      "The vendor-timing clue strengthens the pattern.",
+      "The vacation issue is the strongest signal because it suggests concealment and weak controls."
+    ]
+  };
+}
+
+function evaluateSymptomGroups() {
+  const selected = new Set(Array.isArray(state.selection) ? state.selection : []);
+  const correct = new Set(["accounting", "controls"]);
+  let points = 0;
+
+  correct.forEach((id) => {
+    if (selected.has(id)) {
+      points += 5;
+    }
+  });
+
+  selected.forEach((id) => {
+    if (!correct.has(id)) {
+      points -= 2;
+    }
+  });
+
+  points = clamp(points, 0, 10);
+  const exact = selected.size === correct.size && [...correct].every((id) => selected.has(id));
+
+  return {
+    points,
+    feedbackTitle: exact ? "Correct symptom tagging" : "Close, but keep the case boundaries tight",
+    feedbackText: exact
+      ? "The case already shows accounting anomalies and internal control weaknesses. The chapter debrief points you to watch for behavior and lifestyle issues next, but they are not reported yet in the case facts."
+      : "The strongest reading of the case is that accounting anomalies are already present, and the vacation issue points to internal control weakness. Other symptom groups may become relevant later, but they are not directly reported yet.",
+    transcriptEntries: [],
+    evidenceToAdd: [],
+    symptomUpdates: {
+      accounting: "present",
+      controls: "present"
+    },
+    summaryTitle: "What is present right now",
+    summaryText: "The meeting already gives you two symptom groups. The rest should be handled carefully as future watch areas, not assumptions.",
+    summaryBullets: [
+      "Present now: accounting anomalies.",
+      "Present now: internal control weaknesses.",
+      "Not yet reported: tips, behavior changes, lifestyle clues, or analytical tests."
+    ]
+  };
+}
+
+function evaluateNextActions() {
+  const selected = new Set(Array.isArray(state.selection) ? state.selection : []);
+  const correct = new Set([
+    "investigate-payments",
+    "research-vendor",
+    "monitor-behavior",
+    "monitor-lifestyle"
+  ]);
+  let points = 0;
+
+  correct.forEach((id) => {
+    if (selected.has(id)) {
+      points += 3;
+    }
+  });
+
+  selected.forEach((id) => {
+    if (!correct.has(id)) {
+      points -= 2;
+    }
+  });
+
+  points = clamp(points, 0, 10);
+  const exact = selected.size === correct.size && [...correct].every((id) => selected.has(id));
+
+  return {
+    points,
+    feedbackTitle: exact ? "Strong fraud response" : "Your response needs better prioritization",
+    feedbackText: exact
+      ? "You matched the debrief: investigate the payments, research the vendor's goods and services, and monitor for suspicious behavior or lifestyle symptoms going forward."
+      : "The case debrief calls for investigation and continued monitoring. It does not support closing the matter or treating the symptoms as automatic proof of guilt.",
+    transcriptEntries: [],
+    evidenceToAdd: [],
+    symptomUpdates: {
+      behavior: "monitor",
+      lifestyle: "monitor"
+    },
+    summaryTitle: "Ready for the debrief",
+    summaryText: "You have now connected the current clues to the right follow-up actions. The final debrief will show how closely your judgment matched the case solution.",
+    summaryBullets: [
+      "Investigate the questionable payments.",
+      "Research the new vendor's goods and services.",
+      "Monitor for employee behavioral and lifestyle symptoms as the case develops."
+    ]
+  };
+}
+
+function applyFinalSummary() {
+  const title = state.score >= 85
+    ? "Early detection achieved"
+    : state.score >= 65
+      ? "Solid fraud awareness"
+      : "More fraud-signal practice needed";
+
+  state.insightTitle = title;
+  state.insightText = "The case debrief says the accounting anomaly could have a normal explanation, the vendor-timing clue is stronger, and the vacation request is the strongest current indication of a potential vendor-related fraud.";
+  state.insightBullets = [
+    "Cross-functional communication turned three isolated observations into one meaningful fraud pattern.",
+    "Present symptom groups: accounting anomalies and internal control weaknesses.",
+    "Best next moves: investigate the payments, research the vendor, and watch for unusual behavior or extravagant lifestyle signs."
+  ];
+}
+
+function sceneChoiceLabel(sceneId, choiceId) {
+  const scene = scenes.find((item) => item.id === sceneId);
+  const choice = scene?.choices.find((item) => item.id === choiceId);
+  return choice ? choice.label : "";
+}
+
+function roleLabel(role) {
+  if (role === "hr") {
+    return "Human resource manager";
+  }
+  if (role === "accounting") {
+    return "Accounting manager";
+  }
+  if (role === "purchasing") {
+    return "Purchasing manager";
+  }
+  return "Meeting team";
+}
+
+function strengthLabel(level) {
+  if (level === "high") {
+    return "Strongest";
+  }
+  if (level === "medium") {
+    return "Stronger";
+  }
+  return "Initial";
+}
+
+function arraysEqual(left, right) {
+  return left.length === right.length && left.every((item, index) => item === right[index]);
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function capitalize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function syncRepositoryLink() {
+  if (!elements.repoLink) {
+    return;
+  }
+
+  const repositoryUrl = new URL("/", window.location.href).href;
+  elements.repoLink.setAttribute("href", repositoryUrl);
+  elements.repoLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.assign(repositoryUrl);
+  });
+}
+
+function hasWebGL() {
+  try {
+    const testCanvas = document.createElement("canvas");
+    return Boolean(window.WebGLRenderingContext && (testCanvas.getContext("webgl2") || testCanvas.getContext("webgl")));
+  } catch {
+    return false;
+  }
+}
+
+async function bootRenderer() {
+  if (!hasWebGL()) {
+    showSceneFallback("WebGL is not available in this browser, so the meeting stays in the text-first view.");
+    return;
+  }
+
+  try {
+    const THREE = await import(THREE_CDN);
+    rendererAdapter = createMeetingRenderer(THREE, {
+      canvas: elements.sceneCanvas,
+      dialogLayer: elements.dialogLayer
+    });
+    rendererAdapter.start();
+    hideSceneFallback();
+    renderMeetingViewport();
+  } catch (error) {
+    console.error(error);
+    showSceneFallback("The 3D boardroom could not load. Check your internet connection or use a browser that allows CDN modules from local files.");
+  }
+}
+
+function showSceneFallback(message) {
+  elements.sceneFallbackText.textContent = message;
+  elements.sceneFallback.classList.remove("hidden");
+}
+
+function hideSceneFallback() {
+  elements.sceneFallback.classList.add("hidden");
+}
+
+function createMeetingRenderer(THREE, options) {
+  const { canvas, dialogLayer } = options;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111a22);
+  scene.fog = new THREE.Fog(0x111a22, 10, 22);
+
+  const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 100);
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+    alpha: false,
+    powerPreference: "high-performance"
+  });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const clock = new THREE.Clock();
+  const root = new THREE.Group();
+  scene.add(root);
+
+  const desiredCamera = new THREE.Vector3(0, 2.8, 7.8);
+  const desiredTarget = new THREE.Vector3(0, 1.12, 0.2);
+  const currentTarget = desiredTarget.clone();
+
+  const roleMeshes = new Map();
+  const haloMeshes = new Map();
+  const screenBars = [];
+  const animatedLabels = [];
+  const skylineBlocks = [];
+  const paperwork = [];
+  const projectionVector = new THREE.Vector3();
+
+  buildLights();
+  buildRoom(root);
+  buildFurniture(root);
+  buildCharacters(root);
+  resize();
+
+  window.addEventListener("resize", resize);
+  canvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    showSceneFallback("The WebGL context was lost. Reload the page to restore the 3D meeting room.");
+  });
+
+  function buildLights() {
+    const ambient = new THREE.HemisphereLight(0xf7efe0, 0x1a2732, 2.1);
+    scene.add(ambient);
+
+    const key = new THREE.DirectionalLight(0xfff3db, 2.6);
+    key.position.set(-4.2, 6.8, 4.8);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.camera.near = 0.5;
+    key.shadow.camera.far = 25;
+    key.shadow.camera.left = -8;
+    key.shadow.camera.right = 8;
+    key.shadow.camera.top = 8;
+    key.shadow.camera.bottom = -8;
+    scene.add(key);
+
+    const windowGlow = new THREE.DirectionalLight(0xa7d7ea, 1.1);
+    windowGlow.position.set(5.2, 3.6, -2.8);
+    scene.add(windowGlow);
+
+    const tableGlow = new THREE.PointLight(0xf4d29a, 0.7, 10, 2);
+    tableGlow.position.set(0, 2.4, 0.4);
+    scene.add(tableGlow);
+  }
+
+  function buildRoom(parent) {
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 20),
+      new THREE.MeshStandardMaterial({ color: 0x40352c, roughness: 0.96 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    parent.add(floor);
+
+    const rug = new THREE.Mesh(
+      new THREE.CylinderGeometry(3.35, 3.55, 0.04, 42),
+      new THREE.MeshStandardMaterial({ color: 0x214958, roughness: 0.88 })
+    );
+    rug.position.set(0, 0.02, 0.2);
+    rug.scale.z = 0.82;
+    rug.receiveShadow = true;
+    parent.add(rug);
+
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 20),
+      new THREE.MeshStandardMaterial({ color: 0xddd6ca, roughness: 0.9 })
+    );
+    ceiling.position.y = 4.2;
+    ceiling.rotation.x = Math.PI / 2;
+    parent.add(ceiling);
+
+    const backWall = new THREE.Mesh(
+      new THREE.BoxGeometry(12.5, 4.3, 0.22),
+      new THREE.MeshStandardMaterial({ color: 0xe8ddcf, roughness: 0.96 })
+    );
+    backWall.position.set(0, 2.1, -4.2);
+    backWall.receiveShadow = true;
+    parent.add(backWall);
+
+    const leftWall = new THREE.Mesh(
+      new THREE.BoxGeometry(0.22, 4.3, 10.8),
+      new THREE.MeshStandardMaterial({ color: 0xdfd3c5, roughness: 0.94 })
+    );
+    leftWall.position.set(-6.2, 2.1, 0.2);
+    parent.add(leftWall);
+
+    const rightWall = new THREE.Mesh(
+      new THREE.BoxGeometry(0.22, 4.3, 10.8),
+      new THREE.MeshStandardMaterial({ color: 0xdfd3c5, roughness: 0.94 })
+    );
+    rightWall.position.set(6.2, 2.1, 0.2);
+    parent.add(rightWall);
+
+    const windowFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(6.4, 2.35, 0.14),
+      new THREE.MeshStandardMaterial({ color: 0x2d3f4d, roughness: 0.55 })
+    );
+    windowFrame.position.set(0, 2.45, -4.08);
+    parent.add(windowFrame);
+
+    const glass = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.95, 1.92),
+      new THREE.MeshStandardMaterial({
+        color: 0xcde0ea,
+        transparent: true,
+        opacity: 0.46,
+        roughness: 0.12,
+        metalness: 0.08
+      })
+    );
+    glass.position.set(0, 2.45, -4);
+    parent.add(glass);
+
+    const mullionMaterial = new THREE.MeshStandardMaterial({ color: 0x2d3f4d, roughness: 0.6 });
+    [-1.95, 0, 1.95].forEach((x) => {
+      const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.92, 0.12), mullionMaterial);
+      mullion.position.set(x, 2.45, -4.02);
+      parent.add(mullion);
+    });
+    const crossbar = new THREE.Mesh(new THREE.BoxGeometry(5.95, 0.12, 0.12), mullionMaterial);
+    crossbar.position.set(0, 2.45, -4.02);
+    parent.add(crossbar);
+
+    const skylineGroup = new THREE.Group();
+    skylineGroup.position.set(0, 0, -5.2);
+    parent.add(skylineGroup);
+    for (let index = 0; index < 18; index += 1) {
+      const width = 0.35 + (index % 3) * 0.16;
+      const height = 0.8 + (index % 5) * 0.36 + (index === 9 ? 1.1 : 0);
+      const depth = 0.35 + (index % 4) * 0.1;
+      const block = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, depth),
+        new THREE.MeshStandardMaterial({ color: 0x203444, roughness: 0.72, emissive: 0x08131b, emissiveIntensity: 0.4 })
+      );
+      block.position.set(-4.2 + index * 0.5, height * 0.5, -0.35 - (index % 3) * 0.18);
+      skylineBlocks.push(block);
+      skylineGroup.add(block);
+    }
+
+    const skylineGlow = new THREE.Mesh(
+      new THREE.PlaneGeometry(8.4, 3.1),
+      new THREE.MeshBasicMaterial({
+        color: 0x8bb7cf,
+        transparent: true,
+        opacity: 0.14
+      })
+    );
+    skylineGlow.position.set(0, 2.55, -5.65);
+    parent.add(skylineGlow);
+  }
+
+  function buildFurniture(parent) {
+    const screenPanel = new THREE.Mesh(
+      new THREE.BoxGeometry(2.8, 1.55, 0.14),
+      new THREE.MeshStandardMaterial({ color: 0x121d26, roughness: 0.42 })
+    );
+    screenPanel.position.set(0, 1.7, -3.9);
+    screenPanel.castShadow = true;
+    parent.add(screenPanel);
+
+    const screenGlow = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.42, 1.22),
+      new THREE.MeshStandardMaterial({ color: 0xe9eef1, emissive: 0x1b7286, emissiveIntensity: 0.18, roughness: 0.22 })
+    );
+    screenGlow.position.set(0, 1.7, -3.81);
+    parent.add(screenGlow);
+
+    const screenAccentMaterial = new THREE.MeshStandardMaterial({ color: 0xc86d4a, roughness: 0.35, emissive: 0x321612, emissiveIntensity: 0.15 });
+    for (let index = 0; index < 4; index += 1) {
+      const bar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.38 + index * 0.2, 0.08, 0.05),
+        screenAccentMaterial.clone()
+      );
+      bar.position.set(-0.64 + index * 0.32, 1.32 + index * 0.16, -3.74);
+      screenBars.push(bar);
+      parent.add(bar);
+    }
+
+    const screenDot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.08, 18, 16),
+      new THREE.MeshStandardMaterial({ color: 0xb4473e, emissive: 0xb4473e, emissiveIntensity: 0.26, roughness: 0.4 })
+    );
+    screenDot.position.set(0.92, 1.95, -3.72);
+    screenBars.push(screenDot);
+    parent.add(screenDot);
+
+    const tableGroup = new THREE.Group();
+    tableGroup.position.set(0, 0.48, 0.2);
+    parent.add(tableGroup);
+
+    const tableTop = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.45, 2.58, 0.14, 42),
+      new THREE.MeshStandardMaterial({ color: 0x6a4d37, roughness: 0.58 })
+    );
+    tableTop.scale.z = 0.78;
+    tableTop.castShadow = true;
+    tableTop.receiveShadow = true;
+    tableGroup.add(tableTop);
+
+    const tableBase = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.3, 0.45, 0.72, 28),
+      new THREE.MeshStandardMaterial({ color: 0x1b242c, roughness: 0.68 })
+    );
+    tableBase.position.y = -0.42;
+    tableBase.castShadow = true;
+    tableGroup.add(tableBase);
+
+    const laptop = new THREE.Group();
+    const laptopBase = new THREE.Mesh(
+      new THREE.BoxGeometry(0.58, 0.03, 0.36),
+      new THREE.MeshStandardMaterial({ color: 0xc1c5c8, roughness: 0.5 })
+    );
+    laptopBase.position.set(0, 0.11, 0.3);
+    laptop.add(laptopBase);
+    const laptopScreen = new THREE.Mesh(
+      new THREE.BoxGeometry(0.56, 0.34, 0.03),
+      new THREE.MeshStandardMaterial({ color: 0x13212d, emissive: 0x1b7286, emissiveIntensity: 0.16, roughness: 0.2 })
+    );
+    laptopScreen.position.set(0, 0.28, 0.14);
+    laptopScreen.rotation.x = -1.06;
+    laptop.add(laptopScreen);
+    tableGroup.add(laptop);
+
+    [[-0.98, 0.18, 0.46], [0.94, 0.2, -0.12], [0.18, 0.18, -0.58]].forEach(([x, y, z], index) => {
+      const paper = new THREE.Mesh(
+        new THREE.BoxGeometry(0.52, 0.018, 0.34),
+        new THREE.MeshStandardMaterial({ color: 0xfffaf2, roughness: 0.82 })
+      );
+      paper.position.set(x, y, z);
+      paper.rotation.y = -0.2 + index * 0.18;
+      paper.castShadow = true;
+      paperwork.push(paper);
+      tableGroup.add(paper);
+    });
+
+    [1.5, -1.5, 0].forEach((x, index) => {
+      const mug = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.09, 0.09, 0.14, 22),
+        new THREE.MeshStandardMaterial({ color: index === 1 ? 0x1b7286 : 0xf6f1e8, roughness: 0.54 })
+      );
+      mug.position.set(x * 0.62, 0.18, index === 2 ? -0.66 : 0.62);
+      mug.castShadow = true;
+      tableGroup.add(mug);
+    });
+
+    createCabinet(parent, -4.55, -1.3);
+    createCabinet(parent, 4.55, -1.15);
+    createPlant(parent, -5.1, 3.05);
+    createPlant(parent, 5.05, 2.7);
+
+    const ceilingLight = new THREE.Mesh(
+      new THREE.BoxGeometry(2.2, 0.08, 1.05),
+      new THREE.MeshStandardMaterial({ color: 0xf2ece1, emissive: 0xf6ddb6, emissiveIntensity: 0.28, roughness: 0.35 })
+    );
+    ceilingLight.position.set(0, 3.92, 0.28);
+    parent.add(ceilingLight);
+  }
+
+  function createCabinet(parent, x, z) {
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(1.4, 0.9, 0.38),
+      new THREE.MeshStandardMaterial({ color: 0xa58161, roughness: 0.74 })
+    );
+    body.position.set(x, 0.45, z);
+    body.castShadow = true;
+    body.receiveShadow = true;
+    parent.add(body);
+
+    for (let index = 0; index < 3; index += 1) {
+      const folder = new THREE.Mesh(
+        new THREE.BoxGeometry(0.18, 0.5 + index * 0.06, 0.18),
+        new THREE.MeshStandardMaterial({ color: index === 1 ? 0x1b7286 : index === 2 ? 0xb98230 : 0xe8ddcf, roughness: 0.72 })
+      );
+      folder.position.set(x - 0.34 + index * 0.3, 1.12 + index * 0.02, z);
+      folder.castShadow = true;
+      parent.add(folder);
+    }
+  }
+
+  function createPlant(parent, x, z) {
+    const pot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.24, 0.28, 24),
+      new THREE.MeshStandardMaterial({ color: 0xc58d53, roughness: 0.82 })
+    );
+    pot.position.set(x, 0.16, z);
+    pot.castShadow = true;
+    parent.add(pot);
+
+    for (let index = 0; index < 6; index += 1) {
+      const leaf = new THREE.Mesh(
+        new THREE.SphereGeometry(0.16 + (index % 2) * 0.03, 18, 16),
+        new THREE.MeshStandardMaterial({ color: 0x59784f, roughness: 0.86 })
+      );
+      leaf.scale.set(0.72, 1.45, 0.4);
+      leaf.position.set(
+        x + Math.cos(index * 1.2) * 0.12,
+        0.48 + index * 0.08,
+        z + Math.sin(index * 1.2) * 0.12
+      );
+      leaf.rotation.z = -0.4 + index * 0.14;
+      leaf.castShadow = true;
+      parent.add(leaf);
+    }
+  }
+
+  function buildCharacters(parent) {
+    const people = [
+      {
+        id: "accounting",
+        label: "Accounting manager",
+        accent: 0x1b7286,
+        suit: 0x223443,
+        shirt: 0xd8ebe8,
+        tie: 0x1b7286,
+        skin: "#e5be9c",
+        skinShadow: "#cc9e7f",
+        hair: "#57443a",
+        hairAccent: "#8d7769",
+        lip: "#9d6252",
+        browTilt: -6,
+        smileCurve: 6,
+        glasses: true,
+        seat: [2.02, 0.22, 1.72],
+        facing: Math.PI + 0.52
+      },
+      {
+        id: "purchasing",
+        label: "Purchasing manager",
+        accent: 0xb98230,
+        suit: 0x5a4027,
+        shirt: 0xf2eadf,
+        tie: 0xb98230,
+        skin: "#d5a17f",
+        skinShadow: "#b88163",
+        hair: "#342721",
+        hairAccent: "#6b5248",
+        lip: "#8f5a47",
+        browTilt: 4,
+        smileCurve: -2,
+        glasses: false,
+        seat: [-2.38, 0.22, 0.98],
+        facing: 1.02
+      },
+      {
+        id: "hr",
+        label: "Human resource manager",
+        accent: 0x657e50,
+        suit: 0x2d4630,
+        shirt: 0xe8eee2,
+        tie: 0x657e50,
+        skin: "#f0c8a9",
+        skinShadow: "#d3aa8a",
+        hair: "#46342f",
+        hairAccent: "#78605a",
+        lip: "#9d6458",
+        browTilt: -2,
+        smileCurve: 8,
+        glasses: false,
+        seat: [0.06, 0.22, -2.02],
+        facing: 0.02
+      }
+    ];
+
+    people.forEach((person) => {
+      const group = new THREE.Group();
+      group.position.set(...person.seat);
+      group.userData.baseY = person.seat[1];
+      group.rotation.y = person.facing;
+
+      const chairSeat = new THREE.Mesh(
+        new THREE.BoxGeometry(0.56, 0.12, 0.56),
+        new THREE.MeshStandardMaterial({ color: 0x2b3135, roughness: 0.8 })
+      );
+      chairSeat.position.y = 0.18;
+      chairSeat.castShadow = true;
+      group.add(chairSeat);
+
+      const chairBack = new THREE.Mesh(
+        new THREE.BoxGeometry(0.56, 0.62, 0.12),
+        new THREE.MeshStandardMaterial({ color: 0x2b3135, roughness: 0.8 })
+      );
+      chairBack.position.set(0, 0.54, -0.23);
+      chairBack.castShadow = true;
+      group.add(chairBack);
+
+      const chairLegs = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.05, 0.34, 18),
+        new THREE.MeshStandardMaterial({ color: 0x1e2428, roughness: 0.78 })
+      );
+      chairLegs.position.set(0, 0.02, 0.08);
+      chairLegs.castShadow = true;
+      group.add(chairLegs);
+
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.36, 0.024, 10, 42),
+        new THREE.MeshStandardMaterial({
+          color: person.accent,
+          emissive: person.accent,
+          emissiveIntensity: 0.1,
+          roughness: 0.45,
+          transparent: true,
+          opacity: 0.72
+        })
+      );
+      halo.rotation.x = Math.PI / 2;
+      halo.position.y = 0.03;
+      group.add(halo);
+      haloMeshes.set(person.id, halo);
+
+      const torso = new THREE.Mesh(
+        new THREE.BoxGeometry(0.46, 0.7, 0.26),
+        new THREE.MeshStandardMaterial({ color: person.suit, roughness: 0.72 })
+      );
+      torso.position.set(0, 0.68, -0.01);
+      torso.castShadow = true;
+      group.add(torso);
+
+      const shoulders = new THREE.Mesh(
+        new THREE.SphereGeometry(0.3, 24, 18),
+        new THREE.MeshStandardMaterial({ color: person.suit, roughness: 0.64 })
+      );
+      shoulders.scale.set(1.18, 0.6, 1.06);
+      shoulders.position.y = 0.9;
+      shoulders.castShadow = true;
+      group.add(shoulders);
+
+      const neck = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.07, 0.082, 0.15, 18),
+        new THREE.MeshStandardMaterial({ color: new THREE.Color(person.skin), roughness: 0.8 })
+      );
+      neck.position.set(0, 1.02, 0.01);
+      neck.castShadow = true;
+      group.add(neck);
+
+      const arms = [
+        [-0.22, 0.68, 0.05, -0.68],
+        [0.22, 0.68, 0.05, 0.68]
+      ];
+      arms.forEach(([x, y, z, rotationZ]) => {
+        const arm = new THREE.Mesh(
+          new THREE.CapsuleGeometry(0.06, 0.34, 6, 10),
+          new THREE.MeshStandardMaterial({ color: person.suit, roughness: 0.72 })
+        );
+        arm.position.set(x, y, z);
+        arm.rotation.z = rotationZ;
+        arm.rotation.x = -0.22;
+        arm.castShadow = true;
+        group.add(arm);
+      });
+
+      const portraitPanel = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.22, 0.42),
+        new THREE.MeshStandardMaterial({
+          color: person.shirt,
+          roughness: 0.92,
+          metalness: 0
+        })
+      );
+      portraitPanel.position.set(0, 0.78, 0.135);
+      portraitPanel.castShadow = true;
+      group.add(portraitPanel);
+
+      const lapelMaterial = new THREE.MeshStandardMaterial({ color: person.suit, roughness: 0.62 });
+      const leftLapel = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.36, 0.02), lapelMaterial);
+      leftLapel.position.set(-0.1, 0.78, 0.148);
+      leftLapel.rotation.z = 0.38;
+      leftLapel.castShadow = true;
+      group.add(leftLapel);
+
+      const rightLapel = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.36, 0.02), lapelMaterial);
+      rightLapel.position.set(0.1, 0.78, 0.148);
+      rightLapel.rotation.z = -0.38;
+      rightLapel.castShadow = true;
+      group.add(rightLapel);
+
+      const tieKnot = new THREE.Mesh(
+        new THREE.BoxGeometry(0.06, 0.06, 0.025),
+        new THREE.MeshStandardMaterial({ color: person.tie, roughness: 0.58 })
+      );
+      tieKnot.position.set(0, 0.86, 0.16);
+      tieKnot.rotation.z = Math.PI / 4;
+      tieKnot.castShadow = true;
+      group.add(tieKnot);
+
+      const tieBlade = new THREE.Mesh(
+        new THREE.BoxGeometry(0.065, 0.28, 0.02),
+        new THREE.MeshStandardMaterial({ color: person.tie, roughness: 0.58 })
+      );
+      tieBlade.position.set(0, 0.68, 0.16);
+      tieBlade.castShadow = true;
+      group.add(tieBlade);
+
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.17, 24, 20),
+        new THREE.MeshStandardMaterial({ color: new THREE.Color(person.skin), roughness: 0.84 })
+      );
+      head.position.set(0, 1.16, 0.02);
+      head.castShadow = true;
+      head.scale.set(0.92, 1.03, 0.86);
+      group.add(head);
+
+      const leftEar = new THREE.Mesh(
+        new THREE.SphereGeometry(0.038, 14, 12),
+        new THREE.MeshStandardMaterial({ color: new THREE.Color(person.skinShadow), roughness: 0.84 })
+      );
+      leftEar.position.set(-0.145, 1.16, -0.005);
+      leftEar.scale.set(0.68, 1.08, 0.54);
+      leftEar.castShadow = true;
+      group.add(leftEar);
+
+      const rightEar = leftEar.clone();
+      rightEar.position.x *= -1;
+      group.add(rightEar);
+
+      const hairCap = new THREE.Mesh(
+        new THREE.SphereGeometry(0.182, 24, 20, 0, Math.PI * 2, 0, Math.PI * 0.58),
+        new THREE.MeshStandardMaterial({ color: new THREE.Color(person.hair), roughness: 0.82 })
+      );
+      hairCap.position.set(0, 1.24, -0.01);
+      hairCap.rotation.x = 0.2;
+      hairCap.scale.set(0.96, 0.92, 0.94);
+      hairCap.castShadow = true;
+      group.add(hairCap);
+
+      const facePanel = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.245, 0.295),
+        new THREE.MeshStandardMaterial({
+          map: createFaceTexture(THREE, person),
+          transparent: true,
+          alphaTest: 0.08,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          roughness: 1
+        })
+      );
+      facePanel.position.set(0, 1.16, 0.168);
+      facePanel.renderOrder = 4;
+      group.add(facePanel);
+
+      const nose = new THREE.Mesh(
+        new THREE.SphereGeometry(0.028, 12, 10),
+        new THREE.MeshStandardMaterial({ color: new THREE.Color(person.skinShadow), roughness: 0.86 })
+      );
+      nose.position.set(0, 1.14, 0.148);
+      nose.scale.set(0.72, 1.12, 0.84);
+      group.add(nose);
+
+      const anchor = new THREE.Object3D();
+      anchor.position.set(0, 1.82, 0.18);
+      group.add(anchor);
+
+      const label = createLabelSprite(THREE, person.label, 1.26, 0.26, 34);
+      label.position.set(0, 1.62, 0);
+      label.userData.baseY = 1.62;
+      animatedLabels.push(label);
+      group.add(label);
+
+      roleMeshes.set(person.id, {
+        group,
+        torso,
+        shoulders,
+        facePanel,
+        portraitPanel,
+        anchor,
+        accent: person.accent
+      });
+      parent.add(group);
+    });
+  }
+
+  function positionDialogBubbles() {
+    if (!dialogLayer) {
+      return;
+    }
+
+    const width = canvas.clientWidth || 1;
+    const height = canvas.clientHeight || 1;
+    const bubbles = dialogLayer.querySelectorAll(".dialog-bubble[data-role]");
+
+    bubbles.forEach((bubble, index) => {
+      const roleId = bubble.dataset.role;
+      const bubbleWidth = bubble.offsetWidth || 280;
+      const bubbleHeight = bubble.offsetHeight || 124;
+      const stackShift = Number(bubble.dataset.stack || index) * 98;
+      const base = dialogBubbleAnchors[roleId] || { x: 0.5, y: 0.5, tail: 24 };
+      const safeX = bubbleWidth * 0.5 + 18;
+      const safeY = bubbleHeight + 18;
+      const rawX = base.x * width;
+      const rawY = (base.y * height) - stackShift;
+      const x = clamp(rawX, safeX, width - safeX);
+      const y = clamp(rawY, safeY, height - 32);
+
+      bubble.style.setProperty("--bubble-tail-left", `${base.tail}px`);
+      bubble.style.left = `${x}px`;
+      bubble.style.top = `${y}px`;
+      bubble.classList.remove("is-hidden");
+    });
+  }
+
+  function resize() {
+    const host = canvas.parentElement;
+    const width = Math.max(host?.clientWidth || 1, 1);
+    const height = Math.max(host?.clientHeight || 1, 1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  function sync(viewModel) {
+    const anchors = {
+      overview: {
+        position: [0, 2.95, 8.45],
+        target: [0, 1.12, 0.08]
+      },
+      "accounting-intro": {
+        position: [4.4, 2.24, 6.12],
+        target: [1.06, 1.08, 0.92]
+      },
+      "accounting-intro-direct": {
+        position: [4.05, 2.14, 5.42],
+        target: [1.24, 1.08, 1.08]
+      },
+      "accounting-intro-hard": {
+        position: [3.52, 2.08, 5.16],
+        target: [0.62, 1.02, 1.02]
+      },
+      "accounting-intro-wide": {
+        position: [4.9, 2.3, 6.52],
+        target: [0.9, 1.06, 0.96]
+      },
+      accounting: {
+        position: [4.08, 2.14, 5.5],
+        target: [1.58, 1.06, 1.34]
+      },
+      "accounting-decision": {
+        position: [4.18, 2.16, 5.72],
+        target: [1.46, 1.06, 1.28]
+      },
+      "accounting-decision-tight": {
+        position: [3.74, 2.08, 5.05],
+        target: [1.68, 1.06, 1.42]
+      },
+      "accounting-to-purchasing": {
+        position: [4.02, 2.12, 5.18],
+        target: [0.12, 1.03, 1.04]
+      },
+      "accounting-to-purchasing-tight": {
+        position: [3.54, 2.06, 4.84],
+        target: [-0.14, 1.04, 1.02]
+      },
+      "accounting-to-purchasing-side": {
+        position: [4.52, 2.16, 5.68],
+        target: [0.48, 1.04, 1.1]
+      },
+      "accounting-to-purchasing-wide": {
+        position: [5.08, 2.3, 6.38],
+        target: [0.18, 1.04, 1.02]
+      },
+      "accounting-to-hr": {
+        position: [2.8, 2.22, 4.84],
+        target: [0.52, 1.04, -0.36]
+      },
+      "accounting-to-hr-tight": {
+        position: [2.2, 2.22, 4.12],
+        target: [0.18, 1.04, -0.82]
+      },
+      "accounting-to-hr-side": {
+        position: [3.3, 2.24, 5.22],
+        target: [0.68, 1.05, -0.18]
+      },
+      "accounting-to-hr-wide": {
+        position: [3.66, 2.34, 5.74],
+        target: [0.4, 1.05, -0.42]
+      },
+      purchasing: {
+        position: [-4.68, 2.18, 5.2],
+        target: [-2.04, 1.04, 0.9]
+      },
+      "purchasing-response": {
+        position: [-4.18, 2.12, 4.48],
+        target: [-1.94, 1.06, 0.92]
+      },
+      hr: {
+        position: [0.02, 2.36, 4.78],
+        target: [0.02, 1.06, -1.7]
+      },
+      "hr-response": {
+        position: [0.56, 2.42, 4.08],
+        target: [0.04, 1.08, -1.78]
+      }
+    };
+
+    const focus = anchors[viewModel.cameraPreset] || anchors[viewModel.focusRole] || anchors.overview;
+    desiredCamera.set(...focus.position);
+    desiredTarget.set(...focus.target);
+
+    roleMeshes.forEach((record, roleId) => {
+      const active = roleId === viewModel.focusRole;
+      record.group.scale.setScalar(active ? 1.06 : 1);
+      record.shoulders.material.emissive.setHex(active ? record.accent : 0x000000);
+      record.shoulders.material.emissiveIntensity = active ? 0.18 : 0;
+      record.torso.material.emissive.setHex(active ? record.accent : 0x000000);
+      record.torso.material.emissiveIntensity = active ? 0.08 : 0;
+      record.facePanel.material.emissive.setHex(active ? 0x181818 : 0x000000);
+      record.facePanel.material.emissiveIntensity = active ? 0.08 : 0;
+      record.facePanel.material.opacity = active ? 1 : 0.94;
+      record.portraitPanel.material.emissive.setHex(active ? 0x121212 : 0x000000);
+      record.portraitPanel.material.emissiveIntensity = active ? 0.06 : 0;
+    });
+
+    haloMeshes.forEach((halo, roleId) => {
+      const active = roleId === viewModel.focusRole;
+      halo.material.opacity = active ? 0.96 : 0.38;
+      halo.material.emissiveIntensity = active ? 0.4 : 0.06;
+      halo.scale.setScalar(active ? 1.14 : 1);
+    });
+
+    const clueIntensity = clamp(viewModel.evidenceCount, 0, 3);
+    screenBars.forEach((mesh, index) => {
+      if (mesh.geometry.type === "SphereGeometry") {
+        mesh.material.emissiveIntensity = 0.14 + clueIntensity * 0.08;
+        return;
+      }
+      mesh.scale.x = 0.9 + (clueIntensity * 0.18) + index * 0.05;
+      mesh.material.color.setHex(
+        clueIntensity >= 3 ? 0xb4473e : clueIntensity === 2 ? 0xc86d4a : 0x1b7286
+      );
+    });
+  }
+
+  function renderFrame() {
+    const elapsed = clock.getElapsedTime();
+    const pulse = 0.5 + Math.sin(elapsed * 2.1) * 0.5;
+
+    camera.position.lerp(desiredCamera, 0.045);
+    currentTarget.lerp(desiredTarget, 0.06);
+    camera.lookAt(currentTarget);
+
+    roleMeshes.forEach(({ group }, roleId) => {
+      const phase = roleId === "accounting" ? 0 : roleId === "purchasing" ? 1.7 : 3.4;
+      group.position.y = group.userData.baseY + Math.sin(elapsed * 1.6 + phase) * 0.015;
+    });
+
+    haloMeshes.forEach((halo, roleId) => {
+      const active = halo.material.opacity > 0.7;
+      halo.rotation.z += active ? 0.01 : 0.004;
+      if (active) {
+        halo.scale.setScalar(1.08 + pulse * 0.08);
+      }
+    });
+
+    screenBars.forEach((mesh, index) => {
+      if (mesh.geometry.type === "SphereGeometry") {
+        mesh.position.y = 1.95 + Math.sin(elapsed * 2.8) * 0.03;
+      } else {
+        mesh.position.z = -3.74 + Math.sin(elapsed * 1.2 + index) * 0.01;
+      }
+    });
+
+    skylineBlocks.forEach((block, index) => {
+      block.material.emissiveIntensity = 0.18 + ((index % 4) * 0.05) + Math.sin(elapsed * 0.8 + index) * 0.02;
+    });
+
+    paperwork.forEach((paper, index) => {
+      paper.rotation.z = Math.sin(elapsed * 0.6 + index) * 0.03;
+    });
+
+    animatedLabels.forEach((label, index) => {
+      label.position.y = label.userData.baseY + Math.sin(elapsed * 1.3 + index) * 0.02;
+    });
+
+    positionDialogBubbles();
+    renderer.render(scene, camera);
+  }
+
+  function start() {
+    renderer.setAnimationLoop(renderFrame);
+  }
+
+  return {
+    start,
+    sync,
+    positionDialogBubbles,
+    resize
+  };
+}
+
+function createLabelSprite(THREE, text, width, height, fontSize = 40) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 860;
+  canvas.height = 164;
+  const context = canvas.getContext("2d");
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "rgba(255, 250, 242, 0.96)";
+  drawRoundedRect(context, 18, 20, 824, 118, 24);
+  context.fill();
+  context.strokeStyle = "rgba(22, 34, 47, 0.18)";
+  context.lineWidth = 4;
+  drawRoundedRect(context, 18, 20, 824, 118, 24);
+  context.stroke();
+  context.fillStyle = "#16222f";
+  context.font = `700 ${fontSize}px 'Avenir Next', system-ui, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(text, 430, 79, 760);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(width, height, 1);
+  return sprite;
+}
+
+function createFaceTexture(THREE, person) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 320;
+  canvas.height = 384;
+  const context = canvas.getContext("2d");
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cheekGlow = context.createRadialGradient(160, 194, 12, 160, 198, 112);
+  cheekGlow.addColorStop(0, "rgba(122, 86, 70, 0.18)");
+  cheekGlow.addColorStop(1, "rgba(122, 86, 70, 0)");
+  context.fillStyle = cheekGlow;
+  context.beginPath();
+  context.ellipse(160, 198, 102, 112, 0, 0, Math.PI * 2);
+  context.fill();
+
+  context.strokeStyle = person.hair;
+  context.lineWidth = 10;
+  context.lineCap = "round";
+  context.beginPath();
+  context.moveTo(72, 114 + person.browTilt);
+  context.quadraticCurveTo(102, 98 + person.browTilt, 126, 108 + person.browTilt);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(194, 108 - person.browTilt);
+  context.quadraticCurveTo(218, 98 - person.browTilt, 248, 114 - person.browTilt);
+  context.stroke();
+
+  context.fillStyle = "rgba(255, 255, 255, 0.96)";
+  context.beginPath();
+  context.ellipse(102, 154, 26, 16, -0.08, 0, Math.PI * 2);
+  context.ellipse(218, 154, 26, 16, 0.08, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "rgba(34, 42, 50, 0.96)";
+  context.beginPath();
+  context.arc(102, 156, 9, 0, Math.PI * 2);
+  context.arc(218, 156, 9, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "rgba(255, 255, 255, 0.88)";
+  context.beginPath();
+  context.arc(98, 151, 3, 0, Math.PI * 2);
+  context.arc(214, 151, 3, 0, Math.PI * 2);
+  context.fill();
+
+  if (person.glasses) {
+    context.strokeStyle = "rgba(66, 78, 90, 0.72)";
+    context.lineWidth = 5;
+    drawRoundedRect(context, 68, 130, 68, 48, 18);
+    context.stroke();
+    drawRoundedRect(context, 184, 130, 68, 48, 18);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(136, 152);
+    context.lineTo(184, 152);
+    context.stroke();
+  }
+
+  context.strokeStyle = "rgba(122, 86, 70, 0.52)";
+  context.lineWidth = 6;
+  context.beginPath();
+  context.moveTo(160, 164);
+  context.quadraticCurveTo(146, 208, 160, 230);
+  context.quadraticCurveTo(172, 216, 178, 232);
+  context.stroke();
+
+  context.strokeStyle = person.lip;
+  context.lineWidth = 7;
+  context.beginPath();
+  context.moveTo(104, 278);
+  context.quadraticCurveTo(160, 286 + person.smileCurve, 216, 278);
+  context.stroke();
+  context.strokeStyle = "rgba(157, 100, 88, 0.34)";
+  context.lineWidth = 4;
+  context.beginPath();
+  context.moveTo(116, 292);
+  context.quadraticCurveTo(160, 304 + (person.smileCurve * 0.35), 204, 292);
+  context.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createPortraitTexture(THREE, person) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 768;
+  canvas.height = 1024;
+  const context = canvas.getContext("2d");
+
+  const jacketColor = `#${person.suit.toString(16).padStart(6, "0")}`;
+  const shirtColor = `#${person.shirt.toString(16).padStart(6, "0")}`;
+  const tieColor = `#${person.tie.toString(16).padStart(6, "0")}`;
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  const glow = context.createRadialGradient(384, 260, 60, 384, 360, 340);
+  glow.addColorStop(0, "rgba(255, 255, 255, 0.28)");
+  glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+  context.fillStyle = glow;
+  context.beginPath();
+  context.arc(384, 350, 320, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = jacketColor;
+  context.beginPath();
+  context.moveTo(178, 910);
+  context.quadraticCurveTo(210, 668, 300, 590);
+  context.quadraticCurveTo(338, 552, 384, 552);
+  context.quadraticCurveTo(430, 552, 468, 590);
+  context.quadraticCurveTo(558, 668, 590, 910);
+  context.lineTo(178, 910);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = "rgba(255, 255, 255, 0.12)";
+  context.beginPath();
+  context.moveTo(305, 595);
+  context.lineTo(354, 860);
+  context.lineTo(262, 910);
+  context.quadraticCurveTo(258, 724, 305, 595);
+  context.closePath();
+  context.fill();
+  context.beginPath();
+  context.moveTo(463, 595);
+  context.lineTo(506, 910);
+  context.lineTo(414, 860);
+  context.quadraticCurveTo(419, 702, 463, 595);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = shirtColor;
+  context.beginPath();
+  context.moveTo(316, 592);
+  context.quadraticCurveTo(350, 656, 384, 708);
+  context.quadraticCurveTo(418, 656, 452, 592);
+  context.lineTo(430, 858);
+  context.lineTo(338, 858);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = tieColor;
+  context.beginPath();
+  context.moveTo(384, 610);
+  context.lineTo(410, 660);
+  context.lineTo(384, 705);
+  context.lineTo(358, 660);
+  context.closePath();
+  context.fill();
+  context.beginPath();
+  context.moveTo(372, 705);
+  context.lineTo(396, 705);
+  context.lineTo(416, 878);
+  context.lineTo(352, 878);
+  context.closePath();
+  context.fill();
+
+  const neckGradient = context.createLinearGradient(0, 500, 0, 642);
+  neckGradient.addColorStop(0, person.skin);
+  neckGradient.addColorStop(1, person.skinShadow);
+  context.fillStyle = neckGradient;
+  context.beginPath();
+  context.moveTo(345, 548);
+  context.lineTo(423, 548);
+  context.quadraticCurveTo(419, 610, 384, 650);
+  context.quadraticCurveTo(349, 610, 345, 548);
+  context.closePath();
+  context.fill();
+
+  const faceGradient = context.createLinearGradient(0, 214, 0, 584);
+  faceGradient.addColorStop(0, "#f9dfc0");
+  faceGradient.addColorStop(0.45, person.skin);
+  faceGradient.addColorStop(1, person.skinShadow);
+  context.fillStyle = faceGradient;
+  context.beginPath();
+  context.ellipse(384, 356, 128, 164, 0, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = person.hair;
+  context.beginPath();
+  context.moveTo(246, 372);
+  context.quadraticCurveTo(236, 214, 384, 190);
+  context.quadraticCurveTo(524, 210, 528, 358);
+  context.quadraticCurveTo(494, 292, 436, 274);
+  context.quadraticCurveTo(404, 244, 372, 252);
+  context.quadraticCurveTo(320, 256, 286, 304);
+  context.quadraticCurveTo(266, 328, 246, 372);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = person.hairAccent;
+  context.beginPath();
+  context.ellipse(332, 268, 48, 18, -0.2, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.ellipse(428, 244, 64, 20, 0.12, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "rgba(80, 42, 34, 0.16)";
+  context.beginPath();
+  context.ellipse(384, 398, 86, 62, 0, 0, Math.PI);
+  context.fill();
+
+  context.strokeStyle = "#3b2b25";
+  context.lineWidth = 7;
+  context.lineCap = "round";
+  context.beginPath();
+  context.moveTo(314, 342);
+  context.quadraticCurveTo(338, 328, 362, 338);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(406, 338);
+  context.quadraticCurveTo(432, 326, 454, 340);
+  context.stroke();
+
+  context.fillStyle = "#202428";
+  context.beginPath();
+  context.ellipse(340, 382, 18, 12, 0, 0, Math.PI * 2);
+  context.ellipse(428, 382, 18, 12, 0, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "rgba(255,255,255,0.86)";
+  context.beginPath();
+  context.arc(334, 378, 4, 0, Math.PI * 2);
+  context.arc(422, 378, 4, 0, Math.PI * 2);
+  context.fill();
+
+  context.strokeStyle = "rgba(124, 76, 58, 0.44)";
+  context.lineWidth = 5;
+  context.beginPath();
+  context.moveTo(384, 388);
+  context.quadraticCurveTo(372, 430, 384, 454);
+  context.quadraticCurveTo(392, 440, 398, 454);
+  context.stroke();
+
+  context.strokeStyle = person.lip;
+  context.lineWidth = 5;
+  context.beginPath();
+  context.moveTo(336, 486);
+  context.quadraticCurveTo(384, 512, 432, 486);
+  context.stroke();
+
+  context.fillStyle = "rgba(255,255,255,0.3)";
+  context.beginPath();
+  context.ellipse(384, 352, 118, 150, 0, Math.PI * 1.04, Math.PI * 1.85);
+  context.fill();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function drawRoundedRect(context, x, y, width, height, radius) {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
+}
+
+render();
+syncRepositoryLink();
+bootRenderer();
+
+</script>
+</body>
+</html>

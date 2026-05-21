@@ -24,7 +24,7 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Data Lab</p>
             <h3 className="mt-2 text-xl font-black text-gray-900">Decision Tree Builder Lab</h3>
@@ -65,6 +65,20 @@ export default function HomePage() {
               className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
             >
               Launch Cash Receipts Game
+            </Link>
+          </article>
+          <article className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Fraud Lab</p>
+            <h3 className="mt-2 text-xl font-black text-gray-900">Fraud Signal Briefing</h3>
+            <p className="mt-2 text-sm leading-6 text-gray-600">
+              Lead a cross-functional vendor review meeting and connect accounting, purchasing,
+              and HR clues before weak fraud signals get ignored.
+            </p>
+            <Link
+              href="/fraud-symptoms-roleplay-game/index.html"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
+            >
+              Launch Fraud Symptoms Game
             </Link>
           </article>
         </div>
