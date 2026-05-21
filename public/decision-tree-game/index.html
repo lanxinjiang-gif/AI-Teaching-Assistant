@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Decision Tree Builder Lab</title>
+    <meta
+      name="description"
+      content="An interactive college study game for learning how a decision tree model is built and applied."
+    />
+    <style>
+      :root {
+        --bg: #0f2d28;
+        --bg-deep: #081714;
+        --panel: #f7edd3;
+        --panel-soft: rgba(255,255,255,0.72);
+        --ink: #16211d;
+        --ink-soft: #4d5b54;
+        --accent: #c95a33;
+        --accent-strong: #9b3917;
+        --decision: #476fba;
+        --leaf: #17a35d;
+        --sports: #f26f4f;
+        --family: #4478dc;
+        --success: #11724b;
+        --warning: #bf482f;
+        --line: rgba(22, 33, 29, 0.12);
+        --shadow: 0 18px 40px rgba(3, 14, 11, 0.22);
+        --radius: 22px;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(233, 191, 93, 0.18), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(110, 198, 171, 0.18), transparent 28%),
+          linear-gradient(180deg, var(--bg), var(--bg-deep));
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 22px 22px;
+      }
+      a { color: inherit; }
+      button { font: inherit; cursor: pointer; }
+      .back-link {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 20;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(7, 25, 21, 0.92);
+        color: #f8f0d7;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.16);
+      }
+      .shell {
+        position: relative;
+        z-index: 1;
+        width: min(1200px, calc(100vw - 24px));
+        margin: 0 auto;
+        padding: 18px 0 30px;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr);
+        gap: 18px;
+        padding: 24px;
+        border-radius: 28px;
+        color: #f8f3e5;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+          linear-gradient(160deg, rgba(241, 188, 102, 0.16), rgba(255,255,255,0.02));
+        box-shadow: var(--shadow);
+      }
+      .eyebrow {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: .82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        background: rgba(255,255,255,0.12);
+        color: #ffe9ba;
+      }
+      .hero h1 {
+        margin: 14px 0 10px;
+        font-family: "Rockwell", Georgia, serif;
+        font-size: clamp(2rem, 4vw, 3.3rem);
+        line-height: .98;
+      }
+      .hero p { margin: 0; line-height: 1.55; max-width: 60ch; }
+      .chip-row, .action-row, .option-grid, .stat-grid, .future-actions, .rule-grid, .summary-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .chip {
+        padding: 9px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        font-size: .92rem;
+      }
+      .meter-card {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(7, 20, 16, 0.34);
+        border: 1px solid rgba(255,255,255,0.12);
+      }
+      .meter-card p { margin: 0 0 10px; font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; color: #ffefbf; }
+      .meter-strong { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+      .meter-strong strong { font-size: 2rem; font-family: "Rockwell", Georgia, serif; }
+      .meter-track { height: 14px; border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
+      .meter-track span { display: block; height: 100%; background: linear-gradient(90deg, #ffd86d, #ff8f52); }
+      .phase-nav {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+        margin: 14px 0;
+      }
+      .phase-pill {
+        border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(247,237,211,0.1);
+        color: #f8f2df;
+        border-radius: 18px;
+        text-align: left;
+        padding: 14px;
+        min-height: 72px;
+      }
+      .phase-pill.is-current {
+        background: linear-gradient(135deg, rgba(255,217,120,0.28), rgba(255,126,77,0.18));
+        border-color: rgba(255,224,156,0.35);
+      }
+      .phase-pill.is-complete { background: linear-gradient(135deg, rgba(20,146,95,0.28), rgba(53,203,154,0.14)); }
+      .phase-pill:disabled { opacity: .5; cursor: not-allowed; }
+      .phase-pill strong { display: block; margin-bottom: 4px; }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(320px, .85fr) minmax(460px, 1.15fr);
+        gap: 14px;
+      }
+      .panel {
+        min-height: 640px;
+        border-radius: 28px;
+        padding: 22px;
+        background: var(--panel);
+        box-shadow: 0 12px 28px rgba(8, 18, 14, 0.15);
+      }
+      .panel h2 {
+        margin: 0 0 10px;
+        font-family: "Rockwell", Georgia, serif;
+        font-size: clamp(1.6rem, 3vw, 2.3rem);
+      }
+      .subtle { color: var(--ink-soft); line-height: 1.55; }
+      .card {
+        padding: 16px 18px;
+        border-radius: var(--radius);
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+        margin-top: 14px;
+      }
+      .card h3 { margin: 0 0 10px; font-size: 1.05rem; }
+      .feedback.info { background: rgba(71,111,186,0.08); }
+      .feedback.success { background: rgba(17,114,75,0.1); }
+      .feedback.warning { background: rgba(191,72,47,0.1); }
+      .feedback strong { display: block; margin-bottom: 6px; }
+      .option {
+        flex: 1 1 180px;
+        text-align: left;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(22,33,29,0.14);
+        background: #fff9ec;
+      }
+      .option strong { display: block; margin-bottom: 5px; }
+      .option span { color: var(--ink-soft); line-height: 1.45; }
+      .small-btn {
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(22,33,29,0.14);
+        background: #fff9ec;
+      }
+      .small-btn.accent {
+        background: linear-gradient(135deg, #ffd878, #ff8f53);
+        border-color: rgba(155,57,23,0.3);
+      }
+      .small-btn.dark {
+        background: rgba(8,30,25,.9);
+        color: #f8f0d7;
+        border-color: rgba(255,255,255,.12);
+      }
+      .tree-card {
+        padding: 18px;
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(248,240,216,0.95));
+        border: 1px solid var(--line);
+      }
+      .tree-layout {
+        display: grid;
+        gap: 12px;
+      }
+      .tree-node {
+        padding: 12px 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(22,33,29,0.12);
+        background: rgba(255,255,255,0.9);
+      }
+      .tree-node.decision {
+        border-left: 6px solid var(--decision);
+      }
+      .tree-node.leaf {
+        border-left: 6px solid var(--leaf);
+      }
+      .tree-node.active {
+        outline: 3px solid rgba(201,90,51,0.25);
+      }
+      .branch-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 12px;
+        padding-left: 18px;
+      }
+      .tree-tag {
+        display: inline-block;
+        margin-bottom: 8px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(22,33,29,.08);
+        font-size: .82rem;
+        font-weight: 700;
+      }
+      .table-wrap { overflow-x: auto; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.82); }
+      table { width: 100%; border-collapse: collapse; min-width: 620px; }
+      th, td { padding: 12px 14px; border-bottom: 1px solid rgba(22,33,29,0.08); text-align: left; }
+      thead th { background: rgba(249,245,234,0.98); }
+      .label-col, .pred-col { background: rgba(23,163,93,.08); }
+      .current-row { background: rgba(71,111,186,.08); }
+      .done-row { background: rgba(17,114,75,.06); }
+      .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: .84rem;
+        font-weight: 700;
+      }
+      .badge.pending { background: rgba(201,90,51,0.14); color: var(--accent-strong); }
+      .badge.done { background: rgba(17,114,75,0.14); color: var(--success); }
+      .split-card {
+        flex: 1 1 220px;
+        padding: 16px;
+        border-radius: 22px;
+        border: 1px solid rgba(22,33,29,0.14);
+        background: #fff9ec;
+      }
+      .split-card strong { font-size: 1.05rem; }
+      .bar { height: 12px; border-radius: 999px; overflow: hidden; background: rgba(22,33,29,0.08); margin-top: 10px; display: flex; }
+      .bar span:first-child { background: var(--sports); }
+      .bar span:last-child { background: var(--family); }
+      .summary-grid .card, .rule-grid .card { flex: 1 1 220px; margin-top: 0; }
+      .future-actions { margin-top: 12px; }
+      .note-list { margin: 0; padding-left: 1.2rem; color: var(--ink-soft); line-height: 1.55; }
+      .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); }
+      @media (max-width: 1100px) {
+        .phase-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .workspace { grid-template-columns: 1fr; }
+        .panel { min-height: auto; }
+      }
+      @media (max-width: 760px) {
+        .shell { width: min(100vw - 16px, 100%); }
+        .hero { grid-template-columns: 1fr; }
+        .phase-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .branch-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 540px) {
+        .phase-nav { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="/">Back to Accounting Case Game</a>
+    <main class="shell" id="app"></main>
+    <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <script>
+      const PHASES = [
+        { id: "intro", title: "Spot the Parts", slideRef: "Slide 18" },
+        { id: "learn", title: "Learn From Data", slideRef: "Slide 19" },
+        { id: "split", title: "Pick the Best Split", slideRef: "Slides 20-21" },
+        { id: "grow", title: "Grow the Tree", slideRef: "Slide 21" },
+        { id: "apply", title: "Apply the Tree", slideRef: "Slides 22-28" },
+        { id: "wrap", title: "Wrap-Up", slideRef: "Rules Review" },
+      ];
+
+      const TRAINING_ROWS = [
+        { id: 1, maritalStatus: "Single", gender: "Male", annualIncome: 90, incomeText: "90K", carType: "Sports Car" },
+        { id: 2, maritalStatus: "Married", gender: "Male", annualIncome: 300, incomeText: "300K", carType: "Sports Car" },
+        { id: 3, maritalStatus: "Married", gender: "Male", annualIncome: 180, incomeText: "180K", carType: "Sports Car" },
+        { id: 4, maritalStatus: "Married", gender: "Male", annualIncome: 90, incomeText: "90K", carType: "Family Car" },
+        { id: 5, maritalStatus: "Married", gender: "Female", annualIncome: 50, incomeText: "50K", carType: "Family Car" },
+        { id: 6, maritalStatus: "Married", gender: "Male", annualIncome: 70, incomeText: "70K", carType: "Family Car" },
+        { id: 7, maritalStatus: "Single", gender: "Female", annualIncome: 80, incomeText: "80K", carType: "Sports Car" },
+        { id: 8, maritalStatus: "Single", gender: "Male", annualIncome: 130, incomeText: "130K", carType: "Sports Car" },
+        { id: 9, maritalStatus: "Married", gender: "Female", annualIncome: 100, incomeText: "100K", carType: "Family Car" },
+        { id: 10, maritalStatus: "Single", gender: "Female", annualIncome: 110, incomeText: "110K", carType: "Sports Car" },
+      ];
+
+      const FUTURE_ROWS = [
+        { id: 11, maritalStatus: "Married", gender: "Male", annualIncome: 170, incomeText: "170K" },
+        { id: 12, maritalStatus: "Married", gender: "Female", annualIncome: 95, incomeText: "95K" },
+        { id: 13, maritalStatus: "Single", gender: "Female", annualIncome: 100, incomeText: "100K" },
+        { id: 14, maritalStatus: "Married", gender: "Male", annualIncome: 80, incomeText: "80K" },
+        { id: 15, maritalStatus: "Single", gender: "Female", annualIncome: 150, incomeText: "150K" },
+      ];
+
+      const RULES = [
+        "If marital status is Single, predict Sports Car.",
+        "If marital status is Married and gender is Female, predict Family Car.",
+        "If marital status is Married, gender is Male, and income is 100K or below, predict Family Car.",
+        "If marital status is Married, gender is Male, and income is above 100K, predict Sports Car.",
+      ];
+
+      const app = document.getElementById("app");
+      const srStatus = document.getElementById("sr-status");
+
+      let state = createInitialState();
+
+      function createInitialState() {
+        return {
+          phaseIndex: 0,
+          unlockedPhaseIndex: 0,
+          checkpoints: [],
+          completedPhases: [],
+          feedback: {
+            tone: "info",
+            title: "Welcome to the lab",
+            text: "Start by identifying what counts as a decision node and what counts as a leaf.",
+          },
+          introStep: 0,
+          splitChoice: null,
+          growStep: 0,
+          treeBuild: { genderPlaced: false, incomePlaced: false },
+          apply: {
+            recordIndex: 0,
+            currentNode: "marital",
+            pathBranches: [],
+            resolved: false,
+            lastPrediction: null,
+            completed: [],
+          },
+        };
+      }
+
+      app.addEventListener("click", (event) => {
+        const control = event.target.closest("[data-action]");
+        if (!control) return;
+        handleAction(control.dataset.action, control.dataset.value || "");
+      });
+
+      function currentPhase() {
+        return PHASES[state.phaseIndex];
+      }
+
+      function phaseIndexFor(id) {
+        return PHASES.findIndex((phase) => phase.id === id);
+      }
+
+      function setFeedback(title, text, tone = "info") {
+        state.feedback = { title, text, tone };
+      }
+
+      function awardCheckpoint(id) {
+        if (!state.checkpoints.includes(id)) state.checkpoints = state.checkpoints.concat(id);
+      }
+
+      function completePhase(id, title, text) {
+        if (!state.completedPhases.includes(id)) {
+          state.completedPhases = state.completedPhases.concat(id);
+          const index = phaseIndexFor(id);
+          state.unlockedPhaseIndex = Math.max(state.unlockedPhaseIndex, Math.min(PHASES.length - 1, index + 1));
+        }
+        setFeedback(title, text, "success");
+      }
+
+      function handleAction(action, value) {
+        if (action === "restart") {
+          state = createInitialState();
+          render();
+          return;
+        }
+        if (action === "go-phase") {
+          const index = Number(value);
+          if (Number.isFinite(index) && index <= state.unlockedPhaseIndex) {
+            state.phaseIndex = index;
+            render();
+          }
+          return;
+        }
+        if (action === "prev-phase") {
+          if (state.phaseIndex > 0) state.phaseIndex -= 1;
+          render();
+          return;
+        }
+        if (action === "next-phase") {
+          if (state.phaseIndex < state.unlockedPhaseIndex) state.phaseIndex += 1;
+          render();
+          return;
+        }
+        if (action === "next-record") {
+          advanceApplyRecord();
+          render();
+          return;
+        }
+        if (action === "replay-apply") {
+          state.apply = createInitialState().apply;
+          state.phaseIndex = phaseIndexFor("apply");
+          setFeedback("Try the route again", "Start again at the root and classify the future clients one by one.");
+          render();
+          return;
+        }
+
+        const phase = currentPhase().id;
+        if (phase === "intro" && action === "intro-choice") handleIntroChoice(value);
+        if (phase === "learn" && action === "learn-choice") handleLearnChoice(value);
+        if (phase === "split" && action === "split-choice") handleSplitChoice(value);
+        if (phase === "grow" && action === "grow-choice") handleGrowChoice(value);
+        if (phase === "apply" && action === "apply-choice") handleApplyChoice(value);
+        render();
+      }
+
+      function handleIntroChoice(value) {
+        if (state.introStep === 0) {
+          if (value === "marital") {
+            awardCheckpoint("intro-node");
+            state.introStep = 1;
+            setFeedback("Correct", "A decision node asks a question that splits the data.", "success");
+          } else {
+            setFeedback("Try again", "A decision node asks something like 'What is the marital status?' Sports Car and Family Car are outcomes.", "warning");
+          }
+          return;
+        }
+
+        if (value === "family") {
+          awardCheckpoint("intro-leaf");
+          state.introStep = 2;
+          completePhase("intro", "Nice work", "You found both tree parts: decision nodes ask questions, and leaves hold the predicted class label.");
+        } else {
+          setFeedback("Almost", "A leaf is a final outcome such as Family Car or Sports Car.", "warning");
+        }
+      }
+
+      function handleLearnChoice(value) {
+        if (value === "carType") {
+          awardCheckpoint("data-label");
+          completePhase("learn", "Exactly", "Car Type is the label the model learns to predict. The other columns are features.");
+        } else {
+          setFeedback("Not quite", "Marital status, gender, and annual income are inputs. The model is trying to predict the car type.", "warning");
+        }
+      }
+
+      function handleSplitChoice(value) {
+        state.splitChoice = value;
+        if (value === "maritalStatus") {
+          awardCheckpoint("split-root");
+          completePhase("split", "Best first split found", "Marital Status creates cleaner groups than Gender, so it is the stronger root question.");
+        } else {
+          setFeedback("Cleaner split still needed", "Gender leaves both branches mixed. Marital Status gets much closer to pure leaves.", "warning");
+        }
+      }
+
+      function handleGrowChoice(value) {
+        if (state.growStep === 0) {
+          if (value === "married") {
+            awardCheckpoint("grow-married-branch");
+            state.growStep = 1;
+            setFeedback("Good read", "The Single branch is already pure. The Married branch is the one that still needs another question.", "success");
+          } else {
+            setFeedback("Check the pure branch", "Single buyers already land in a pure Sports Car leaf, so the uncertain side is Married.", "warning");
+          }
+          return;
+        }
+
+        if (state.growStep === 1) {
+          if (value === "gender") {
+            awardCheckpoint("grow-gender-node");
+            state.growStep = 2;
+            state.treeBuild.genderPlaced = true;
+            setFeedback("Node placed", "Gender is the next question under Married. Now find which branch still stays mixed.", "success");
+          } else {
+            setFeedback("Not the best next question", "Gender is the next useful split because it makes one branch pure right away.", "warning");
+          }
+          return;
+        }
+
+        if (state.growStep === 2) {
+          if (value === "male") {
+            awardCheckpoint("grow-male-branch");
+            state.growStep = 3;
+            setFeedback("Right branch", "Married + Female is already a Family Car leaf. Married + Male still mixes both classes.", "success");
+          } else {
+            setFeedback("Look for the mixed branch", "Female is already pure. Male is the branch that still needs one more split.", "warning");
+          }
+          return;
+        }
+
+        if (value === "annualIncome") {
+          awardCheckpoint("grow-income-node");
+          state.growStep = 4;
+          state.treeBuild.incomePlaced = true;
+          completePhase("grow", "Tree built", "Annual Income finishes the last mixed branch by separating low-income Family Car buyers from high-income Sports Car buyers.");
+        } else {
+          setFeedback("One final question remains", "The final split is Annual Income on the Married + Male branch.", "warning");
+        }
+      }
+
+      function expectedApplyChoice(record, node) {
+        if (node === "marital") return record.maritalStatus.toLowerCase();
+        if (node === "gender") return record.gender.toLowerCase();
+        return record.annualIncome <= 100 ? "income-low" : "income-high";
+      }
+
+      function handleApplyChoice(value) {
+        const record = FUTURE_ROWS[state.apply.recordIndex];
+        if (!record || state.apply.resolved) return;
+
+        const node = state.apply.currentNode;
+        const expected = expectedApplyChoice(record, node);
+        if (value !== expected) {
+          setFeedback("Try that branch again", wrongApplyMessage(record, node), "warning");
+          return;
+        }
+
+        state.apply.pathBranches = state.apply.pathBranches.concat(value);
+
+        if (node === "marital") {
+          if (value === "single") {
+            finishApplyRecord(record, "Sports Car");
+            return;
+          }
+          state.apply.currentNode = "gender";
+          setFeedback("Correct branch", `Client ${record.id} is Married, so the tree moves to Gender next.`, "success");
+          return;
+        }
+
+        if (node === "gender") {
+          if (value === "female") {
+            finishApplyRecord(record, "Family Car");
+            return;
+          }
+          state.apply.currentNode = "income";
+          setFeedback("Keep going", `Client ${record.id} is Male, so the final question is Annual Income.`, "success");
+          return;
+        }
+
+        finishApplyRecord(record, value === "income-low" ? "Family Car" : "Sports Car");
+      }
+
+      function finishApplyRecord(record, prediction) {
+        state.apply.resolved = true;
+        state.apply.lastPrediction = prediction;
+        if (!state.apply.completed.some((entry) => entry.id === record.id)) {
+          state.apply.completed = state.apply.completed.concat({ id: record.id, prediction });
+        }
+        awardCheckpoint(`apply-${record.id}`);
+        if (state.apply.recordIndex === FUTURE_ROWS.length - 1) {
+          completePhase("apply", "All future clients classified", "You routed every record from the root to a leaf, just like the lecture walkthrough.");
+        } else {
+          setFeedback("Prediction complete", `Client ${record.id} lands on the ${prediction} leaf. Move to the next client when you are ready.`, "success");
+        }
+      }
+
+      function advanceApplyRecord() {
+        if (!state.apply.resolved) return;
+        if (state.apply.recordIndex === FUTURE_ROWS.length - 1) {
+          state.phaseIndex = phaseIndexFor("wrap");
+          return;
+        }
+        state.apply.recordIndex += 1;
+        state.apply.currentNode = "marital";
+        state.apply.pathBranches = [];
+        state.apply.resolved = false;
+        state.apply.lastPrediction = null;
+        const record = FUTURE_ROWS[state.apply.recordIndex];
+        setFeedback("New client loaded", `Start Client ${record.id} at the root of the tree.`, "info");
+      }
+
+      function wrongApplyMessage(record, node) {
+        if (node === "marital") return `Client ${record.id} is ${record.maritalStatus}, so the first move must follow the ${record.maritalStatus} branch.`;
+        if (node === "gender") return `On the Married branch, the tree now checks Gender. Client ${record.id} is ${record.gender}, so follow that branch next.`;
+        return `Client ${record.id} has income ${record.incomeText}, so compare it with the 100K threshold before choosing the branch.`;
+      }
+
+      function classifyRecord(record) {
+        if (record.maritalStatus === "Single") return "Sports Car";
+        if (record.gender === "Female") return "Family Car";
+        return record.annualIncome <= 100 ? "Family Car" : "Sports Car";
+      }
+
+      function classificationPath(record) {
+        const parts = [`Marital Status: ${record.maritalStatus}`];
+        if (record.maritalStatus === "Single") return parts.concat("Sports Car leaf").join(" -> ");
+        parts.push(`Gender: ${record.gender}`);
+        if (record.gender === "Female") return parts.concat("Family Car leaf").join(" -> ");
+        parts.push(`Annual Income: ${record.annualIncome <= 100 ? "<=100K" : ">100K"}`);
+        parts.push(`${classifyRecord(record)} leaf`);
+        return parts.join(" -> ");
+      }
+
+      function ruleForRecord(record) {
+        if (record.maritalStatus === "Single") return "Rule 1: Single -> Sports Car";
+        if (record.gender === "Female") return "Rule 2: Married + Female -> Family Car";
+        if (record.annualIncome <= 100) return "Rule 3: Married + Male + <=100K -> Family Car";
+        return "Rule 4: Married + Male + >100K -> Sports Car";
+      }
+
+      function summarizeRows(rows, label) {
+        let sports = 0;
+        let family = 0;
+        rows.forEach((row) => {
+          if (row.carType === "Sports Car") sports += 1;
+          if (row.carType === "Family Car") family += 1;
+        });
+        const total = sports + family;
+        const dominant = Math.max(sports, family);
+        const purity = total ? Math.round((dominant / total) * 100) : 0;
+        return { label, sports, family, total, purity };
+      }
+
+      function getPurityStats() {
+        const single = TRAINING_ROWS.filter((row) => row.maritalStatus === "Single");
+        const married = TRAINING_ROWS.filter((row) => row.maritalStatus === "Married");
+        const female = married.filter((row) => row.gender === "Female");
+        const male = married.filter((row) => row.gender === "Male");
+        return {
+          all: summarizeRows(TRAINING_ROWS, "All training rows"),
+          single: summarizeRows(single, "Single branch"),
+          married: summarizeRows(married, "Married branch"),
+          female: summarizeRows(female, "Married + Female"),
+          male: summarizeRows(male, "Married + Male"),
+          maleLow: summarizeRows(male.filter((row) => row.annualIncome <= 100), "Male + <=100K"),
+          maleHigh: summarizeRows(male.filter((row) => row.annualIncome > 100), "Male + >100K"),
+        };
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function renderOption(action, value, title, detail) {
+        return `<button class="option" type="button" data-action="${action}" data-value="${value}"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(detail)}</span></button>`;
+      }
+
+      function renderPhaseNav() {
+        return PHASES.map((phase, index) => {
+          const classes = ["phase-pill"];
+          if (index === state.phaseIndex) classes.push("is-current");
+          if (state.completedPhases.includes(phase.id)) classes.push("is-complete");
+          const disabled = index > state.unlockedPhaseIndex ? "disabled" : "";
+          return `<button type="button" class="${classes.join(" ")}" data-action="go-phase" data-value="${index}" ${disabled}><strong>${phase.title}</strong><span>${phase.slideRef}</span></button>`;
+        }).join("");
+      }
+
+      function renderTree() {
+        const node = currentPhase().id === "apply" ? state.apply.currentNode : (state.growStep === 0 ? "marital" : state.growStep === 1 ? "gender" : state.growStep >= 3 ? "income" : "gender");
+        return `
+          <div class="tree-card">
+            <h3 style="margin-top:0">Lecture tree</h3>
+            <div class="tree-layout">
+              <div class="tree-node decision ${node === "marital" ? "active" : ""}">
+                <span class="tree-tag">Decision node</span>
+                <strong>Marital Status</strong>
+              </div>
+              <div class="branch-grid">
+                <div class="tree-node leaf ${state.apply.resolved && state.apply.lastPrediction === "Sports Car" && state.apply.pathBranches[0] === "single" ? "active" : ""}">
+                  <span class="tree-tag">Single</span>
+                  <strong>Sports Car</strong>
+                </div>
+                <div class="tree-node decision ${node === "gender" ? "active" : ""}">
+                  <span class="tree-tag">Married</span>
+                  <strong>Gender</strong>
+                  <div class="branch-grid" style="padding-left: 12px; margin-top: 12px;">
+                    <div class="tree-node leaf ${state.apply.resolved && state.apply.lastPrediction === "Family Car" && state.apply.pathBranches[1] === "female" ? "active" : ""}">
+                      <span class="tree-tag">Female</span>
+                      <strong>Family Car</strong>
+                    </div>
+                    <div class="tree-node decision ${node === "income" ? "active" : ""}">
+                      <span class="tree-tag">Male</span>
+                      <strong>Annual Income</strong>
+                      <div class="branch-grid" style="padding-left: 12px; margin-top: 12px;">
+                        <div class="tree-node leaf ${state.apply.resolved && state.apply.lastPrediction === "Family Car" && state.apply.pathBranches.includes("income-low") ? "active" : ""}">
+                          <span class="tree-tag"><=100K</span>
+                          <strong>Family Car</strong>
+                        </div>
+                        <div class="tree-node leaf ${state.apply.resolved && state.apply.lastPrediction === "Sports Car" && state.apply.pathBranches.includes("income-high") ? "active" : ""}">
+                          <span class="tree-tag">>100K</span>
+                          <strong>Sports Car</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      function renderTrainingTable() {
+        return `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Marital Status</th><th>Gender</th><th>Annual Income</th><th class="label-col">Car Type</th></tr>
+              </thead>
+              <tbody>
+                ${TRAINING_ROWS.map((row) => `<tr><td>${row.id}</td><td>${row.maritalStatus}</td><td>${row.gender}</td><td>${row.incomeText}</td><td class="label-col">${row.carType}</td></tr>`).join("")}
+              </tbody>
+            </table>
+          </div>`;
+      }
+
+      function renderFutureTable(showAll) {
+        return `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Marital Status</th><th>Gender</th><th>Annual Income</th><th class="pred-col">Prediction</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                ${FUTURE_ROWS.map((row, index) => {
+                  const completed = state.apply.completed.find((item) => item.id === row.id);
+                  const prediction = showAll ? classifyRecord(row) : completed ? completed.prediction : "?";
+                  const classes = [index === state.apply.recordIndex && currentPhase().id === "apply" ? "current-row" : "", completed || showAll ? "done-row" : ""].join(" ");
+                  return `<tr class="${classes}"><td>${row.id}</td><td>${row.maritalStatus}</td><td>${row.gender}</td><td>${row.incomeText}</td><td class="pred-col">${prediction}</td><td>${completed || showAll ? '<span class="badge done">Done</span>' : '<span class="badge pending">Pending</span>'}</td></tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>`;
+      }
+
+      function renderSplitCards() {
+        const candidates = [
+          {
+            value: "maritalStatus",
+            title: "Marital Status",
+            summary: "This split creates one almost-all-sports branch and one mostly-family branch right away.",
+            sports: 15,
+            family: 3,
+            sports2: 5,
+            family2: 17,
+            purity: 80,
+          },
+          {
+            value: "gender",
+            title: "Gender",
+            summary: "Both branches stay mixed, so the tree would still have a lot of sorting left to do.",
+            sports: 12,
+            family: 10,
+            sports2: 8,
+            family2: 10,
+            purity: 55,
+          },
+        ];
+        return candidates.map((card) => {
+          const totalA = card.sports + card.family;
+          const totalB = card.sports2 + card.family2;
+          return `
+            <button class="split-card" type="button" data-action="split-choice" data-value="${card.value}">
+              <strong>${card.title}</strong>
+              <p class="subtle">${card.summary}</p>
+              <div class="subtle">Branch A: ${card.sports} sports / ${card.family} family</div>
+              <div class="bar"><span style="width:${Math.round((card.sports / totalA) * 100)}%"></span><span style="width:${Math.round((card.family / totalA) * 100)}%"></span></div>
+              <div class="subtle" style="margin-top:10px;">Branch B: ${card.sports2} sports / ${card.family2} family</div>
+              <div class="bar"><span style="width:${Math.round((card.sports2 / totalB) * 100)}%"></span><span style="width:${Math.round((card.family2 / totalB) * 100)}%"></span></div>
+              <div style="margin-top:10px;font-weight:700;">About ${card.purity}% clean</div>
+            </button>`;
+        }).join("");
+      }
+
+      function renderGrowPrompt() {
+        const prompts = [
+          {
+            title: "Checkpoint 5: Which branch still needs another question?",
+            text: "After splitting on Marital Status, which branch stays mixed enough that the tree should keep growing?",
+            options: [
+              ["married", "Married", "This branch still mixes both classes."],
+              ["single", "Single", "This branch is already a pure Sports Car leaf."],
+            ],
+          },
+          {
+            title: "Checkpoint 6: Place the next decision node",
+            text: "What question belongs under the Married branch in the lecture tree?",
+            options: [
+              ["gender", "Gender", "This split makes the Female branch pure right away."],
+              ["stop", "Stop here", "The Married branch is still mixed, so the tree cannot stop yet."],
+            ],
+          },
+          {
+            title: "Checkpoint 7: Which Gender branch still stays mixed?",
+            text: "Once Gender is added, which branch still needs another split?",
+            options: [
+              ["male", "Male", "This branch still contains both Sports Car and Family Car examples."],
+              ["female", "Female", "This branch is already a Family Car leaf."],
+            ],
+          },
+          {
+            title: "Checkpoint 8: Add the final decision",
+            text: "What final question separates the Married + Male branch into the last two leaves?",
+            options: [
+              ["annualIncome", "Annual Income", "This creates the <=100K and >100K leaves."],
+              ["carType", "Car Type", "That is the answer, not a feature the model can ask in advance."],
+            ],
+          },
+        ];
+        const prompt = prompts[Math.min(state.growStep, 3)];
+        const stats = getPurityStats();
+        return `
+          <div class="card">
+            <h3>${prompt.title}</h3>
+            <p class="subtle">${prompt.text}</p>
+            <div class="option-grid">${prompt.options.map(([value, title, detail]) => renderOption("grow-choice", value, title, detail)).join("")}</div>
+          </div>
+          <div class="summary-grid" style="margin-top:14px;">
+            <div class="card"><strong>${stats.single.label}</strong><p class="subtle">${stats.single.sports} Sports / ${stats.single.family} Family, ${stats.single.purity}% pure</p></div>
+            <div class="card"><strong>${stats.married.label}</strong><p class="subtle">${stats.married.sports} Sports / ${stats.married.family} Family, ${stats.married.purity}% pure</p></div>
+            <div class="card"><strong>${stats.male.label}</strong><p class="subtle">${stats.male.sports} Sports / ${stats.male.family} Family, ${stats.male.purity}% pure</p></div>
+            <div class="card"><strong>${stats.maleLow.label}</strong><p class="subtle">${stats.maleLow.sports} Sports / ${stats.maleLow.family} Family, ${stats.maleLow.purity}% pure</p></div>
+          </div>`;
+      }
+
+      function renderApplyPrompt() {
+        const record = FUTURE_ROWS[state.apply.recordIndex];
+        if (state.apply.resolved) {
+          return `
+            <div class="card">
+              <h3>Client ${record.id} classified</h3>
+              <p class="subtle">Client ${record.id} lands on <strong>${state.apply.lastPrediction}</strong>.</p>
+              <div class="future-actions">
+                <button class="small-btn accent" type="button" data-action="${state.apply.recordIndex < FUTURE_ROWS.length - 1 ? "next-record" : "next-phase"}">${state.apply.recordIndex < FUTURE_ROWS.length - 1 ? "Load next client" : "Open wrap-up"}</button>
+              </div>
+            </div>`;
+        }
+        const prompts = {
+          marital: {
+            title: `Checkpoint ${state.apply.recordIndex + 9}: Start at the root`,
+            text: `Which branch should Client ${record.id} follow from the Marital Status node?`,
+            options: [
+              ["single", "Single", "Go left to the Single branch."],
+              ["married", "Married", "Go right to the Married branch."],
+            ],
+          },
+          gender: {
+            title: `Client ${record.id}: keep following the tree`,
+            text: "The Married branch now asks about Gender. Which branch fits this client?",
+            options: [
+              ["male", "Male", "Follow the Male branch."],
+              ["female", "Female", "Follow the Female branch."],
+            ],
+          },
+          income: {
+            title: `Client ${record.id}: final split`,
+            text: `The Male branch uses an income threshold. Which side of 100K does ${record.incomeText} belong to?`,
+            options: [
+              ["income-low", "<=100K", "Choose the low-income branch."],
+              ["income-high", ">100K", "Choose the high-income branch."],
+            ],
+          },
+        };
+        const prompt = prompts[state.apply.currentNode];
+        return `
+          <div class="card">
+            <h3>${prompt.title}</h3>
+            <div class="stat-grid">
+              <div class="card" style="margin-top:0;flex:1 1 180px;"><strong>Client</strong><p class="subtle">${record.id}</p></div>
+              <div class="card" style="margin-top:0;flex:1 1 180px;"><strong>Marital Status</strong><p class="subtle">${record.maritalStatus}</p></div>
+              <div class="card" style="margin-top:0;flex:1 1 180px;"><strong>Gender</strong><p class="subtle">${record.gender}</p></div>
+              <div class="card" style="margin-top:0;flex:1 1 180px;"><strong>Annual Income</strong><p class="subtle">${record.incomeText}</p></div>
+            </div>
+            <p class="subtle">${prompt.text}</p>
+            <div class="option-grid">${prompt.options.map(([value, title, detail]) => renderOption("apply-choice", value, title, detail)).join("")}</div>
+          </div>`;
+      }
+
+      function renderLeftPanel() {
+        const phase = currentPhase();
+        const intros = {
+          intro: "Slide 18 introduces the vocabulary: decision nodes ask questions, and leaves store the predicted class label.",
+          learn: "Slide 19 shows the labeled examples the model learns from before any split is chosen.",
+          split: "Slides 20-21 compare candidate first splits by looking for cleaner, less mixed groups.",
+          grow: "Continue the best split branch-by-branch until the tree reaches confident leaves.",
+          apply: "Slides 22-28 shift from learning to applying: start at the root and route each future client to a leaf.",
+          wrap: "Turn the finished tree into memorable if/then rules and review what you learned.",
+        };
+        let body = "";
+        if (phase.id === "intro") {
+          body = state.introStep === 0
+            ? `<div class="card"><h3>Checkpoint 1: Find the decision node</h3><p class="subtle">Which label on the tree is a decision node?</p><div class="option-grid">${renderOption("intro-choice", "marital", "Marital Status", "It asks the first question at the root.")}${renderOption("intro-choice", "sports", "Sports Car", "This is an outcome, not a question.")}${renderOption("intro-choice", "family", "Family Car", "This is also an outcome at the end of a path.")}</div></div>`
+            : `<div class="card"><h3>Checkpoint 2: Find the leaf</h3><p class="subtle">Which label is a final class label at the end of a branch?</p><div class="option-grid">${renderOption("intro-choice", "income", "Annual Income", "This is still a question inside the tree.")}${renderOption("intro-choice", "family", "Family Car", "This is a final prediction.")}${renderOption("intro-choice", "gender", "Gender", "This is a decision node, not a final outcome.")}</div></div>`;
+        }
+        if (phase.id === "learn") {
+          body = `<div class="card"><h3>Checkpoint 3: What is the model trying to predict?</h3><p class="subtle">Which column is the class label?</p><div class="option-grid">${renderOption("learn-choice", "maritalStatus", "Marital Status", "Useful input, but not the target label.")}${renderOption("learn-choice", "annualIncome", "Annual Income", "Useful input, but still a feature.")}${renderOption("learn-choice", "carType", "Car Type", "The final outcome the model learns to predict.")}</div></div>`;
+        }
+        if (phase.id === "split") {
+          body = `<div class="card"><h3>Checkpoint 4: Pick the strongest root question</h3><p class="subtle">Choose the split that creates cleaner first groups.</p><div class="option-grid">${renderSplitCards()}</div></div>`;
+        }
+        if (phase.id === "grow") body = renderGrowPrompt();
+        if (phase.id === "apply") body = renderApplyPrompt();
+        if (phase.id === "wrap") {
+          body = `
+            <div class="card"><h3>Decision tree rules to remember</h3><div class="rule-grid">${RULES.map((rule, index) => `<div class="card" style="margin-top:0"><strong>Rule ${index + 1}</strong><p class="subtle">${rule}</p></div>`).join("")}</div></div>
+            <div class="summary-grid" style="margin-top:14px;">
+              <div class="card"><strong>Root choice review</strong><p class="subtle">Marital Status is the best root because it creates a perfectly pure Single branch and a much cleaner Married branch.</p></div>
+              <div class="card"><strong>Tree-building takeaway</strong><p class="subtle">Pick the split that makes branches less mixed, then keep splitting only where uncertainty remains.</p></div>
+              <div class="card"><strong>Application takeaway</strong><p class="subtle">Start at the root, follow matching branches, and stop only when you reach a leaf.</p></div>
+            </div>
+            <div class="card"><h3>Study checklist</h3><ul class="note-list"><li>A decision node asks a question about a feature.</li><li>A leaf stores the final predicted class label.</li><li>The best split reduces mixing and increases purity.</li><li>Only mixed branches keep growing. Pure leaves can stop.</li><li>To apply the model, always start at the root and follow matching branches until a leaf.</li></ul><div class="future-actions"><button class="small-btn accent" type="button" data-action="replay-apply">Replay classification round</button><button class="small-btn" type="button" data-action="restart">Restart the full lab</button></div></div>`;
+        }
+
+        return `
+          <section class="panel">
+            <div class="eyebrow">${phase.slideRef}</div>
+            <h2>${phase.title}</h2>
+            <p class="subtle">${intros[phase.id]}</p>
+            <div class="card feedback ${state.feedback.tone}"><strong>${state.feedback.title}</strong><p class="subtle">${state.feedback.text}</p></div>
+            ${body}
+            <div class="action-row" style="margin-top:18px;justify-content:space-between;">
+              <div>${state.phaseIndex > 0 ? '<button class="small-btn" type="button" data-action="prev-phase">Back</button>' : ''}</div>
+              <div>${state.phaseIndex < state.unlockedPhaseIndex ? `<button class="small-btn accent" type="button" data-action="next-phase">Continue to ${PHASES[state.phaseIndex + 1].title}</button>` : ''}</div>
+            </div>
+          </section>`;
+      }
+
+      function renderRightPanel() {
+        const phase = currentPhase().id;
+        const extra = phase === "learn"
+          ? renderTrainingTable()
+          : phase === "apply"
+          ? renderFutureTable(false)
+          : phase === "wrap"
+          ? renderFutureTable(true)
+          : phase === "split"
+          ? `<div class="card"><h3>Purity reading rule</h3><p class="subtle">You do not need formulas here. Just compare how mixed the branches look. Less mixing means a stronger split.</p></div>`
+          : `<div class="card"><h3>What to watch for</h3><p class="subtle">Decision nodes ask questions that split the data. Leaves store the predicted class label.</p></div>`;
+        return `<aside class="panel">${renderTree()}${extra}</aside>`;
+      }
+
+      function render() {
+        const masteryPercent = Math.round((state.checkpoints.length / 13) * 100);
+        const phase = currentPhase();
+        app.innerHTML = `
+          <section class="hero">
+            <div>
+              <span class="eyebrow">Guided ML Study Game</span>
+              <h1>Decision Tree Builder Lab</h1>
+              <p>Build the lecture tree from slides 18-28, compare stronger and weaker first splits, then classify five future clients by walking the finished model from root to leaf.</p>
+              <div class="chip-row" style="margin-top:18px;">
+                <span class="chip"><strong>Source</strong> AI/ML Part I, slides 18-28</span>
+                <span class="chip"><strong>Current phase</strong> ${phase.title}</span>
+                <span class="chip"><strong>Format</strong> Guided walkthrough</span>
+              </div>
+            </div>
+            <div>
+              <div class="meter-card">
+                <p>Mastery Tracker</p>
+                <div class="meter-strong"><strong>${state.checkpoints.length}/13</strong><span>${masteryPercent}% of checkpoints collected</span></div>
+                <div class="meter-track" aria-hidden="true"><span style="width:${masteryPercent}%"></span></div>
+                <div class="future-actions" style="margin-top:14px;"><button class="small-btn dark" type="button" data-action="restart">Restart Lab</button></div>
+              </div>
+            </div>
+          </section>
+          <section class="phase-nav" aria-label="Lesson phases">${renderPhaseNav()}</section>
+          <section class="workspace">${renderLeftPanel()}${renderRightPanel()}</section>`;
+        srStatus.textContent = `${state.feedback.title}. ${state.feedback.text}`;
+      }
+
+      render();
+    </script>
+  </body>
+</html>
