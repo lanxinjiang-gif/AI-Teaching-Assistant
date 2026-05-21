@@ -1,0 +1,2461 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cash Receipts Control Lab</title>
+    <meta
+      name="description"
+      content="A faux-3D role-play study game for learning the cash receipts process and six internal control activities."
+    />
+    <style>
+:root {
+  --page-top: #f7efe3;
+  --page-bottom: #dfeff7;
+  --panel: rgba(254, 251, 243, 0.88);
+  --panel-strong: rgba(252, 246, 233, 0.96);
+  --ink: #163142;
+  --ink-soft: #49667a;
+  --accent: #ea7d49;
+  --accent-deep: #b55327;
+  --line: rgba(22, 49, 66, 0.12);
+  --shadow: 0 28px 60px rgba(35, 53, 75, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+  color: var(--ink);
+}
+
+body {
+  min-height: 100svh;
+  padding: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 35%),
+    radial-gradient(circle at 82% 18%, rgba(255, 201, 157, 0.42), transparent 24%),
+    linear-gradient(180deg, var(--page-top), var(--page-bottom));
+}
+
+.repo-return {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 13px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  background: rgba(254, 251, 243, 0.94);
+  color: var(--ink);
+  box-shadow: 0 10px 24px rgba(35, 53, 75, 0.18);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.repo-return:hover,
+.repo-return:focus-visible {
+  background: #ffffff;
+}
+
+.lab-shell {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  display: grid;
+  gap: 0;
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+.lab-canvas {
+  width: 100vw;
+  height: 100svh;
+  display: block;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+  background: linear-gradient(180deg, #fefaf1, #f0f7fb);
+}
+
+.assistive-copy {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 12px;
+  margin: 0;
+  max-width: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(254, 251, 243, 0.82);
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:fullscreen body,
+:fullscreen .lab-shell {
+  width: 100%;
+  height: 100%;
+}
+
+:fullscreen .lab-canvas {
+  width: 100vw;
+  height: auto;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+</style>
+  </head>
+  <body>
+    <a class="repo-return" href="/">Back to home</a>
+    <main id="lab-shell" class="lab-shell">
+      <canvas
+        id="lab-canvas"
+        class="lab-canvas"
+        width="1280"
+        height="760"
+        aria-label="Cash Receipts Control Lab game canvas"
+      ></canvas>
+      <p class="assistive-copy">
+        Use Arrow keys or WASD to move, E to interact, Enter to confirm choices,
+        Space to pause, R to restart the current role, and F to toggle
+        fullscreen.
+      </p>
+      <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    </main>
+    <script>
+const canvas = document.getElementById("lab-canvas");
+const ctx = canvas.getContext("2d");
+const shell = document.getElementById("lab-shell");
+const srStatus = document.getElementById("sr-status");
+
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
+
+const ROOM = {
+  width: 7.6,
+  depth: 5.8,
+  halfTileW: 58,
+  halfTileH: 30,
+  originX: 845,
+  originY: 178,
+};
+
+const CONTROL_ORDER = [
+  "responsibility",
+  "segregation",
+  "documentation",
+  "physical",
+  "verification",
+  "human",
+];
+
+const CONTROL_META = {
+  responsibility: {
+    label: "Establishment of Responsibility",
+    shortLabel: "Responsibility",
+    color: "#ef8b55",
+    detail: "A named person owns each task, drawer, handoff, or approval.",
+  },
+  segregation: {
+    label: "Segregation of Duties",
+    shortLabel: "Segregation",
+    color: "#54a2d8",
+    detail: "Custody, authorization, deposit prep, and recording stay in different hands.",
+  },
+  documentation: {
+    label: "Documentation Procedures",
+    shortLabel: "Documentation",
+    color: "#f1c25b",
+    detail: "Prenumbered logs, slips, and packets move promptly to accounting.",
+  },
+  physical: {
+    label: "Physical Controls",
+    shortLabel: "Physical",
+    color: "#5fba8e",
+    detail: "Cash, checks, and documents are protected with locked storage and restricted access.",
+  },
+  verification: {
+    label: "Independent Internal Verification",
+    shortLabel: "Verification",
+    color: "#8b7dd8",
+    detail: "Someone independent compares the prelist, deposit, and recorded entry.",
+  },
+  human: {
+    label: "Human Resource Controls",
+    shortLabel: "Human Resources",
+    color: "#df6f94",
+    detail: "Bonding, background checks, duty rotation, and vacations make concealment harder.",
+  },
+};
+
+const STATIONS = {
+  mail: {
+    id: "mail",
+    label: "Receipt Counter",
+    hint: "Receive payments and prepare the first record.",
+    x: 0.7,
+    y: 1.15,
+    w: 1.9,
+    d: 1.2,
+    h: 52,
+    palette: {
+      top: "#ffcc9d",
+      left: "#f7a468",
+      right: "#dc7b46",
+      accent: "#a54722",
+    },
+  },
+  supervisor: {
+    id: "supervisor",
+    label: "Supervisor Desk",
+    hint: "Approve assignments and review handoffs.",
+    x: 4.15,
+    y: 0.7,
+    w: 1.65,
+    d: 1.15,
+    h: 44,
+    palette: {
+      top: "#9fd7ff",
+      left: "#6fb6f0",
+      right: "#3f8fc6",
+      accent: "#215f91",
+    },
+  },
+  cashier: {
+    id: "cashier",
+    label: "Cashier Safe",
+    hint: "Count, secure, and prepare the deposit packet.",
+    x: 5.55,
+    y: 3.15,
+    w: 1.4,
+    d: 1.15,
+    h: 70,
+    palette: {
+      top: "#9de2b5",
+      left: "#70c78c",
+      right: "#4a9d68",
+      accent: "#2f6f47",
+    },
+  },
+  accounting: {
+    id: "accounting",
+    label: "Accounting Desk",
+    hint: "Record cash receipts and reconcile the support.",
+    x: 1.75,
+    y: 4.2,
+    w: 1.95,
+    d: 1.15,
+    h: 42,
+    palette: {
+      top: "#ffe39c",
+      left: "#f5c96c",
+      right: "#d59c33",
+      accent: "#9a6512",
+    },
+  },
+};
+
+const STATION_LIST = Object.values(STATIONS);
+
+const STAFF = {
+  clerk: { name: "Maya Chen", color: "#f28c5d" },
+  supervisor: { name: "Omar Ruiz", color: "#5fa9dd" },
+  cashier: { name: "Leah Park", color: "#62b986" },
+  accounting: { name: "Sam Patel", color: "#e5ba53" },
+};
+
+function option(label, correct, feedback, consequence) {
+  return { label, correct, feedback, consequence };
+}
+
+const ROLE_ORDER = ["clerk", "supervisor", "cashier", "accounting"];
+
+const ROLE_DATA = {
+  clerk: {
+    title: "Clerk",
+    color: "#f28c5d",
+    summary: "Receive payments, create the first record, and hand the batch off cleanly.",
+    mission:
+      "Keep the first custody point traceable, documented, and ready for secure transfer.",
+    start: { x: 1.1, y: 2.9 },
+    briefing: {
+      title: "Pre-shift policy huddle",
+      prompt:
+        "HR reminds you that cash handlers are bonded, duties rotate weekly, vacations are mandatory, and backgrounds are checked. Why does that matter before you touch the day's receipts?",
+      options: [
+        option(
+          "Those policies screen risky hires and make it harder for one person to hide a cash scheme for too long.",
+          true,
+          "Human resource controls strengthen prevention before the first receipt arrives.",
+          ""
+        ),
+        option(
+          "Those policies mostly help employees move faster, but they do not change fraud risk much.",
+          false,
+          "",
+          "If cash handlers are never screened, rotated, or required to step away, concealment can continue much longer."
+        ),
+      ],
+    },
+    steps: [
+      {
+        id: "clerk-responsibility",
+        station: "mail",
+        control: "responsibility",
+        title: "Claim the batch under your ID",
+        objective:
+          "Go to the Receipt Counter and keep the drawer and receipt batch under your own name.",
+        prompt:
+          "A coworker offers to share your drawer code so either of you can accept payments during the lunch rush. What should you do?",
+        options: [
+          option(
+            "Use your assigned drawer and put your initials on the batch cover sheet.",
+            true,
+            "A named owner makes shortages traceable and supports quick follow-up.",
+            ""
+          ),
+          option(
+            "Share the drawer so the line moves faster, then sort it out later if cash is short.",
+            false,
+            "",
+            "Shared responsibility weakens accountability. If the drawer is short, no one can be pinned to the missing cash quickly."
+          ),
+        ],
+      },
+      {
+        id: "clerk-documentation",
+        station: "accounting",
+        control: "documentation",
+        title: "Prepare the remittance log",
+        objective:
+          "Walk to the Accounting Desk drop tray and forward a prenumbered remittance log promptly.",
+        prompt:
+          "The shift is busy and accounting says they can wait until tomorrow for the source documents. Which choice protects the process?",
+        options: [
+          option(
+            "Complete the prenumbered log now, list each check and cash total, and send the packet immediately.",
+            true,
+            "Prompt, prenumbered documentation keeps the accounting record timely and complete.",
+            ""
+          ),
+          option(
+            "Keep rough notes at your station and send one total at the end of the week.",
+            false,
+            "",
+            "Delaying source documents increases the chance of missing, duplicated, or altered entries."
+          ),
+        ],
+      },
+      {
+        id: "clerk-segregation",
+        station: "supervisor",
+        control: "segregation",
+        title: "Hand off instead of posting",
+        objective:
+          "Move to the Supervisor Desk and route the packet for approval instead of recording it yourself.",
+        prompt:
+          "A temporary staff member says you can save time by entering today's receipts into the accounting system yourself after you finish at the counter. What is the secure response?",
+        options: [
+          option(
+            "Hand the packet to the supervisor and let accounting record the receipts from the source documents.",
+            true,
+            "Separating custody from recordkeeping reduces the chance of hidden theft or altered records.",
+            ""
+          ),
+          option(
+            "Accept the shortcut so one person can finish the entire process end to end.",
+            false,
+            "",
+            "If the same person handles cash and updates the ledger, missing receipts can be concealed much more easily."
+          ),
+        ],
+      },
+      {
+        id: "clerk-physical",
+        station: "cashier",
+        control: "physical",
+        title: "Seal the transfer",
+        objective:
+          "Take the batch to the Cashier Safe area and protect it during the handoff.",
+        prompt:
+          "You are ready to transfer the batch. Which method best protects the cash and checks on the way to the safe?",
+        options: [
+          option(
+            "Place the batch in the sealed transfer bag and keep it in locked storage until the cashier signs for it.",
+            true,
+            "Locked storage and sealed custody reduce tampering opportunities during handoff.",
+            ""
+          ),
+          option(
+            "Leave the receipts in an open tray so the cashier can grab them whenever the line slows down.",
+            false,
+            "",
+            "Unsecured cash or checks are vulnerable to theft, loss, and unauthorized access."
+          ),
+        ],
+      },
+      {
+        id: "clerk-verification",
+        station: "accounting",
+        control: "verification",
+        title: "Support the reconciliation",
+        objective:
+          "Return to Accounting so the packet can be independently matched to the deposit.",
+        prompt:
+          "Accounting notices a difference between the batch total and the deposit support. How should you respond?",
+        options: [
+          option(
+            "Provide your original prelist and let accounting compare it independently to the deposit slip and recorded entry.",
+            true,
+            "Independent verification works only when the reviewer uses the original support and stays separate from custody.",
+            ""
+          ),
+          option(
+            "Rewrite your log so it matches the number that looks closest, then move on.",
+            false,
+            "",
+            "Changing source support to fit the totals destroys the audit trail and can hide both errors and fraud."
+          ),
+        ],
+      },
+    ],
+  },
+  supervisor: {
+    title: "Supervisor",
+    color: "#5fa9dd",
+    summary: "Assign people, approve handoffs, and keep shortcuts from breaking the process.",
+    mission:
+      "Use oversight to preserve accountability while the cash receipts packet moves through the office.",
+    start: { x: 4.8, y: 1.9 },
+    briefing: {
+      title: "Pre-shift policy huddle",
+      prompt:
+        "You are opening the shift and HR confirms duty rotation, background checks, bonding, and mandatory vacations for cash handlers. Why should you reinforce that message with your team?",
+      options: [
+        option(
+          "Because those policies discourage long-running concealment and signal that cash handling is monitored seriously.",
+          true,
+          "Human resource controls support the control environment before any approval decision is made.",
+          ""
+        ),
+        option(
+          "Because those policies matter mainly for morale, not for fraud prevention in the cash receipts cycle.",
+          false,
+          "",
+          "If management treats staffing controls as optional, employees have more room to rationalize and hide misconduct."
+        ),
+      ],
+    },
+    steps: [
+      {
+        id: "supervisor-responsibility",
+        station: "supervisor",
+        control: "responsibility",
+        title: "Assign named ownership",
+        objective:
+          "At the Supervisor Desk, assign today's drawer and deposit custody to named employees.",
+        prompt:
+          "The team is short-handed. How should you assign today's responsibilities?",
+        options: [
+          option(
+            "Assign one named clerk to the drawer and one named cashier to deposit custody, then document both assignments.",
+            true,
+            "Named assignments make each handoff traceable and strengthen accountability.",
+            ""
+          ),
+          option(
+            "Tell the team to share duties informally and cover for each other as needed.",
+            false,
+            "",
+            "When duties are shared casually, shortages and policy violations are much harder to trace."
+          ),
+        ],
+      },
+      {
+        id: "supervisor-segregation",
+        station: "mail",
+        control: "segregation",
+        title: "Reject the shortcut",
+        objective:
+          "Go to the Receipt Counter and stop one person from handling both cash custody and recordkeeping.",
+        prompt:
+          "A clerk says they can both receive the payments and post the cash receipts journal because the system is already open. What should you decide?",
+        options: [
+          option(
+            "Keep the clerk on custody and documentation, then route the packet to accounting for posting.",
+            true,
+            "Separating related duties lowers the chance that one person can both steal and hide the theft.",
+            ""
+          ),
+          option(
+            "Approve the shortcut for today since it saves time during the rush.",
+            false,
+            "",
+            "Combining custody with recordkeeping removes a key barrier to concealment."
+          ),
+        ],
+      },
+      {
+        id: "supervisor-documentation",
+        station: "supervisor",
+        control: "documentation",
+        title: "Review the prenumbered support",
+        objective:
+          "Return to the Supervisor Desk and review the clerk's prenumbered remittance support.",
+        prompt:
+          "The clerk has a prelist with missing receipt numbers but says the totals look right. What should you do?",
+        options: [
+          option(
+            "Require the missing document numbers to be accounted for before approving the handoff.",
+            true,
+            "Prenumbered documents help identify gaps, duplicates, and missing transactions.",
+            ""
+          ),
+          option(
+            "Approve the handoff anyway because the batch total seems reasonable.",
+            false,
+            "",
+            "Skipping document control invites unrecorded or duplicated receipts."
+          ),
+        ],
+      },
+      {
+        id: "supervisor-physical",
+        station: "cashier",
+        control: "physical",
+        title: "Secure the packet",
+        objective:
+          "Walk to the Cashier Safe area and require locked storage before the bank deposit leaves.",
+        prompt:
+          "The courier is running late and the batch needs to wait. Which instruction protects the cash receipts packet?",
+        options: [
+          option(
+            "Keep the sealed bag in the locked safe with access limited to authorized personnel.",
+            true,
+            "Restricted access and locked storage reduce theft and tampering risk.",
+            ""
+          ),
+          option(
+            "Leave the bag beside the safe so the courier can take it without bothering anyone.",
+            false,
+            "",
+            "Leaving the bag exposed breaks physical control over one of the company's most vulnerable assets."
+          ),
+        ],
+      },
+      {
+        id: "supervisor-verification",
+        station: "accounting",
+        control: "verification",
+        title: "Require the reconciliation",
+        objective:
+          "Move to the Accounting Desk and make sure someone independent compares the batch to the books.",
+        prompt:
+          "The deposit slip and the accounting entry disagree by a small amount. How do you proceed?",
+        options: [
+          option(
+            "Ask accounting to compare the prelist, deposit slip, and journal entry independently, then report any discrepancy.",
+            true,
+            "Independent verification catches both honest mistakes and intentional manipulation.",
+            ""
+          ),
+          option(
+            "Tell accounting to round the entry to match the deposit so the day can close on time.",
+            false,
+            "",
+            "Ignoring discrepancies bypasses a control designed to detect errors and irregularities."
+          ),
+        ],
+      },
+    ],
+  },
+  cashier: {
+    title: "Cashier",
+    color: "#62b986",
+    summary: "Take custody, recount the batch, secure the funds, and prepare the deposit.",
+    mission:
+      "Protect the deposit while staying out of the accounting records and preserving the audit trail.",
+    start: { x: 6.1, y: 3.95 },
+    briefing: {
+      title: "Pre-shift policy huddle",
+      prompt:
+        "You handle cash today, so HR reminds you that cash employees are bonded, rotated through duties, required to take vacations, and background checked. Which statement is most accurate?",
+      options: [
+        option(
+          "Those policies both screen for risk and make it harder for a cashier to hide a problem over time.",
+          true,
+          "Human resource controls help prevent and expose long-running cash schemes.",
+          ""
+        ),
+        option(
+          "Those policies matter only if theft already happened, so they do not affect today's shift much.",
+          false,
+          "",
+          "Preventive staffing controls matter before cash is handled, not just after a loss is discovered."
+        ),
+      ],
+    },
+    steps: [
+      {
+        id: "cashier-responsibility",
+        station: "cashier",
+        control: "responsibility",
+        title: "Accept custody formally",
+        objective:
+          "At the Cashier Safe area, sign for the sealed batch when it changes hands.",
+        prompt:
+          "The clerk hands you the transfer bag and says the signature log is optional because everyone knows the batch is yours now. What should you do?",
+        options: [
+          option(
+            "Sign the custody log and confirm the bag number before taking possession.",
+            true,
+            "Formal handoff records make custody clear at each point in the process.",
+            ""
+          ),
+          option(
+            "Skip the log and move the bag straight to the safe.",
+            false,
+            "",
+            "Without a documented handoff, it is harder to trace where a shortage or tampering occurred."
+          ),
+        ],
+      },
+      {
+        id: "cashier-segregation",
+        station: "accounting",
+        control: "segregation",
+        title: "Stay out of the ledger",
+        objective:
+          "Walk to the Accounting Desk and keep your role limited to deposit custody and support.",
+        prompt:
+          "Accounting is swamped and asks you to post the cash receipts journal after you finish the deposit slip. Which response is correct?",
+        options: [
+          option(
+            "Decline and provide the deposit support so accounting can record the entry independently.",
+            true,
+            "The cashier should not both hold the money and update the books.",
+            ""
+          ),
+          option(
+            "Agree so the entry gets posted faster and the paperwork stays together.",
+            false,
+            "",
+            "Giving the cashier recordkeeping access makes it easier to conceal missing cash."
+          ),
+        ],
+      },
+      {
+        id: "cashier-documentation",
+        station: "cashier",
+        control: "documentation",
+        title: "Prepare the deposit slip",
+        objective:
+          "Return to the Cashier Safe area and complete the deposit documentation from the source support.",
+        prompt:
+          "The clerk's packet is complete, but you are tempted to send the bank only a total amount. What supports the control system?",
+        options: [
+          option(
+            "Prepare the deposit slip from the detailed source support and keep the slip with the remittance packet.",
+            true,
+            "Complete deposit documentation preserves the trail from receipt to bank deposit.",
+            ""
+          ),
+          option(
+            "Send a single total to the bank and discard the detailed support once you finish counting.",
+            false,
+            "",
+            "Discarding or skipping detailed support weakens both recording accuracy and later reconciliation."
+          ),
+        ],
+      },
+      {
+        id: "cashier-physical",
+        station: "cashier",
+        control: "physical",
+        title: "Lock down the deposit",
+        objective:
+          "Keep the batch in protected storage until it leaves for the bank.",
+        prompt:
+          "You still have twenty minutes before pickup. Which handling choice best protects the deposit?",
+        options: [
+          option(
+            "Keep the counted funds in the safe and seal the deposit bag until pickup.",
+            true,
+            "Physical controls protect highly vulnerable cash between count and deposit.",
+            ""
+          ),
+          option(
+            "Leave the counted cash on the desk so you can double-check it quickly if needed.",
+            false,
+            "",
+            "Visible, unsecured cash invites both theft and accidental loss."
+          ),
+        ],
+      },
+      {
+        id: "cashier-verification",
+        station: "accounting",
+        control: "verification",
+        title: "Support independent review",
+        objective:
+          "Bring the deposit support to Accounting so someone independent can match it to the entry.",
+        prompt:
+          "Accounting asks for your count sheet and the deposit slip to compare with the clerk's prelist. What should happen next?",
+        options: [
+          option(
+            "Provide the original support and let accounting perform the reconciliation independently.",
+            true,
+            "The review should compare the cashier's support with the clerk's record and the journal entry.",
+            ""
+          ),
+          option(
+            "Adjust the count sheet yourself until it matches what accounting expects.",
+            false,
+            "",
+            "Letting the cashier rewrite support destroys the independence of the verification."
+          ),
+        ],
+      },
+    ],
+  },
+  accounting: {
+    title: "Accounting Department",
+    color: "#e5ba53",
+    summary: "Record receipts from source documents and reconcile the deposit to the ledger.",
+    mission:
+      "Keep the books accurate without touching the cash itself, then surface any discrepancy for management.",
+    start: { x: 2.85, y: 5.2 },
+    briefing: {
+      title: "Pre-shift policy huddle",
+      prompt:
+        "As the accounting reviewer, you are told that cash handlers are background checked, bonded, rotated, and required to take vacations. Why should that matter to you if you do not touch the cash directly?",
+      options: [
+        option(
+          "Because those staffing controls lower the chance that the documents reaching accounting hide a long-running scheme.",
+          true,
+          "Human resource controls support the integrity of the information flowing into accounting.",
+          ""
+        ),
+        option(
+          "Because those policies matter only to HR, not to anyone who records or reviews transactions.",
+          false,
+          "",
+          "Accounting relies on staffing controls too. Weak hiring and no rotation increase concealment risk."
+        ),
+      ],
+    },
+    steps: [
+      {
+        id: "accounting-responsibility",
+        station: "accounting",
+        control: "responsibility",
+        title: "Own the posting batch",
+        objective:
+          "At the Accounting Desk, post today's packet under your own user ID and initials.",
+        prompt:
+          "A coworker says you can use the shared 'cash desk' login because it is already open. Which option keeps responsibility clear?",
+        options: [
+          option(
+            "Use your own credentials and mark the batch as posted by you.",
+            true,
+            "Posting responsibility should be tied to one person just like custody is.",
+            ""
+          ),
+          option(
+            "Use the shared login so anyone can finish the entry if you step away.",
+            false,
+            "",
+            "Shared system access weakens accountability and makes later review harder."
+          ),
+        ],
+      },
+      {
+        id: "accounting-segregation",
+        station: "mail",
+        control: "segregation",
+        title: "Refuse custody of the cash",
+        objective:
+          "Go to the Receipt Counter and keep accounting separate from physical custody of receipts.",
+        prompt:
+          "The clerk asks you to carry the open transfer tray to the safe because you are walking that way anyway. What is the proper response?",
+        options: [
+          option(
+            "Decline physical custody and direct the clerk to use the approved handoff to the cashier.",
+            true,
+            "Accounting should record and reconcile, not take possession of the cash.",
+            ""
+          ),
+          option(
+            "Carry the tray to the safe yourself since accounting is part of the overall process.",
+            false,
+            "",
+            "If accounting takes custody of the cash, the separation between records and assets starts to disappear."
+          ),
+        ],
+      },
+      {
+        id: "accounting-documentation",
+        station: "accounting",
+        control: "documentation",
+        title: "Record from the support",
+        objective:
+          "Return to the Accounting Desk and use the source packet to record the receipts promptly.",
+        prompt:
+          "The supervisor gives you only a verbal total and says the detailed remittance log can follow later. What should you do?",
+        options: [
+          option(
+            "Wait for the prenumbered support packet and record the entry from the actual documents.",
+            true,
+            "Accounting entries should be based on timely source documents, not unsupported estimates.",
+            ""
+          ),
+          option(
+            "Post the verbal total now and let the support catch up whenever it arrives.",
+            false,
+            "",
+            "Posting unsupported totals increases the risk of incomplete or inaccurate records."
+          ),
+        ],
+      },
+      {
+        id: "accounting-physical",
+        station: "accounting",
+        control: "physical",
+        title: "Protect the records",
+        objective:
+          "Keep the cash receipts packet in restricted storage after you finish the entry.",
+        prompt:
+          "Once the entry is recorded, where should the supporting packet go?",
+        options: [
+          option(
+            "Into the restricted accounting file so only authorized staff can alter or remove it.",
+            true,
+            "Physical controls apply to key records as well as to the cash itself.",
+            ""
+          ),
+          option(
+            "Back onto the open counter so anyone in the office can access it later.",
+            false,
+            "",
+            "Unprotected records can be removed, changed, or lost before review."
+          ),
+        ],
+      },
+      {
+        id: "accounting-verification",
+        station: "supervisor",
+        control: "verification",
+        title: "Flag and report the difference",
+        objective:
+          "Take the packet to the Supervisor Desk and report the result of your reconciliation.",
+        prompt:
+          "The prelist, deposit slip, and journal entry do not match. Which action completes the control properly?",
+        options: [
+          option(
+            "Document the discrepancy and report it to management after your independent comparison.",
+            true,
+            "Independent verification works only when discrepancies are surfaced instead of buried.",
+            ""
+          ),
+          option(
+            "Adjust whichever document is easiest so the packet balances before anyone notices.",
+            false,
+            "",
+            "Changing documents to force agreement bypasses the very control meant to detect problems."
+          ),
+        ],
+      },
+    ],
+  },
+};
+
+const state = createState();
+const keysDown = new Set();
+let interactiveRegions = [];
+
+function createState() {
+  return {
+    mode: "menu",
+    selectedRoleIndex: 0,
+    run: null,
+    paused: false,
+    manualStepping: false,
+    hoverAction: null,
+    consequence: null,
+    promptSelection: 0,
+  };
+}
+
+function createRun(roleId) {
+  const role = cloneRoleForRun(ROLE_DATA[roleId]);
+  return {
+    roleId,
+    role,
+    player: {
+      x: role.start.x,
+      y: role.start.y,
+    },
+    stepIndex: 0,
+    score: 0,
+    risk: 22,
+    controls: {
+      responsibility: false,
+      segregation: false,
+      documentation: false,
+      physical: false,
+      verification: false,
+      human: false,
+    },
+    controlNotes: {},
+    incidents: [],
+    completedSteps: [],
+    briefingSolved: false,
+  };
+}
+
+function cloneRoleForRun(role) {
+  return {
+    ...role,
+    start: { ...role.start },
+    briefing: cloneQuestionWithShuffledOptions(role.briefing),
+    steps: role.steps.map((step) => cloneQuestionWithShuffledOptions(step)),
+  };
+}
+
+function cloneQuestionWithShuffledOptions(question) {
+  return {
+    ...question,
+    options: shuffledOptions(question.options),
+  };
+}
+
+function shuffledOptions(options) {
+  const copy = options.map((item) => ({ ...item }));
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function roundRectPath(x, y, w, h, r) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function deepCloneControls() {
+  return {
+    responsibility: false,
+    segregation: false,
+    documentation: false,
+    physical: false,
+    verification: false,
+    human: false,
+  };
+}
+
+function resetToMenu() {
+  state.mode = "menu";
+  state.promptSelection = 0;
+  state.paused = false;
+  state.consequence = null;
+}
+
+function startRole(roleId) {
+  state.run = createRun(roleId);
+  state.mode = "briefing";
+  state.promptSelection = 0;
+  state.paused = false;
+  state.consequence = null;
+  announce(`Selected role: ${ROLE_DATA[roleId].title}. Complete the briefing question first.`);
+}
+
+function restartCurrentRole() {
+  const currentRole = state.run ? state.run.roleId : ROLE_ORDER[state.selectedRoleIndex];
+  startRole(currentRole);
+}
+
+function getSelectedRoleId() {
+  return ROLE_ORDER[state.selectedRoleIndex];
+}
+
+function getSelectedRole() {
+  return ROLE_DATA[getSelectedRoleId()];
+}
+
+function getCurrentRun() {
+  return state.run;
+}
+
+function getCurrentStep() {
+  const run = getCurrentRun();
+  if (!run || !run.role) {
+    return null;
+  }
+  return run.role.steps[run.stepIndex] || null;
+}
+
+function getCurrentQuestion() {
+  const run = getCurrentRun();
+  if (!run) {
+    return null;
+  }
+  if (state.mode === "briefing") {
+    return run.role.briefing;
+  }
+  if (state.mode === "prompt") {
+    return getCurrentStep();
+  }
+  return null;
+}
+
+function getObjectiveText() {
+  if (state.mode === "menu") {
+    return "Choose a role and start the cash receipts shift.";
+  }
+  if (state.mode === "help") {
+    return "Review the controls, then return to the role menu.";
+  }
+  if (!state.run) {
+    return "Start a role to begin.";
+  }
+  if (state.mode === "briefing") {
+    return "Answer the pre-shift policy question to unlock the floor.";
+  }
+  if (state.mode === "consequence") {
+    return "Review the control gap and retry the secure choice.";
+  }
+  if (state.mode === "debrief") {
+    return "Review how the six controls protected the cash receipts process.";
+  }
+  const step = getCurrentStep();
+  return step ? step.objective : "Shift complete.";
+}
+
+function currentActiveStation() {
+  const step = getCurrentStep();
+  if (!step) {
+    return null;
+  }
+  return STATIONS[step.station];
+}
+
+function getPromptTitle() {
+  const question = getCurrentQuestion();
+  return question ? question.title : "";
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function announce(text) {
+  srStatus.textContent = text;
+}
+
+function isoProject(x, y, z = 0) {
+  return {
+    x: ROOM.originX + (x - y) * ROOM.halfTileW,
+    y: ROOM.originY + (x + y) * ROOM.halfTileH - z,
+  };
+}
+
+function toScreenRect(rect) {
+  const topLeft = isoProject(rect.x, rect.y, rect.h || 0);
+  const topRight = isoProject(rect.x + rect.w, rect.y, rect.h || 0);
+  const bottomLeft = isoProject(rect.x, rect.y + rect.d, rect.h || 0);
+  const bottomRight = isoProject(rect.x + rect.w, rect.y + rect.d, rect.h || 0);
+  return [topLeft, topRight, bottomRight, bottomLeft];
+}
+
+function fillPolygon(points, fillStyle, strokeStyle) {
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i += 1) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+  if (strokeStyle) {
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+}
+
+function setFittedFont(text, baseSize, minSize, weight, family, maxWidth) {
+  let size = baseSize;
+  do {
+    ctx.font = `${weight} ${size}px ${family}`;
+    if (ctx.measureText(text).width <= maxWidth || size <= minSize) {
+      return size;
+    }
+    size -= 1;
+  } while (size >= minSize);
+  return minSize;
+}
+
+function drawPrism(station, highlight) {
+  const x = station.x;
+  const y = station.y;
+  const w = station.w;
+  const d = station.d;
+  const h = station.h;
+  const top = toScreenRect({ x, y, w, d, h });
+  const bottom = toScreenRect({ x, y, w, d, h: 0 });
+
+  const leftFace = [top[0], top[3], bottom[3], bottom[0]];
+  const rightFace = [top[1], top[2], bottom[2], bottom[1]];
+
+  if (highlight) {
+    const ringTop = toScreenRect({ x: x - 0.12, y: y - 0.12, w: w + 0.24, d: d + 0.24, h: 4 });
+    fillPolygon(ringTop, "rgba(255, 227, 123, 0.45)");
+  }
+
+  fillPolygon(leftFace, station.palette.left, "rgba(255,255,255,0.28)");
+  fillPolygon(rightFace, station.palette.right, "rgba(255,255,255,0.22)");
+  fillPolygon(top, station.palette.top, "rgba(255,255,255,0.32)");
+
+  ctx.fillStyle = "rgba(16, 44, 61, 0.08)";
+  const shadow = toScreenRect({ x: x + 0.06, y: y + 0.06, w, d, h: 0 });
+  fillPolygon(shadow, "rgba(16, 44, 61, 0.08)");
+
+  if (state.mode === "shift") {
+    const labelPoint = isoProject(x + w / 2, y + d / 2, h + 18);
+    ctx.fillStyle = station.palette.accent;
+    ctx.textAlign = "center";
+    setFittedFont(station.label, 16, 12, "700", "Avenir Next, Trebuchet MS, sans-serif", 150);
+    ctx.fillText(station.label, labelPoint.x, labelPoint.y);
+  }
+}
+
+function drawPlayer(run) {
+  const point = isoProject(run.player.x, run.player.y, 0);
+  const shadow = isoProject(run.player.x, run.player.y, 0);
+  const color = ROLE_DATA[run.roleId].color;
+
+  ctx.save();
+  ctx.fillStyle = "rgba(18, 44, 59, 0.18)";
+  ctx.beginPath();
+  ctx.ellipse(shadow.x, shadow.y + 9, 18, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(point.x, point.y - 16, 12, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff6ea";
+  ctx.beginPath();
+  ctx.arc(point.x, point.y - 35, 9, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(15, 45, 61, 0.16)";
+  ctx.beginPath();
+  ctx.arc(point.x + 2, point.y - 36, 2, 0, Math.PI * 2);
+  ctx.arc(point.x - 3, point.y - 36, 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawNpcMarker(roleId) {
+  const roleStationMap = {
+    clerk: STATIONS.mail,
+    supervisor: STATIONS.supervisor,
+    cashier: STATIONS.cashier,
+    accounting: STATIONS.accounting,
+  };
+  const station = roleStationMap[roleId];
+  const point = isoProject(station.x + station.w * 0.6, station.y + station.d * 0.55, station.h + 8);
+  const color = STAFF[roleId].color;
+
+  ctx.fillStyle = "rgba(22, 49, 66, 0.12)";
+  ctx.beginPath();
+  ctx.ellipse(point.x, point.y + 44, 16, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(point.x, point.y + 18, 9, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(point.x - 10, point.y + 24, 20, 24);
+}
+
+function drawFloor() {
+  const floor = [
+    isoProject(0, 0, 0),
+    isoProject(ROOM.width, 0, 0),
+    isoProject(ROOM.width, ROOM.depth, 0),
+    isoProject(0, ROOM.depth, 0),
+  ];
+  fillPolygon(floor, "#f4ead7");
+
+  const wallLeft = [
+    isoProject(0, ROOM.depth, 0),
+    isoProject(0, 0, 0),
+    isoProject(0, 0, 90),
+    isoProject(0, ROOM.depth, 90),
+  ];
+  const wallRight = [
+    isoProject(ROOM.width, 0, 0),
+    isoProject(ROOM.width, ROOM.depth, 0),
+    isoProject(ROOM.width, ROOM.depth, 90),
+    isoProject(ROOM.width, 0, 90),
+  ];
+  fillPolygon(wallLeft, "#efe1cd");
+  fillPolygon(wallRight, "#e8d9c4");
+
+  ctx.strokeStyle = "rgba(22, 49, 66, 0.08)";
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= ROOM.width; x += 1) {
+    const a = isoProject(x, 0, 0);
+    const b = isoProject(x, ROOM.depth, 0);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+  for (let y = 0; y <= ROOM.depth; y += 1) {
+    const a = isoProject(0, y, 0);
+    const b = isoProject(ROOM.width, y, 0);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+}
+
+function drawScene(run) {
+  drawFloor();
+
+  const activeStation = currentActiveStation();
+  for (const station of STATION_LIST) {
+    drawPrism(station, activeStation && activeStation.id === station.id);
+  }
+
+  for (const roleId of ROLE_ORDER) {
+    if (!run || run.roleId !== roleId) {
+      drawNpcMarker(roleId);
+    }
+  }
+  if (run) {
+    drawPlayer(run);
+  }
+
+  drawSceneLabels(run);
+}
+
+function drawSceneLabels(run) {
+  const activeStation = currentActiveStation();
+  if (state.mode !== "shift" || !run || !activeStation) {
+    return;
+  }
+  if (!isNearStation(run.player, activeStation)) {
+    return;
+  }
+  const point = isoProject(activeStation.x + activeStation.w / 2, activeStation.y + activeStation.d / 2, activeStation.h + 54);
+  ctx.save();
+  roundRectPath(point.x - 92, point.y - 30, 184, 38, 18);
+  ctx.fillStyle = "rgba(17, 43, 59, 0.88)";
+  ctx.fill();
+  ctx.fillStyle = "#fff8ef";
+  ctx.font = "700 16px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("Press E to interact", point.x, point.y - 6);
+  ctx.restore();
+}
+
+function drawSidebar(run) {
+  roundRectPath(24, 22, 292, 716, 30);
+  ctx.fillStyle = "rgba(254, 251, 243, 0.92)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(22, 49, 66, 0.08)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  const role = run ? ROLE_DATA[run.roleId] : getSelectedRole();
+  const topColor = role.color;
+  roundRectPath(42, 40, 256, 128, 24);
+  ctx.fillStyle = "rgba(255,255,255,0.88)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(22, 49, 66, 0.06)";
+  ctx.stroke();
+
+  ctx.fillStyle = topColor;
+  ctx.textAlign = "left";
+  setFittedFont(run ? role.title : "Select a Role", 28, 18, "800", "Avenir Next, Trebuchet MS, sans-serif", 224);
+  ctx.fillText(run ? role.title : "Select a Role", 58, 78);
+  ctx.fillStyle = "#50687a";
+  ctx.font = "600 16px Avenir Next, Trebuchet MS, sans-serif";
+  const summary = run ? role.summary : "Pick one role to study how controls protect cash receipts.";
+  wrapText(summary, 58, 104, 228, 22);
+
+  const score = run ? run.score : 0;
+  const risk = run ? run.risk : 0;
+  drawMetricCard(42, 182, 122, 86, "Score", String(score), "#1f6b4d");
+  drawMetricCard(176, 182, 122, 86, "Risk", `${risk}%`, riskColor(risk));
+
+  ctx.fillStyle = "#163142";
+  ctx.font = "800 17px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText("Current Objective", 42, 308);
+  roundRectPath(42, 320, 256, 108, 22);
+  ctx.fillStyle = "rgba(242, 248, 250, 0.92)";
+  ctx.fill();
+  ctx.fillStyle = "#49667a";
+  ctx.font = "600 16px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(getObjectiveText(), 58, 350, 224, 22);
+
+  ctx.fillStyle = "#163142";
+  ctx.font = "800 17px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText("Six Controls", 42, 466);
+
+  let rowY = 484;
+  for (const key of CONTROL_ORDER) {
+    const meta = CONTROL_META[key];
+    const done = run ? run.controls[key] : false;
+    drawChecklistRow(42, rowY, 256, 34, meta, done);
+    rowY += 40;
+  }
+
+}
+
+function drawMetricCard(x, y, w, h, label, value, accent) {
+  roundRectPath(x, y, w, h, 22);
+  ctx.fillStyle = "rgba(242, 248, 250, 0.92)";
+  ctx.fill();
+  ctx.fillStyle = "#4b687b";
+  ctx.font = "700 14px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(label, x + 16, y + 24);
+  ctx.fillStyle = accent;
+  ctx.font = "900 30px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(value, x + 16, y + 60);
+}
+
+function drawChecklistRow(x, y, w, h, meta, done) {
+  roundRectPath(x, y, w, h, 16);
+  ctx.fillStyle = done ? "rgba(255,255,255,0.92)" : "rgba(241, 246, 248, 0.78)";
+  ctx.fill();
+  ctx.fillStyle = done ? meta.color : "rgba(120, 139, 154, 0.48)";
+  ctx.beginPath();
+  ctx.arc(x + 18, y + h / 2, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#203748";
+  ctx.font = "700 13px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(meta.shortLabel, x + 34, y + 22);
+  ctx.fillStyle = "#607b8c";
+  ctx.font = "600 12px Avenir Next, Trebuchet MS, sans-serif";
+  const statusLabel = done ? "Applied" : "Pending";
+  ctx.fillText(statusLabel, x + w - 62, y + 22);
+}
+
+function riskColor(risk) {
+  if (risk <= 18) {
+    return "#1f6b4d";
+  }
+  if (risk <= 38) {
+    return "#c3831c";
+  }
+  return "#b34d39";
+}
+
+function drawMenu() {
+  drawBackdrop();
+  drawSidebar(null);
+  drawScene(null);
+
+  roundRectPath(405, 58, 810, 176, 32);
+  ctx.fillStyle = "rgba(255, 250, 243, 0.9)";
+  ctx.fill();
+  ctx.fillStyle = "#163142";
+  ctx.font = "900 36px Georgia, Times, serif";
+  ctx.textAlign = "left";
+  ctx.fillText("Cash Receipts Control Lab", 440, 110);
+  ctx.fillStyle = "#516d7e";
+  ctx.font = "600 19px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(
+    "Study the cash receipts process in a faux-3D office. Each role teaches how the six control activities protect receipt handling, custody, documentation, deposits, and reconciliation.",
+    440,
+    142,
+    720,
+    26
+  );
+
+  const roles = ROLE_ORDER.map((roleId) => ROLE_DATA[roleId]);
+  const baseX = 400;
+  const baseY = 238;
+  const cardWidth = 385;
+  const cardHeight = 170;
+  const rowGap = 176;
+  interactiveRegions = [];
+
+  roles.forEach((role, index) => {
+    const column = index % 2;
+    const row = Math.floor(index / 2);
+    const x = baseX + column * 404;
+    const y = baseY + row * rowGap;
+    const selected = index === state.selectedRoleIndex;
+    drawRoleCard(x, y, cardWidth, cardHeight, role, selected, index + 1);
+    interactiveRegions.push({
+      x,
+      y,
+      w: cardWidth,
+      h: cardHeight,
+      action: { type: "select-role", index },
+    });
+  });
+
+  drawCanvasButton(485, 600, 248, 58, "Start Shift", true);
+  interactiveRegions.push({
+    x: 485,
+    y: 600,
+    w: 248,
+    h: 58,
+    action: { type: "start-role" },
+  });
+
+  drawCanvasButton(755, 600, 292, 58, "How To Play", false);
+  interactiveRegions.push({
+    x: 755,
+    y: 600,
+    w: 292,
+    h: 58,
+    action: { type: "how-to-play" },
+  });
+
+  ctx.fillStyle = "#637d8d";
+  ctx.font = "700 15px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "left";
+  wrapText(
+    "Arrow keys or 1-4 change the role. Enter starts the shift. Each run covers all six control activities from responsibility through independent verification.",
+    446,
+    686,
+    640,
+    20
+  );
+}
+
+function drawBackdrop() {
+  const sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+  sky.addColorStop(0, "#fbf2e4");
+  sky.addColorStop(0.45, "#f4efe7");
+  sky.addColorStop(1, "#dfedf7");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  ctx.fillStyle = "rgba(255,255,255,0.45)";
+  ctx.beginPath();
+  ctx.arc(1110, 92, 72, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(1180, 138, 32, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(1030, 144, 24, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawRoomHeader(title, subtitle) {
+  ctx.fillStyle = "#173245";
+  ctx.font = "900 24px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(title, 420, 38);
+  ctx.fillStyle = "#698291";
+  ctx.font = "700 15px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(subtitle, 420, 62);
+}
+
+function drawRoleCard(x, y, w, h, role, selected, number) {
+  roundRectPath(x, y, w, h, 28);
+  ctx.fillStyle = selected ? "rgba(255, 252, 247, 0.98)" : "rgba(255, 249, 239, 0.84)";
+  ctx.fill();
+  ctx.strokeStyle = selected ? role.color : "rgba(22, 49, 66, 0.1)";
+  ctx.lineWidth = selected ? 3 : 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = role.color;
+  ctx.beginPath();
+  ctx.arc(x + 36, y + 38, 17, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#163142";
+  const title = `${number}. ${role.title}`;
+  setFittedFont(title, 23, 16, "900", "Avenir Next, Trebuchet MS, sans-serif", w - 96);
+  ctx.fillText(title, x + 68, y + 46);
+  ctx.fillStyle = "#516d7e";
+  ctx.font = "600 16px Avenir Next, Trebuchet MS, sans-serif";
+  const summaryEnd = wrapText(role.summary, x + 24, y + 74, w - 48, 22);
+  ctx.fillStyle = "#7c90a0";
+  ctx.font = "700 13px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(role.mission, x + 24, Math.max(y + 120, summaryEnd + 8), w - 48, 18);
+}
+
+function drawCanvasButton(x, y, w, h, label, primary) {
+  roundRectPath(x, y, w, h, 22);
+  ctx.fillStyle = primary ? "#163142" : "rgba(255,255,255,0.9)";
+  ctx.fill();
+  ctx.strokeStyle = primary ? "#163142" : "rgba(22, 49, 66, 0.14)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = primary ? "#fffaf0" : "#163142";
+  ctx.font = "800 18px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(label, x + w / 2, y + 38);
+}
+
+function drawHowToPlay() {
+  drawBackdrop();
+  drawSidebar(null);
+  drawScene(null);
+  interactiveRegions = [];
+
+  roundRectPath(385, 46, 850, 676, 36);
+  ctx.fillStyle = "rgba(255, 251, 244, 0.97)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(22, 49, 66, 0.1)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = "#ef8b55";
+  ctx.font = "900 17px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("HOW TO PLAY", 430, 98);
+  ctx.fillStyle = "#163142";
+  ctx.font = "900 36px Georgia, Times, serif";
+  ctx.fillText("Protect the cash receipts shift.", 430, 142);
+  ctx.fillStyle = "#526d7f";
+  ctx.font = "600 18px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(
+    "Choose one role, move to each highlighted station, and make decisions that preserve accountability, separation of duties, documentation, security, verification, and human resource controls.",
+    430,
+    182,
+    760,
+    27
+  );
+
+  drawHelpColumn(
+    418,
+    292,
+    374,
+    312,
+    "Controls",
+    [
+      "Move: Arrow keys or WASD.",
+      "Interact: E or Enter near a highlighted desk.",
+      "Menu: 1-4 choose a role; Enter starts.",
+      "Prompts: 1-2 or arrows choose; Enter confirms.",
+      "Shift: Space pause, R restart, F fullscreen.",
+    ],
+    "#5fa9dd"
+  );
+  drawHelpColumn(
+    812,
+    292,
+    374,
+    312,
+    "Study Goal",
+    [
+      "Correct choices lower risk and fill the six-control checklist.",
+      "Wrong shortcuts show a consequence, then let you retry.",
+      "Each role sees the same process from a different responsibility point.",
+      "The debrief explains how the choices protected cash from error or fraud.",
+    ],
+    "#62b986"
+  );
+
+  drawCanvasButton(614, 640, 360, 58, "Back To Role Menu", true);
+  interactiveRegions.push({
+    x: 614,
+    y: 640,
+    w: 360,
+    h: 58,
+    action: { type: "back-to-menu" },
+  });
+}
+
+function drawHelpColumn(x, y, w, h, title, items, color) {
+  roundRectPath(x, y, w, h, 28);
+  ctx.fillStyle = "rgba(244, 248, 250, 0.88)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(22, 49, 66, 0.1)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x + 30, y + 34, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#173245";
+  ctx.font = "900 21px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(title, x + 54, y + 42);
+
+  ctx.fillStyle = "#526d7f";
+  ctx.font = "700 15px Avenir Next, Trebuchet MS, sans-serif";
+  let lineY = y + 82;
+  items.forEach((item) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x + 28, lineY - 6, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#526d7f";
+    lineY = wrapText(item, x + 46, lineY, w - 82, 20) + 13;
+  });
+}
+
+function drawBriefing() {
+  drawBackdrop();
+  drawSidebar(state.run);
+  drawRoomHeader("Briefing", "Lock in the human resource control before entering the floor.");
+  drawScene(state.run);
+  drawQuestionCard(state.run.role.briefing, state.run.role.title, state.run.role.color, "Press Enter to confirm.");
+}
+
+function drawQuestionCard(question, eyebrow, color, footer) {
+  interactiveRegions = [];
+  roundRectPath(400, 88, 826, 548, 34);
+  ctx.fillStyle = "rgba(255, 251, 244, 0.95)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(22, 49, 66, 0.08)";
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.font = "900 16px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(eyebrow.toUpperCase(), 442, 134);
+
+  ctx.fillStyle = "#163142";
+  ctx.font = "900 34px Georgia, Times, serif";
+  ctx.fillText(question.title, 442, 184);
+
+  ctx.fillStyle = "#526d7f";
+  ctx.font = "600 19px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(question.prompt, 442, 224, 742, 28);
+
+  question.options.forEach((item, index) => {
+    const x = 442;
+    const y = 342 + index * 126;
+    drawOptionCard(x, y, 740, 102, item.label, state.promptSelection === index, index + 1);
+    interactiveRegions.push({
+      x,
+      y,
+      w: 740,
+      h: 102,
+      action: { type: "choose-option", index },
+    });
+  });
+
+  ctx.fillStyle = "#6e8696";
+  ctx.font = "700 15px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(footer, 442, 600);
+}
+
+function drawOptionCard(x, y, w, h, label, selected, hotkey) {
+  roundRectPath(x, y, w, h, 24);
+  ctx.fillStyle = selected ? "rgba(237, 246, 250, 0.98)" : "rgba(244, 248, 250, 0.88)";
+  ctx.fill();
+  ctx.strokeStyle = selected ? "#163142" : "rgba(22, 49, 66, 0.12)";
+  ctx.lineWidth = selected ? 2.5 : 1.25;
+  ctx.stroke();
+
+  ctx.fillStyle = selected ? "#163142" : "#6f8392";
+  ctx.font = "900 20px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(String(hotkey), x + 24, y + 34);
+  ctx.fillStyle = "#203748";
+  ctx.font = "700 18px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(label, x + 62, y + 34, w - 90, 24);
+}
+
+function drawShift() {
+  drawBackdrop();
+  drawSidebar(state.run);
+  drawRoomHeader(
+    `${state.run.role.title} Shift`,
+    "Move through the office and apply the next control at the highlighted station."
+  );
+  drawScene(state.run);
+  drawShiftFooter();
+
+  if (state.paused) {
+    drawOverlayPanel(
+      "Shift Paused",
+      "The office is frozen. Press Space to resume, or press R to restart this role.",
+      state.run.role.color,
+      ["Press Space to resume", "Press R to restart"]
+    );
+  }
+}
+
+function drawShiftFooter() {
+  const station = currentActiveStation();
+  if (!station) {
+    return;
+  }
+  roundRectPath(432, 642, 780, 82, 26);
+  ctx.fillStyle = "rgba(255, 250, 243, 0.9)";
+  ctx.fill();
+  ctx.fillStyle = "#163142";
+  ctx.font = "900 18px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(`Next station: ${station.label}`, 476, 676);
+  ctx.fillStyle = "#627f90";
+  ctx.font = "600 15px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(station.hint, 476, 704, 690, 20);
+}
+
+function drawPrompt() {
+  drawBackdrop();
+  drawSidebar(state.run);
+  drawRoomHeader("Decision Point", "Choose the action that protects the cash receipts process.");
+  drawScene(state.run);
+  drawQuestionCard(getCurrentStep(), CONTROL_META[getCurrentStep().control].label, state.run.role.color, "Use 1-2 or Enter to choose the secure action.");
+}
+
+function drawConsequence() {
+  drawBackdrop();
+  drawSidebar(state.run);
+  drawRoomHeader("Control Gap", "Review the consequence, then retry the secure choice.");
+  drawScene(state.run);
+  interactiveRegions = [];
+
+  roundRectPath(430, 130, 760, 470, 34);
+  ctx.fillStyle = "rgba(255, 247, 241, 0.96)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(179, 77, 57, 0.18)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = "#b34d39";
+  ctx.font = "900 18px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText("CONSEQUENCE / RETRY", 470, 178);
+  ctx.fillStyle = "#173245";
+  ctx.font = "900 36px Georgia, Times, serif";
+  ctx.fillText("That shortcut opens a control gap.", 470, 226);
+  ctx.fillStyle = "#536f80";
+  ctx.font = "600 19px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(state.consequence.text, 470, 274, 674, 28);
+
+  roundRectPath(470, 388, 680, 108, 24);
+  ctx.fillStyle = "rgba(255,255,255,0.86)";
+  ctx.fill();
+  ctx.fillStyle = "#173245";
+  ctx.font = "800 19px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText("Recover the process", 500, 426);
+  ctx.fillStyle = "#5e7889";
+  ctx.font = "600 17px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(state.consequence.recovery, 500, 454, 620, 24);
+
+  drawCanvasButton(610, 526, 240, 54, "Retry Secure Choice", true);
+  interactiveRegions.push({
+    x: 610,
+    y: 526,
+    w: 240,
+    h: 54,
+    action: { type: "retry-after-consequence" },
+  });
+}
+
+function drawDebrief() {
+  drawBackdrop();
+  drawSidebar(state.run);
+  drawRoomHeader("Debrief", "Map the role decisions back to the full cash receipts process.");
+  drawScene(state.run);
+  interactiveRegions = [];
+
+  roundRectPath(385, 72, 850, 620, 36);
+  ctx.fillStyle = "rgba(255, 251, 244, 0.96)";
+  ctx.fill();
+
+  ctx.fillStyle = state.run.role.color;
+  ctx.font = "900 18px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText(`${state.run.role.title.toUpperCase()} RUN COMPLETE`, 430, 112);
+  ctx.fillStyle = "#163142";
+  ctx.font = "900 31px Georgia, Times, serif";
+  wrapText("Cash receipts stayed protected from receipt to recording.", 430, 152, 760, 38);
+  ctx.fillStyle = "#556f80";
+  ctx.font = "600 18px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(
+    "Your role touched one part of the process, but the six control activities worked together across the whole office.",
+    430,
+    218,
+    740,
+    26
+  );
+
+  drawProcessMap(430, 272);
+  drawControlSummary(430, 398);
+
+  drawCanvasButton(506, 642, 242, 56, "Back To Menu", false);
+  interactiveRegions.push({
+    x: 506,
+    y: 642,
+    w: 242,
+    h: 56,
+    action: { type: "back-to-menu" },
+  });
+  drawCanvasButton(776, 642, 270, 56, "Replay This Role", true);
+  interactiveRegions.push({
+    x: 776,
+    y: 642,
+    w: 270,
+    h: 56,
+    action: { type: "replay-role" },
+  });
+}
+
+function drawProcessMap(x, y) {
+  const steps = [
+    { label: "Receive Payment", color: "#ef8b55" },
+    { label: "Log And Handoff", color: "#5fa9dd" },
+    { label: "Secure And Deposit", color: "#62b986" },
+    { label: "Record And Reconcile", color: "#e5ba53" },
+  ];
+
+  steps.forEach((step, index) => {
+    const boxX = x + index * 185;
+    roundRectPath(boxX, y, 158, 76, 22);
+    ctx.fillStyle = "rgba(245, 249, 251, 0.94)";
+    ctx.fill();
+    ctx.fillStyle = step.color;
+    ctx.beginPath();
+    ctx.arc(boxX + 26, y + 24, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#173245";
+    ctx.font = "800 17px Avenir Next, Trebuchet MS, sans-serif";
+    wrapText(step.label, boxX + 46, y + 28, 94, 22);
+    if (index < steps.length - 1) {
+      ctx.strokeStyle = "rgba(22, 49, 66, 0.18)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(boxX + 158, y + 38);
+      ctx.lineTo(boxX + 185, y + 38);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(boxX + 177, y + 32);
+      ctx.lineTo(boxX + 185, y + 38);
+      ctx.lineTo(boxX + 177, y + 44);
+      ctx.stroke();
+    }
+  });
+}
+
+function drawControlSummary(x, y) {
+  let cursorY = y;
+  for (const key of CONTROL_ORDER) {
+    const meta = CONTROL_META[key];
+    roundRectPath(x, cursorY, 760, 34, 16);
+    ctx.fillStyle = "rgba(245, 249, 251, 0.94)";
+    ctx.fill();
+    ctx.fillStyle = meta.color;
+    ctx.beginPath();
+    ctx.arc(x + 20, cursorY + 17, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#173245";
+    ctx.font = "800 14px Avenir Next, Trebuchet MS, sans-serif";
+    ctx.fillText(meta.label, x + 38, cursorY + 15);
+    ctx.fillStyle = "#607b8c";
+    ctx.font = "600 12px Avenir Next, Trebuchet MS, sans-serif";
+    const note = state.run.controlNotes[key] || meta.detail;
+    ctx.fillText(note, x + 38, cursorY + 29);
+    cursorY += 38;
+  }
+}
+
+function drawOverlayPanel(title, copy, color, footerLines) {
+  roundRectPath(472, 208, 632, 254, 34);
+  ctx.fillStyle = "rgba(255, 250, 243, 0.95)";
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.font = "900 16px Avenir Next, Trebuchet MS, sans-serif";
+  ctx.fillText("PAUSE", 520, 250);
+  ctx.fillStyle = "#163142";
+  ctx.font = "900 34px Georgia, Times, serif";
+  ctx.fillText(title, 520, 296);
+  ctx.fillStyle = "#566f80";
+  ctx.font = "600 19px Avenir Next, Trebuchet MS, sans-serif";
+  wrapText(copy, 520, 334, 526, 28);
+  ctx.font = "700 15px Avenir Next, Trebuchet MS, sans-serif";
+  footerLines.forEach((line, index) => {
+    ctx.fillText(line, 520, 414 + index * 24);
+  });
+}
+
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(/\s+/);
+  let line = "";
+  let lineIndex = 0;
+  for (let i = 0; i < words.length; i += 1) {
+    const testLine = line ? `${line} ${words[i]}` : words[i];
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      ctx.fillText(line, x, y + lineIndex * lineHeight);
+      line = words[i];
+      lineIndex += 1;
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) {
+    ctx.fillText(line, x, y + lineIndex * lineHeight);
+    return y + (lineIndex + 1) * lineHeight;
+  }
+  return y;
+}
+
+function update(dt) {
+  const run = getCurrentRun();
+  if (!run || state.mode !== "shift" || state.paused) {
+    return;
+  }
+
+  let moveX = 0;
+  let moveY = 0;
+  if (keysDown.has("arrowup") || keysDown.has("w")) {
+    moveY -= 1;
+  }
+  if (keysDown.has("arrowdown") || keysDown.has("s")) {
+    moveY += 1;
+  }
+  if (keysDown.has("arrowleft") || keysDown.has("a")) {
+    moveX -= 1;
+  }
+  if (keysDown.has("arrowright") || keysDown.has("d")) {
+    moveX += 1;
+  }
+
+  if (!moveX && !moveY) {
+    return;
+  }
+
+  const magnitude = Math.hypot(moveX, moveY) || 1;
+  const speed = 2.8;
+  const next = {
+    x: run.player.x + (moveX / magnitude) * speed * dt,
+    y: run.player.y + (moveY / magnitude) * speed * dt,
+  };
+  constrainPlayer(next);
+  resolveCollisions(next);
+  run.player.x = next.x;
+  run.player.y = next.y;
+}
+
+function constrainPlayer(pos) {
+  pos.x = clamp(pos.x, 0.34, ROOM.width - 0.34);
+  pos.y = clamp(pos.y, 0.34, ROOM.depth - 0.34);
+}
+
+function resolveCollisions(pos) {
+  const radius = 0.18;
+  for (const station of STATION_LIST) {
+    const minX = station.x - radius;
+    const maxX = station.x + station.w + radius;
+    const minY = station.y - radius;
+    const maxY = station.y + station.d + radius;
+    const insideX = pos.x > minX && pos.x < maxX;
+    const insideY = pos.y > minY && pos.y < maxY;
+    if (insideX && insideY) {
+      const distances = [
+        { axis: "x", value: Math.abs(pos.x - minX), target: minX },
+        { axis: "x", value: Math.abs(maxX - pos.x), target: maxX },
+        { axis: "y", value: Math.abs(pos.y - minY), target: minY },
+        { axis: "y", value: Math.abs(maxY - pos.y), target: maxY },
+      ];
+      distances.sort((a, b) => a.value - b.value);
+      const nearest = distances[0];
+      pos[nearest.axis] = nearest.target;
+    }
+  }
+}
+
+function isNearStation(player, station) {
+  const centerX = station.x + station.w / 2;
+  const centerY = station.y + station.d / 2;
+  return Math.hypot(player.x - centerX, player.y - centerY) <= 1.55;
+}
+
+function choosePromptOption(index) {
+  const question = getCurrentQuestion();
+  const run = getCurrentRun();
+  if (!question || !run) {
+    return;
+  }
+  const chosen = question.options[index];
+  if (!chosen) {
+    return;
+  }
+
+  if (!chosen.correct) {
+    run.score = Math.max(0, run.score - 8);
+    run.risk = clamp(run.risk + 14, 0, 100);
+    const controlKey = state.mode === "briefing" ? "human" : getCurrentStep().control;
+    run.incidents.push({
+      control: controlKey,
+      text: chosen.consequence,
+    });
+    state.consequence = {
+      text: chosen.consequence,
+      recovery:
+        "Return to the prompt and choose the action that preserves documentation, separation, accountability, or secure custody.",
+    };
+    state.mode = "consequence";
+    state.promptSelection = 0;
+    announce(`Incorrect choice. ${chosen.consequence}`);
+    return;
+  }
+
+  if (state.mode === "briefing") {
+    run.controls.human = true;
+    run.controlNotes.human = chosen.feedback;
+    run.score += 12;
+    run.risk = clamp(run.risk - 6, 0, 100);
+    run.briefingSolved = true;
+    state.mode = "shift";
+    state.promptSelection = 0;
+    announce(`Briefing complete. ${getObjectiveText()}`);
+    return;
+  }
+
+  const step = getCurrentStep();
+  run.controls[step.control] = true;
+  run.controlNotes[step.control] = chosen.feedback;
+  run.completedSteps.push(step.id);
+  run.score += 18;
+  run.risk = clamp(run.risk - 5, 0, 100);
+  run.stepIndex += 1;
+  state.promptSelection = 0;
+
+  if (run.stepIndex >= run.role.steps.length) {
+    state.mode = "debrief";
+    announce("Shift complete. Review the debrief.");
+  } else {
+    state.mode = "shift";
+    announce(`Control secured. ${getObjectiveText()}`);
+  }
+}
+
+function handleAction(action) {
+  if (!action) {
+    return;
+  }
+  if (action.type === "select-role") {
+    state.selectedRoleIndex = action.index;
+    announce(`Selected role: ${getSelectedRole().title}`);
+    return;
+  }
+  if (action.type === "start-role") {
+    startRole(getSelectedRoleId());
+    return;
+  }
+  if (action.type === "how-to-play") {
+    state.mode = "help";
+    announce("How to play opened. Review the controls, then press Enter or Escape to return to the menu.");
+    return;
+  }
+  if (action.type === "choose-option") {
+    state.promptSelection = action.index;
+    choosePromptOption(action.index);
+    return;
+  }
+  if (action.type === "retry-after-consequence") {
+    state.mode = state.run && state.run.briefingSolved ? "prompt" : "briefing";
+    announce("Retry the prompt with the secure choice.");
+    return;
+  }
+  if (action.type === "back-to-menu") {
+    resetToMenu();
+    announce("Returned to the menu.");
+    return;
+  }
+  if (action.type === "replay-role") {
+    restartCurrentRole();
+  }
+}
+
+function moveMenuSelection(delta) {
+  const total = ROLE_ORDER.length;
+  state.selectedRoleIndex = (state.selectedRoleIndex + delta + total) % total;
+  announce(`Selected role: ${getSelectedRole().title}`);
+}
+
+function movePromptSelection(delta) {
+  const question = getCurrentQuestion();
+  if (!question) {
+    return;
+  }
+  const total = question.options.length;
+  state.promptSelection = (state.promptSelection + delta + total) % total;
+}
+
+function interactAtStation() {
+  const run = getCurrentRun();
+  if (!run || state.mode !== "shift" || state.paused) {
+    return;
+  }
+  const station = currentActiveStation();
+  if (!station || !isNearStation(run.player, station)) {
+    return;
+  }
+  state.mode = "prompt";
+  state.promptSelection = 0;
+  announce(`Decision point. ${getCurrentStep().title}`);
+}
+
+function handleNumberKey(value) {
+  if (state.mode === "menu") {
+    const index = Number(value) - 1;
+    if (index >= 0 && index < ROLE_ORDER.length) {
+      state.selectedRoleIndex = index;
+      announce(`Selected role: ${getSelectedRole().title}`);
+    }
+    return;
+  }
+  if (state.mode === "briefing" || state.mode === "prompt") {
+    const index = Number(value) - 1;
+    const question = getCurrentQuestion();
+    if (question && index >= 0 && index < question.options.length) {
+      state.promptSelection = index;
+      choosePromptOption(index);
+    }
+  }
+}
+
+function togglePause() {
+  if (state.mode !== "shift") {
+    return;
+  }
+  state.paused = !state.paused;
+  announce(state.paused ? "Shift paused." : "Shift resumed.");
+}
+
+async function toggleFullscreen() {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await shell.requestFullscreen();
+    }
+  } catch (error) {
+    announce("Fullscreen toggle failed.");
+  }
+}
+
+window.addEventListener("keydown", (event) => {
+  const key = event.key.toLowerCase();
+
+  if (key === "f") {
+    event.preventDefault();
+    toggleFullscreen();
+    return;
+  }
+
+  if (state.mode === "help") {
+    if (key === "enter" || key === "escape" || key === " ") {
+      event.preventDefault();
+      resetToMenu();
+      announce("Returned to the menu.");
+    }
+    return;
+  }
+
+  if (key >= "1" && key <= "4") {
+    event.preventDefault();
+    handleNumberKey(key);
+    return;
+  }
+
+  if (key === "r") {
+    event.preventDefault();
+    if (state.mode === "menu") {
+      startRole(getSelectedRoleId());
+    } else {
+      restartCurrentRole();
+    }
+    return;
+  }
+
+  if (state.mode === "menu") {
+    if (key === "arrowright" || key === "d") {
+      event.preventDefault();
+      moveMenuSelection(1);
+    } else if (key === "arrowleft" || key === "a") {
+      event.preventDefault();
+      moveMenuSelection(-1);
+    } else if (key === "arrowdown" || key === "s") {
+      event.preventDefault();
+      moveMenuSelection(2);
+    } else if (key === "arrowup" || key === "w") {
+      event.preventDefault();
+      moveMenuSelection(-2);
+    } else if (key === "enter") {
+      event.preventDefault();
+      startRole(getSelectedRoleId());
+    }
+    return;
+  }
+
+  if (state.mode === "briefing" || state.mode === "prompt") {
+    if (key === "arrowdown" || key === "s" || key === "arrowright" || key === "d") {
+      event.preventDefault();
+      movePromptSelection(1);
+    } else if (key === "arrowup" || key === "w" || key === "arrowleft" || key === "a") {
+      event.preventDefault();
+      movePromptSelection(-1);
+    } else if (key === "enter") {
+      event.preventDefault();
+      choosePromptOption(state.promptSelection);
+    }
+    return;
+  }
+
+  if (state.mode === "consequence") {
+    if (key === "enter" || key === " ") {
+      event.preventDefault();
+      state.mode = state.run && state.run.briefingSolved ? "prompt" : "briefing";
+      announce("Retry the secure choice.");
+    }
+    return;
+  }
+
+  if (state.mode === "debrief") {
+    if (key === "enter") {
+      event.preventDefault();
+      resetToMenu();
+      announce("Returned to the menu.");
+    }
+    return;
+  }
+
+  if (state.mode === "shift") {
+    if (key === " ") {
+      event.preventDefault();
+      togglePause();
+      return;
+    }
+    if ((key === "e" || key === "enter") && !state.paused) {
+      event.preventDefault();
+      interactAtStation();
+      return;
+    }
+    keysDown.add(key);
+  }
+});
+
+window.addEventListener("keyup", (event) => {
+  keysDown.delete(event.key.toLowerCase());
+});
+
+canvas.addEventListener("mousemove", (event) => {
+  const point = getCanvasPoint(event);
+  const region = interactiveRegions.find((item) => point.x >= item.x && point.x <= item.x + item.w && point.y >= item.y && point.y <= item.y + item.h);
+  canvas.style.cursor = region ? "pointer" : "default";
+});
+
+canvas.addEventListener("click", (event) => {
+  const point = getCanvasPoint(event);
+  const region = interactiveRegions.find((item) => point.x >= item.x && point.x <= item.x + item.w && point.y >= item.y && point.y <= item.y + item.h);
+  if (region) {
+    handleAction(region.action);
+  }
+});
+
+function getCanvasPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
+  };
+}
+
+function render() {
+  drawBackdrop();
+  interactiveRegions = [];
+
+  if (state.mode === "menu") {
+    drawMenu();
+  } else if (state.mode === "help") {
+    drawHowToPlay();
+  } else if (state.mode === "briefing") {
+    drawBriefing();
+  } else if (state.mode === "shift") {
+    drawShift();
+  } else if (state.mode === "prompt") {
+    drawPrompt();
+  } else if (state.mode === "consequence") {
+    drawConsequence();
+  } else if (state.mode === "debrief") {
+    drawDebrief();
+  }
+}
+
+let lastFrame = performance.now();
+function frame(now) {
+  if (!state.manualStepping) {
+    const dt = Math.min(0.05, (now - lastFrame) / 1000);
+    lastFrame = now;
+    update(dt);
+  } else {
+    lastFrame = now;
+  }
+  render();
+  requestAnimationFrame(frame);
+}
+
+window.advanceTime = (ms) => {
+  state.manualStepping = true;
+  const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+  for (let i = 0; i < steps; i += 1) {
+    update(1 / 60);
+  }
+  render();
+  return Promise.resolve();
+};
+
+function renderGameToText() {
+  const run = getCurrentRun();
+  const activeStation = currentActiveStation();
+  const nearby = [];
+  if (run && activeStation) {
+    nearby.push({
+      id: activeStation.id,
+      label: activeStation.label,
+      active: true,
+      inRange: isNearStation(run.player, activeStation),
+    });
+  }
+  const payload = {
+    mode: state.paused ? "paused" : state.mode,
+    selectedRole: run ? run.roleId : getSelectedRoleId(),
+    room: state.mode === "help" ? "how to play" : run ? "cash receipts operations floor" : "menu",
+    objective: getObjectiveText(),
+    coordinateSystem:
+      "World origin is the top-left of the room footprint; x increases toward the supervisor and cashier side, y increases toward the accounting side.",
+    playerPosition: run
+      ? {
+          x: Number(run.player.x.toFixed(2)),
+          y: Number(run.player.y.toFixed(2)),
+          nearestStation: activeStation ? activeStation.id : null,
+        }
+      : null,
+    nearbyInteractables: nearby,
+    controlChecklist: run ? run.controls : deepCloneControls(),
+    riskMeter: run ? run.risk : 0,
+    score: run ? run.score : 0,
+    completionState: run
+      ? {
+          completedControls: CONTROL_ORDER.filter((key) => run.controls[key]).length,
+          totalControls: CONTROL_ORDER.length,
+          currentStep: Math.min(run.stepIndex + (run.briefingSolved ? 2 : 1), 6),
+          mistakes: run.incidents.length,
+          finished: state.mode === "debrief",
+        }
+      : {
+          completedControls: 0,
+          totalControls: CONTROL_ORDER.length,
+          currentStep: 0,
+          mistakes: 0,
+          finished: false,
+        },
+  };
+  return JSON.stringify(payload);
+}
+
+window.render_game_to_text = renderGameToText;
+window.__cashReceiptsLabDebug = {
+  startRole,
+  restartCurrentRole,
+  interactAtStation,
+  getSnapshot() {
+    return JSON.parse(renderGameToText());
+  },
+  answer(optionIndex) {
+    if (state.mode === "briefing" || state.mode === "prompt") {
+      choosePromptOption(optionIndex);
+    }
+  },
+  answerCorrect() {
+    const question = getCurrentQuestion();
+    if (!question) {
+      return;
+    }
+    const index = question.options.findIndex((item) => item.correct);
+    if (index >= 0) {
+      choosePromptOption(index);
+    }
+  },
+  answerWrong() {
+    const question = getCurrentQuestion();
+    if (!question) {
+      return;
+    }
+    const index = question.options.findIndex((item) => !item.correct);
+    if (index >= 0) {
+      choosePromptOption(index);
+    }
+  },
+  retry() {
+    if (state.mode === "consequence") {
+      state.mode = state.run && state.run.briefingSolved ? "prompt" : "briefing";
+    }
+  },
+  teleportToActiveStation() {
+    const run = getCurrentRun();
+    const station = currentActiveStation();
+    if (!run || !station) {
+      return;
+    }
+    run.player.x = station.x + station.w / 2;
+    run.player.y = station.y + station.d + 0.2;
+    constrainPlayer(run.player);
+    render();
+  },
+};
+
+document.addEventListener("fullscreenchange", () => {
+  announce(document.fullscreenElement ? "Fullscreen enabled." : "Fullscreen exited.");
+});
+
+announce("Cash Receipts Control Lab loaded. Choose a role to begin.");
+render();
+requestAnimationFrame(frame);
+
+</script>
+  </body>
+</html>
