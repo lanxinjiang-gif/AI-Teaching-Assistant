@@ -25,6 +25,7 @@
   --shadow-soft: 0 12px 28px rgba(5, 12, 18, 0.14);
   --radius: 18px;
   --radius-soft: 12px;
+  --meeting-topbar-height: 52px;
   color-scheme: light;
   font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
@@ -100,9 +101,9 @@ button:focus-visible,
 }
 
 .app-shell {
-  width: min(1450px, calc(100% - 40px));
+  width: min(1320px, calc(100% - 52px));
   margin: 0 auto;
-  padding: 92px 0 34px;
+  padding: 84px 0 28px;
 }
 
 .hero-panel,
@@ -113,11 +114,11 @@ button:focus-visible,
 }
 
 .hero-panel {
-  min-height: 240px;
+  min-height: 216px;
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.8fr);
-  gap: 28px;
-  padding: 28px 30px;
+  gap: 24px;
+  padding: 24px 26px;
   border-radius: 34px;
   background:
     radial-gradient(circle at 85% 20%, rgba(27, 114, 134, 0.18), transparent 14rem),
@@ -169,16 +170,16 @@ button:focus-visible,
 
 .hero-copy h1 {
   margin: 0 0 14px;
-  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-size: clamp(2.45rem, 4.4vw, 4.4rem);
   line-height: 0.92;
 }
 
 .hero-text {
-  max-width: 42rem;
+  max-width: 38rem;
   margin: 0;
   color: rgba(255, 250, 242, 0.82);
-  font-size: 1.08rem;
-  line-height: 1.62;
+  font-size: 1rem;
+  line-height: 1.56;
 }
 
 .hero-meta {
@@ -214,13 +215,13 @@ button:focus-visible,
 .role-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 18px;
+  gap: 14px;
+  margin-top: 16px;
 }
 
 .role-card {
-  min-height: 182px;
-  padding: 18px;
+  min-height: 168px;
+  padding: 16px;
   border: 1px solid rgba(255, 250, 242, 0.14);
   border-radius: 24px;
   background: rgba(255, 250, 242, 0.72);
@@ -249,7 +250,7 @@ button:focus-visible,
 
 .role-card h2 {
   margin: 0 0 10px;
-  font-size: 1.4rem;
+  font-size: 1.28rem;
   line-height: 1.02;
 }
 
@@ -262,8 +263,8 @@ button:focus-visible,
 .workspace {
   display: grid;
   grid-template-columns: minmax(270px, 0.75fr) minmax(0, 1.6fr) minmax(290px, 0.82fr);
-  gap: 18px;
-  margin-top: 22px;
+  gap: 16px;
+  margin-top: 20px;
 }
 
 .symptom-panel,
@@ -279,11 +280,11 @@ button:focus-visible,
 
 .symptom-panel,
 .evidence-panel {
-  padding: 22px;
+  padding: 20px;
 }
 
 .stage-panel {
-  padding: 26px;
+  padding: 22px;
   background:
     linear-gradient(180deg, rgba(255, 250, 242, 0.92), rgba(246, 241, 232, 0.88));
   overflow: visible;
@@ -294,7 +295,7 @@ button:focus-visible,
 .stage-top h2,
 .summary-copy h2 {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.62rem;
   line-height: 1.02;
 }
 
@@ -376,8 +377,8 @@ button:focus-visible,
 .scene-prompt {
   margin: 0;
   color: rgba(255, 250, 242, 0.82);
-  font-size: 0.96rem;
-  line-height: 1.48;
+  font-size: 0.86rem;
+  line-height: 1.36;
 }
 
 .meeting-launch {
@@ -403,9 +404,9 @@ button:focus-visible,
   inset: 0;
   z-index: 30;
   display: flex;
-  align-items: start;
+  align-items: stretch;
   justify-content: center;
-  padding: 28px 20px 24px;
+  padding: 0;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
@@ -420,24 +421,30 @@ button:focus-visible,
 }
 
 .meeting-float {
-  width: min(1180px, calc(100vw - 160px));
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
   display: grid;
-  gap: 14px;
+  grid-template-rows: var(--meeting-topbar-height) minmax(0, 1fr);
+  gap: 0;
   background: transparent;
 }
 
 .meeting-float-head {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  min-height: var(--meeting-topbar-height);
+  height: var(--meeting-topbar-height);
+  padding: 6px 16px 4px;
 }
 
 .meeting-float-head h3 {
   margin: 0;
   color: #0d1722;
   font-family: "Iowan Old Style", "Palatino Linotype", serif;
-  font-size: 1.7rem;
+  font-size: 1.28rem;
   line-height: 1.02;
   text-shadow: none;
 }
@@ -446,14 +453,23 @@ button:focus-visible,
   color: rgba(13, 23, 34, 0.72);
 }
 
+.meeting-float-head .secondary-button {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.84rem;
+}
+
 .meeting-room-shell {
   position: relative;
   margin-top: 0;
   display: grid;
-  grid-template-rows: minmax(500px, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   width: 100%;
+  min-height: 100%;
+  height: 100%;
+  max-height: 100%;
   border: 1px solid rgba(255, 250, 242, 0.1);
-  border-radius: 24px;
+  border-radius: 0;
   overflow: visible;
   background: rgba(14, 22, 30, 0.28);
   box-shadow: inset 0 1px 0 rgba(255, 250, 242, 0.12);
@@ -463,12 +479,12 @@ button:focus-visible,
 
 .meeting-scene {
   position: relative;
-  min-height: 500px;
+  min-height: 0;
   background:
     radial-gradient(circle at 50% 18%, rgba(255, 248, 228, 0.12), transparent 18rem),
     linear-gradient(180deg, #1a2632 0%, #111a22 100%);
   border-bottom: 1px solid rgba(255, 250, 242, 0.1);
-  border-radius: 24px 24px 0 0;
+  border-radius: 0;
   overflow: visible;
   isolation: isolate;
 }
@@ -505,17 +521,34 @@ button:focus-visible,
   opacity: 1;
 }
 
-.dialog-bubble::after {
-  content: "";
+.dialog-bubble > :not(.dialog-pointer) {
+  position: relative;
+  z-index: 1;
+}
+
+.dialog-pointer {
   position: absolute;
-  left: var(--bubble-tail-left, 22px);
-  bottom: -10px;
+  left: var(--bubble-pointer-left, auto);
+  right: var(--bubble-pointer-right, auto);
+  top: var(--bubble-pointer-top, 70%);
   width: 18px;
   height: 18px;
   background: inherit;
-  border-right: inherit;
-  border-bottom: inherit;
-  transform: rotate(45deg);
+  border: inherit;
+  border-radius: 4px;
+  z-index: 0;
+}
+
+.dialog-bubble[data-tail-side="right"] .dialog-pointer {
+  transform: translate(50%, -50%) rotate(45deg);
+  border-left: none;
+  border-bottom: none;
+}
+
+.dialog-bubble[data-tail-side="left"] .dialog-pointer {
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-right: none;
+  border-top: none;
 }
 
 .dialog-bubble[data-role="accounting"] {
@@ -532,10 +565,11 @@ button:focus-visible,
 
 .dialog-speaker {
   display: block;
-  margin-bottom: 6px;
-  font-size: 0.76rem;
+  margin-bottom: 7px;
+  font-size: 0.72rem;
   font-weight: 820;
   letter-spacing: 0.08em;
+  line-height: 1.15;
   text-transform: uppercase;
 }
 
@@ -607,8 +641,12 @@ button:focus-visible,
   margin: 0;
   z-index: 4;
   display: grid;
-  gap: 10px;
-  padding: 14px 16px 16px;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 6px;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  padding: 10px 16px 12px;
   border: 0;
   border-top: 1px solid rgba(255, 250, 242, 0.1);
   border-radius: 0;
@@ -616,12 +654,13 @@ button:focus-visible,
     linear-gradient(180deg, rgba(9, 18, 26, 0.92), rgba(9, 18, 26, 0.98));
   color: #fffaf2;
   backdrop-filter: blur(14px);
+  overflow: hidden;
 }
 
 .console-kicker {
-  margin: 0 0 7px;
+  margin: 0 0 4px;
   color: rgba(255, 250, 242, 0.64);
-  font-size: 0.74rem;
+  font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -630,15 +669,15 @@ button:focus-visible,
 .speaker-rail {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .speaker-chip {
-  min-height: 38px;
+  min-height: 32px;
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 8px 11px;
+  gap: 7px;
+  padding: 6px 9px;
   border: 1px solid rgba(255, 250, 242, 0.12);
   border-radius: 999px;
   background: rgba(255, 250, 242, 0.08);
@@ -664,14 +703,14 @@ button:focus-visible,
 
 .speaker-chip-label {
   color: rgba(255, 250, 242, 0.62);
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .speaker-chip-name {
-  font-size: 0.86rem;
+  font-size: 0.79rem;
   font-weight: 760;
 }
 
@@ -731,17 +770,20 @@ button:focus-visible,
 .choice-form {
   margin: 0;
   display: grid;
-  gap: 10px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .choice-area {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  max-height: min(244px, 34vh);
+  gap: 10px;
+  min-height: 0;
+  max-height: none;
   overflow: auto;
-  padding: 4px 8px 10px 2px;
+  padding: 2px 6px 6px 2px;
 }
 
 .choice-button {
@@ -750,10 +792,10 @@ button:focus-visible,
   display: flex;
   align-items: start;
   justify-content: flex-start;
-  gap: 12px;
-  padding: 16px 18px 17px;
+  gap: 10px;
+  padding: 11px 14px 12px;
   border: 1px solid rgba(27, 114, 134, 0.14);
-  border-radius: 22px;
+  border-radius: 18px;
   background: linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(239, 230, 216, 0.88));
   color: var(--ink);
   cursor: pointer;
@@ -765,10 +807,10 @@ button:focus-visible,
 .choice-button::after {
   content: "";
   position: absolute;
-  left: 22px;
-  bottom: -10px;
-  width: 18px;
-  height: 18px;
+  left: 18px;
+  bottom: -8px;
+  width: 14px;
+  height: 14px;
   background: inherit;
   border-right: inherit;
   border-bottom: inherit;
@@ -797,9 +839,9 @@ button:focus-visible,
 
 .choice-label {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  line-height: 1.38;
+  line-height: 1.32;
 }
 
 .choice-hint {
@@ -811,17 +853,17 @@ button:focus-visible,
 
 .choice-marker {
   margin-left: auto;
-  min-width: 42px;
-  height: 34px;
+  min-width: 38px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
+  padding: 0 8px;
   border-radius: 999px;
   border: 1px solid rgba(27, 114, 134, 0.16);
   background: rgba(255, 255, 255, 0.72);
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 820;
 }
 
@@ -834,13 +876,13 @@ button:focus-visible,
 .stage-actions {
   display: flex;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .primary-button,
 .secondary-button {
-  min-height: 48px;
-  padding: 0 18px;
+  min-height: 40px;
+  padding: 0 16px;
   border-radius: 999px;
   border: 1px solid transparent;
   font-weight: 780;
@@ -878,10 +920,12 @@ button:disabled {
 
 .feedback-card {
   margin-top: 0;
-  padding: 16px 18px;
+  max-height: 112px;
+  padding: 12px 14px;
   border-radius: 18px;
   border: 1px solid rgba(27, 114, 134, 0.16);
   background: linear-gradient(180deg, rgba(217, 238, 241, 0.56), rgba(255, 250, 242, 0.92));
+  overflow: auto;
 }
 
 .feedback-card strong {
@@ -1110,6 +1154,10 @@ button:disabled {
 }
 
 @media (max-width: 880px) {
+  :root {
+    --meeting-topbar-height: 56px;
+  }
+
   .app-shell {
     width: min(100%, calc(100% - 24px));
     padding-top: 82px;
@@ -1137,11 +1185,11 @@ button:disabled {
   }
 
   .meeting-room-shell {
-    grid-template-rows: minmax(470px, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
   }
 
   .meeting-scene {
-    min-height: 470px;
+    min-height: 0;
   }
 
   .dialog-bubble {
@@ -1149,11 +1197,15 @@ button:disabled {
   }
 
   .meeting-float {
-    width: min(calc(100vw - 32px), 980px);
+    width: 100vw;
   }
 }
 
 @media (max-width: 620px) {
+  :root {
+    --meeting-topbar-height: 64px;
+  }
+
   .repo-link {
     right: 12px;
     top: 12px;
@@ -1179,22 +1231,22 @@ button:disabled {
   }
 
   .meeting-room-shell {
-    border-radius: 20px;
-    grid-template-rows: minmax(430px, 1fr) auto;
+    border-radius: 0;
+    grid-template-rows: minmax(0, 1fr) auto;
   }
 
   .meeting-scene {
-    min-height: 430px;
+    min-height: 0;
   }
 
   .meeting-console {
     width: 100%;
-    padding: 14px;
+    padding: 10px 14px 14px;
     border-radius: 0;
   }
 
   .meeting-popout {
-    padding: 16px 12px 18px;
+    padding: 0;
   }
 
   .meeting-float {
@@ -1204,6 +1256,10 @@ button:disabled {
   .meeting-float-head {
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
+    min-height: var(--meeting-topbar-height);
+    height: var(--meeting-topbar-height);
+    padding: 8px 14px 6px;
   }
 
   .dialog-bubble {
@@ -1461,10 +1517,22 @@ const evidenceCatalog = {
 
 const THREE_CDN = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 let rendererAdapter = null;
+const DIALOG_OVERLAP_STEP = 34;
+const DIALOG_OVERLAP_PADDING = 12;
 const dialogBubbleAnchors = {
-  accounting: { x: 0.77, y: 0.68, tail: 24 },
-  purchasing: { x: 0.22, y: 0.68, tail: 24 },
-  hr: { x: 0.5, y: 0.44, tail: 50 }
+  accounting: { x: 0.74, y: 0.83, align: "start", tailSide: "left", tailOffset: "56%", sideGap: 8, bottomGap: 10 },
+  purchasing: { x: 0.2, y: 0.81, align: "end", tailSide: "right", tailOffset: "56%", sideGap: 10, bottomGap: 10 },
+  hr: { x: 0.5, y: 0.61, align: "end", tailSide: "right", tailOffset: "52%", sideGap: 10, bottomGap: 10 }
+};
+const dialogBubbleSceneAnchors = {
+  opener: {
+    accounting: { x: 0.77 },
+    purchasing: { x: 0.2, y: 0.86, mobileLaneBottom: 0.9 },
+    hr: { x: 0.2, y: 0.5, mobileLaneBottom: 0.46 }
+  },
+  "purchasing-question": {
+    accounting: { x: 0.78 }
+  }
 };
 
 const scenes = [
@@ -1948,14 +2016,17 @@ function renderDialogLayer() {
     roleStacks.set(turn.role, stackIndex + 1);
 
     const bubble = document.createElement("article");
-    bubble.className = `dialog-bubble${turn.preview ? " is-preview" : ""}`;
+    bubble.className = `dialog-bubble is-hidden${turn.preview ? " is-preview" : ""}`;
     bubble.dataset.role = turn.role;
     bubble.dataset.stack = String(stackIndex);
-    bubble.innerHTML = `<p>${turn.text}</p>`;
+    bubble.innerHTML = `
+      <span class="dialog-speaker">${turn.speaker || roleLabel(turn.role)}</span>
+      <p>${turn.text}</p>
+      <span class="dialog-pointer" aria-hidden="true"></span>
+    `;
     elements.dialogLayer.appendChild(bubble);
   });
 
-  positionDialogBubbles();
   requestAnimationFrame(() => {
     positionDialogBubbles();
   });
@@ -1978,26 +2049,256 @@ function positionDialogBubblesFallback() {
   const layer = elements.dialogLayer;
   const width = layer.clientWidth || layer.parentElement?.clientWidth || 1;
   const height = layer.clientHeight || layer.parentElement?.clientHeight || 1;
-  const bubbles = layer.querySelectorAll(".dialog-bubble[data-role]");
+  const bubbles = Array.from(layer.querySelectorAll(".dialog-bubble[data-role]"))
+    .sort((left, right) => {
+      const leftBase = resolveDialogBubbleAnchor(left.dataset.role);
+      const rightBase = resolveDialogBubbleAnchor(right.dataset.role);
+      if (leftBase.y !== rightBase.y) {
+        return leftBase.y - rightBase.y;
+      }
+      return leftBase.x - rightBase.x;
+    });
+  const placedRects = [];
 
   bubbles.forEach((bubble, index) => {
     const roleId = bubble.dataset.role;
     const bubbleWidth = bubble.offsetWidth || 280;
     const bubbleHeight = bubble.offsetHeight || 124;
     const stackShift = Number(bubble.dataset.stack || index) * 98;
-    const base = dialogBubbleAnchors[roleId] || { x: 0.5, y: 0.5, tail: 24 };
-    const safeX = bubbleWidth * 0.5 + 18;
+    const base = resolveDialogBubbleAnchor(roleId);
     const safeY = bubbleHeight + 18;
     const rawX = base.x * width;
     const rawY = (base.y * height) - stackShift;
-    const x = clamp(rawX, safeX, width - safeX);
-    const y = clamp(rawY, safeY, height - 32);
+    const placement = resolveDialogBubblePlacement({
+      rawX,
+      rawY,
+      anchorX: rawX,
+      anchorY: rawY,
+      bubbleWidth,
+      bubbleHeight,
+      width,
+      height,
+      safeY,
+      base,
+      placedRects
+    });
 
-    bubble.style.setProperty("--bubble-tail-left", `${base.tail}px`);
-    bubble.style.left = `${x}px`;
-    bubble.style.top = `${y}px`;
-    bubble.classList.remove("is-hidden");
+    applyDialogBubbleStyles(bubble, {
+      x: placement.x,
+      y: placement.y,
+      base,
+      pointerTop: placement.pointerTop
+    });
   });
+}
+
+function resolveDialogBubbleAnchor(roleId) {
+  const fallback = dialogBubbleAnchors[roleId] || {
+    x: 0.5,
+    y: 0.5,
+    align: "end",
+    tailSide: "right",
+    tailOffset: "70%",
+    sideGap: 10,
+    bottomGap: 10
+  };
+
+  const sceneId = scenes[state.sceneIndex]?.id;
+  const sceneOverride = sceneId ? dialogBubbleSceneAnchors[sceneId]?.[roleId] : null;
+  return sceneOverride ? { ...fallback, ...sceneOverride } : fallback;
+}
+
+function computeDialogBubbleLeft(rawX, bubbleWidth, width, align) {
+  const minX = 18 + (bubbleWidth * 0.5);
+  const maxX = width - (bubbleWidth * 0.5) - 18;
+
+  if (align === "start") {
+    return clamp(rawX + (bubbleWidth * 0.5), minX, maxX);
+  }
+
+  if (align === "end") {
+    return clamp(rawX - (bubbleWidth * 0.5), minX, maxX);
+  }
+
+  return clamp(rawX, minX, maxX);
+}
+
+function resolveDialogBubblePlacement(model) {
+  const anchorX = model.anchorX ?? model.rawX;
+  const anchorY = model.anchorY ?? model.rawY;
+  const sideGap = model.base.sideGap ?? 10;
+  const bottomGap = model.base.bottomGap ?? 10;
+  const useMobileLane = model.width <= 430 && typeof model.base.mobileLaneBottom === "number";
+  const adjustedX = model.base.align === "start"
+    ? anchorX + sideGap
+    : model.base.align === "end"
+      ? anchorX - sideGap
+      : anchorX;
+  const outwardDirection = model.base.align === "start"
+    ? 1
+    : model.base.align === "end"
+      ? -1
+      : 0;
+  const horizontalShifts = outwardDirection === 0
+    ? [0]
+    : [0, 48, 96, 144, 192];
+  const verticalShifts = [0, -DIALOG_OVERLAP_STEP, -DIALOG_OVERLAP_STEP * 2, DIALOG_OVERLAP_STEP, -DIALOG_OVERLAP_STEP * 3, DIALOG_OVERLAP_STEP * 2];
+  let bestCandidate = null;
+
+  for (const horizontalShift of horizontalShifts) {
+    for (const verticalShift of verticalShifts) {
+      const candidateX = computeDialogBubbleLeft(
+        adjustedX + (outwardDirection * horizontalShift),
+        model.bubbleWidth,
+        model.width,
+        model.base.align
+      );
+      const targetBottom = useMobileLane
+        ? (model.height * model.base.mobileLaneBottom)
+        : (anchorY + bottomGap);
+      const candidateY = clamp(targetBottom + verticalShift, model.safeY, model.height - 32);
+      const rect = getDialogBubbleRect(candidateX, candidateY, model.bubbleWidth, model.bubbleHeight);
+      const overlapPenalty = getDialogBubbleOverlapPenalty(rect, model.placedRects);
+      const distancePenalty = (horizontalShift * 0.8) + Math.abs(verticalShift);
+      const candidate = {
+        x: candidateX,
+        y: candidateY,
+        rect,
+        overlapPenalty,
+        distancePenalty
+      };
+
+      if (!bestCandidate
+        || overlapPenalty < bestCandidate.overlapPenalty
+        || (overlapPenalty === bestCandidate.overlapPenalty && distancePenalty < bestCandidate.distancePenalty)) {
+        bestCandidate = candidate;
+      }
+
+      if (overlapPenalty === 0) {
+        break;
+      }
+    }
+
+    if (bestCandidate?.overlapPenalty === 0) {
+      break;
+    }
+  }
+
+  const finalCandidate = bestCandidate || {
+    x: computeDialogBubbleLeft(adjustedX, model.bubbleWidth, model.width, model.base.align),
+    y: clamp(useMobileLane ? (model.height * model.base.mobileLaneBottom) : (anchorY + bottomGap), model.safeY, model.height - 32),
+    rect: getDialogBubbleRect(
+      computeDialogBubbleLeft(adjustedX, model.bubbleWidth, model.width, model.base.align),
+      clamp(useMobileLane ? (model.height * model.base.mobileLaneBottom) : (anchorY + bottomGap), model.safeY, model.height - 32),
+      model.bubbleWidth,
+      model.bubbleHeight
+    )
+  };
+
+  nudgeDialogBubbleOutward(finalCandidate, model);
+  while (model.placedRects.some((placed) => dialogBubbleRectsOverlap(finalCandidate.rect, placed))) {
+    const nextY = clamp(finalCandidate.y - DIALOG_OVERLAP_STEP, model.safeY, model.height - 32);
+    if (nextY === finalCandidate.y) {
+      break;
+    }
+    finalCandidate.y = nextY;
+    finalCandidate.rect = getDialogBubbleRect(finalCandidate.x, finalCandidate.y, model.bubbleWidth, model.bubbleHeight);
+  }
+
+  model.placedRects.push(finalCandidate.rect);
+  return {
+    x: finalCandidate.x,
+    y: finalCandidate.y,
+    pointerTop: clamp(anchorY - finalCandidate.rect.top, 20, model.bubbleHeight - 20)
+  };
+}
+
+function getDialogBubbleRect(x, y, bubbleWidth, bubbleHeight) {
+  return {
+    left: x - (bubbleWidth * 0.5),
+    right: x + (bubbleWidth * 0.5),
+    top: y - bubbleHeight,
+    bottom: y
+  };
+}
+
+function dialogBubbleRectsOverlap(left, right) {
+  const horizontalGap = getDialogBubbleGap(left.left, left.right, right.left, right.right);
+  const verticalGap = getDialogBubbleGap(left.top, left.bottom, right.top, right.bottom);
+  return horizontalGap < DIALOG_OVERLAP_PADDING && verticalGap < DIALOG_OVERLAP_PADDING;
+}
+
+function getDialogBubbleOverlapPenalty(rect, placedRects) {
+  return placedRects.reduce((total, placed) => {
+    const horizontalGap = getDialogBubbleGap(rect.left, rect.right, placed.left, placed.right);
+    const verticalGap = getDialogBubbleGap(rect.top, rect.bottom, placed.top, placed.bottom);
+
+    if (horizontalGap >= DIALOG_OVERLAP_PADDING || verticalGap >= DIALOG_OVERLAP_PADDING) {
+      return total;
+    }
+
+    return total
+      + ((DIALOG_OVERLAP_PADDING - horizontalGap) * (DIALOG_OVERLAP_PADDING - verticalGap));
+  }, 0);
+}
+
+function getDialogBubbleGap(startA, endA, startB, endB) {
+  if (endA < startB) {
+    return startB - endA;
+  }
+  if (endB < startA) {
+    return startA - endB;
+  }
+  return 0;
+}
+
+function nudgeDialogBubbleOutward(candidate, model) {
+  const conflicts = model.placedRects.filter((placed) => dialogBubbleRectsOverlap(candidate.rect, placed));
+  if (!conflicts.length) {
+    return;
+  }
+
+  const halfWidth = model.bubbleWidth * 0.5;
+  const minCenterX = 18 + halfWidth;
+  const maxCenterX = model.width - halfWidth - 18;
+
+  if (model.base.align === "start") {
+    const minLeft = Math.max(...conflicts.map((placed) => placed.right + DIALOG_OVERLAP_PADDING));
+    const nextCenterX = clamp(minLeft + halfWidth, minCenterX, maxCenterX);
+    candidate.x = nextCenterX;
+  } else if (model.base.align === "end") {
+    const maxRight = Math.min(...conflicts.map((placed) => placed.left - DIALOG_OVERLAP_PADDING));
+    const nextCenterX = clamp(maxRight - halfWidth, minCenterX, maxCenterX);
+    candidate.x = nextCenterX;
+  }
+
+  candidate.rect = getDialogBubbleRect(candidate.x, candidate.y, model.bubbleWidth, model.bubbleHeight);
+}
+
+function applyDialogBubbleStyles(bubble, model) {
+  bubble.style.left = `${model.x}px`;
+  bubble.style.top = `${model.y}px`;
+  bubble.dataset.tailSide = model.base.tailSide;
+  bubble.style.removeProperty("--bubble-pointer-left");
+  bubble.style.removeProperty("--bubble-pointer-right");
+  bubble.style.removeProperty("--bubble-pointer-top");
+
+  if (model.base.tailSide === "right") {
+    bubble.style.setProperty("--bubble-pointer-right", "0");
+  } else {
+    bubble.style.setProperty("--bubble-pointer-left", "0");
+  }
+
+  bubble.style.setProperty(
+    "--bubble-pointer-top",
+    formatDialogBubbleLength(model.pointerTop ?? model.base.tailOffset)
+  );
+
+  bubble.classList.remove("is-hidden");
+}
+
+function formatDialogBubbleLength(value) {
+  return typeof value === "number" ? `${value}px` : String(value);
 }
 
 function renderEvidence() {
@@ -2175,7 +2476,7 @@ function getPreviewDialog(scene) {
 
   return [{
     role: "accounting",
-    speaker: "Accounting manager · selected answer",
+    speaker: "Accounting manager",
     text: previewText,
     preview: true
   }];
@@ -2272,7 +2573,6 @@ function renderChoices(scene) {
     copy.className = "choice-copy";
     copy.innerHTML = `
       <span class="choice-label">${choice.label}</span>
-      <span class="choice-hint">${choice.hint}</span>
     `;
 
     button.append(copy, marker);
@@ -2860,6 +3160,7 @@ function createMeetingRenderer(THREE, options) {
   const skylineBlocks = [];
   const paperwork = [];
   const projectionVector = new THREE.Vector3();
+  let dialogRefreshTimer = null;
 
   buildLights();
   buildRoom(root);
@@ -3401,7 +3702,7 @@ function createMeetingRenderer(THREE, options) {
       group.add(nose);
 
       const anchor = new THREE.Object3D();
-      anchor.position.set(0, 1.82, 0.18);
+      anchor.position.set(0, 1.18, 0.18);
       group.add(anchor);
 
       const label = createLabelSprite(THREE, person.label, 1.26, 0.26, 34);
@@ -3430,26 +3731,75 @@ function createMeetingRenderer(THREE, options) {
 
     const width = canvas.clientWidth || 1;
     const height = canvas.clientHeight || 1;
-    const bubbles = dialogLayer.querySelectorAll(".dialog-bubble[data-role]");
+    const bubbles = Array.from(dialogLayer.querySelectorAll(".dialog-bubble[data-role]"))
+      .map((bubble) => {
+        const roleId = bubble.dataset.role;
+        const base = resolveDialogBubbleAnchor(roleId);
+        const projectedAnchor = projectDialogAnchor(roleId, width, height);
+        return {
+          bubble,
+          roleId,
+          base,
+          projectedAnchor
+        };
+      })
+      .sort((left, right) => {
+        const leftY = left.projectedAnchor?.y ?? (left.base.y * height);
+        const rightY = right.projectedAnchor?.y ?? (right.base.y * height);
+        if (leftY !== rightY) {
+          return leftY - rightY;
+        }
+        const leftX = left.projectedAnchor?.x ?? (left.base.x * width);
+        const rightX = right.projectedAnchor?.x ?? (right.base.x * width);
+        return leftX - rightX;
+      });
+    const placedRects = [];
 
-    bubbles.forEach((bubble, index) => {
-      const roleId = bubble.dataset.role;
+    bubbles.forEach((entry, index) => {
+      const { bubble, roleId, base, projectedAnchor } = entry;
       const bubbleWidth = bubble.offsetWidth || 280;
       const bubbleHeight = bubble.offsetHeight || 124;
       const stackShift = Number(bubble.dataset.stack || index) * 98;
-      const base = dialogBubbleAnchors[roleId] || { x: 0.5, y: 0.5, tail: 24 };
-      const safeX = bubbleWidth * 0.5 + 18;
       const safeY = bubbleHeight + 18;
-      const rawX = base.x * width;
-      const rawY = (base.y * height) - stackShift;
-      const x = clamp(rawX, safeX, width - safeX);
-      const y = clamp(rawY, safeY, height - 32);
+      const rawX = projectedAnchor?.x ?? (base.x * width);
+      const rawY = (projectedAnchor?.y ?? (base.y * height)) - stackShift;
+      const placement = resolveDialogBubblePlacement({
+        rawX,
+        rawY,
+        anchorX: rawX,
+        anchorY: rawY,
+        bubbleWidth,
+        bubbleHeight,
+        width,
+        height,
+        safeY,
+        base,
+        placedRects
+      });
 
-      bubble.style.setProperty("--bubble-tail-left", `${base.tail}px`);
-      bubble.style.left = `${x}px`;
-      bubble.style.top = `${y}px`;
-      bubble.classList.remove("is-hidden");
+      applyDialogBubbleStyles(bubble, {
+        x: placement.x,
+        y: placement.y,
+        base,
+        pointerTop: placement.pointerTop
+      });
     });
+  }
+
+  function projectDialogAnchor(roleId, width, height) {
+    const record = roleMeshes.get(roleId);
+    if (!record) {
+      return null;
+    }
+
+    record.anchor.getWorldPosition(projectionVector);
+    projectionVector.y -= record.group.position.y - record.group.userData.baseY;
+    projectionVector.project(camera);
+
+    return {
+      x: (projectionVector.x * 0.5 + 0.5) * width,
+      y: (-projectionVector.y * 0.5 + 0.5) * height
+    };
   }
 
   function resize() {
@@ -3460,6 +3810,7 @@ function createMeetingRenderer(THREE, options) {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    positionDialogBubbles();
   }
 
   function sync(viewModel) {
@@ -3549,6 +3900,11 @@ function createMeetingRenderer(THREE, options) {
     const focus = anchors[viewModel.cameraPreset] || anchors[viewModel.focusRole] || anchors.overview;
     desiredCamera.set(...focus.position);
     desiredTarget.set(...focus.target);
+    positionDialogBubbles();
+    clearTimeout(dialogRefreshTimer);
+    dialogRefreshTimer = window.setTimeout(() => {
+      positionDialogBubbles();
+    }, 260);
 
     roleMeshes.forEach((record, roleId) => {
       const active = roleId === viewModel.focusRole;
@@ -3625,7 +3981,6 @@ function createMeetingRenderer(THREE, options) {
       label.position.y = label.userData.baseY + Math.sin(elapsed * 1.3 + index) * 0.02;
     });
 
-    positionDialogBubbles();
     renderer.render(scene, camera);
   }
 
