@@ -22,9 +22,8 @@ https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 | Decision Tree Builder Lab | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/decision-tree-game/ |
 | Fraud Symptoms Roleplay | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/fraud-symptoms-roleplay-game/ |
 | ACC 214 Study Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-study-game/acc214_game.html |
-| Landing page (Benford Audit Lab) | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/ |
 
-> All links verified live (HTTP 200). The **Accounting Case Game** (Next.js: Month-End Close, Revenue Recognition, Inventory Controls) is **not** on Pages — run it locally with `npm run dev` (see below).
+> All links verified live (HTTP 200). Note: the **bare site URL** (`…/AI-Teaching-Assistant/`) currently opens an older standalone copy of the Benford lab, so share the **game hub** link above as the main entry point. The **Accounting Case Game** (Next.js: Month-End Close, Revenue Recognition, Inventory Controls) is **not** on Pages — run it locally with `npm run dev` (see below).
 
 ---
 
