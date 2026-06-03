@@ -8,13 +8,23 @@ A growing collection of interactive games that make accounting classes fun, buil
 
 ## 🎮 Play the games (live)
 
-The static HTML games are published automatically with GitHub Pages:
+All static HTML games are published with GitHub Pages — students just click a link, nothing to install. Pushing to `main` updates them automatically.
 
-**https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/**
+**🎯 Game hub (all games in one page):**
+https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 
-Anything pushed to the `main` branch goes live there — students just open the link, nothing to install.
+**Direct links:**
 
-> The game index (`public/repository.html`) uses **relative** links so they resolve correctly on the project Pages site (absolute `/...` paths break on GitHub project pages).
+| Game | Live link |
+|------|-----------|
+| Benford's Law Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/benford-law-game/ |
+| Cash Receipts Control Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/cash-receipts-control-game/ |
+| Decision Tree Builder Lab | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/decision-tree-game/ |
+| Fraud Symptoms Roleplay | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/fraud-symptoms-roleplay-game/ |
+| ACC 214 Study Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-study-game/acc214_game.html |
+| Landing page (Benford Audit Lab) | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/ |
+
+> All links verified live (HTTP 200). The **Accounting Case Game** (Next.js: Month-End Close, Revenue Recognition, Inventory Controls) is **not** on Pages — run it locally with `npm run dev` (see below).
 
 ---
 
