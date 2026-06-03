@@ -7,6 +7,7 @@ import { DocumentViewer } from './DocumentViewer';
 import { useTypewriter } from '@/lib/hooks/useTypewriter';
 import type { Stage, Document, ChoiceOption } from '@/lib/types/case';
 import type { Role, CompanyType } from '@/lib/types/game';
+import { asset } from '@/lib/basePath';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -42,7 +43,7 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
         {/* Full-bleed scene background (SVG, no optimizer needed) */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`/scenes/${company.sceneId}.svg`}
+          src={asset(`/scenes/${company.sceneId}.svg`)}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
@@ -80,7 +81,7 @@ export function ScenarioCard({ stage, documents, role, company, choices, onChoic
               className="absolute bottom-0 left-5 drop-shadow-2xl"
             >
               <Image
-                src={`/avatars/${role.avatarId}.svg`}
+                src={asset(`/avatars/${role.avatarId}.svg`)}
                 alt={role.label}
                 width={160}
                 height={180}

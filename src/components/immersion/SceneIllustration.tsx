@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { sceneEntrance } from '@/lib/motion/variants';
+import { asset } from '@/lib/basePath';
 
 interface SceneIllustrationProps {
   sceneId: string;
@@ -19,7 +20,7 @@ export function SceneIllustration({ sceneId, className = '', dimmed = false }: S
       className={`relative overflow-hidden rounded-xl ${className}`}
     >
       <Image
-        src={`/scenes/${sceneId}.svg`}
+        src={asset(`/scenes/${sceneId}.svg`)}
         alt={sceneId}
         width={800}
         height={400}

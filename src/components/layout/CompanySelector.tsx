@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { companies } from '@/data/companies';
 import { useGameStore } from '@/lib/state/gameStore';
 import { fadeUp, staggerChildren } from '@/lib/motion/variants';
+import { asset } from '@/lib/basePath';
 
 const accentBorder: Record<string, string> = {
   amber: 'border-amber-400 bg-amber-50',
@@ -40,7 +41,7 @@ export function CompanySelector() {
             >
               <div className="relative w-full h-20 overflow-hidden">
                 <Image
-                  src={`/scenes/${company.sceneId}.svg`}
+                  src={asset(`/scenes/${company.sceneId}.svg`)}
                   alt={company.label}
                   fill
                   className="object-cover"

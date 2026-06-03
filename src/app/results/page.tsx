@@ -11,6 +11,7 @@ import { roleById } from '@/data/roles';
 import { companyById } from '@/data/companies';
 import { computeScore } from '@/lib/utils/scoring';
 import { fadeUp } from '@/lib/motion/variants';
+import { asset } from '@/lib/basePath';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function ResultsPage() {
   if (!session || !caseDef || !role || !company || !result) {
     return (
       <div className="flex items-center justify-center h-screen text-gray-400">
-        <p>No results found. <a href="/" className="text-indigo-500 underline">Go home</a></p>
+        <p>No results found. <a href={asset('/')} className="text-indigo-500 underline">Go home</a></p>
       </div>
     );
   }

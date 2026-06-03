@@ -1,7 +1,54 @@
-import Link from 'next/link';
 import { RoleSelector } from '@/components/layout/RoleSelector';
 import { CompanySelector } from '@/components/layout/CompanySelector';
 import { CasePicker } from '@/components/layout/CasePicker';
+
+// Standalone HTML games are published on GitHub Pages, so link to their live
+// URLs (they live outside this app's base path). Opening them works the same
+// whether this app is run locally or from Pages.
+const PAGES_BASE = 'https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public';
+
+const standaloneGames = [
+  {
+    tag: 'Data Lab',
+    title: 'Decision Tree Builder Lab',
+    blurb:
+      'Explore how a decision tree is built, tested, and applied through an interactive standalone game.',
+    href: `${PAGES_BASE}/decision-tree-game/index.html`,
+    cta: 'Launch Decision Tree Game',
+  },
+  {
+    tag: 'Audit Lab',
+    title: 'Benford Audit Lab',
+    blurb:
+      'Practice spotting when Benford’s Law is useful, when it is misleading, and how it supports audit follow-up.',
+    href: `${PAGES_BASE}/benford-law-game/index.html`,
+    cta: 'Launch Benford Game',
+  },
+  {
+    tag: 'Control Lab',
+    title: 'Cash Receipts Control Lab',
+    blurb:
+      'Walk the receipts cycle role by role and see how six internal control activities protect custody, logging, deposit, and reconciliation.',
+    href: `${PAGES_BASE}/cash-receipts-control-game/index.html`,
+    cta: 'Launch Cash Receipts Game',
+  },
+  {
+    tag: 'Fraud Lab',
+    title: 'Fraud Signal Briefing',
+    blurb:
+      'Lead a cross-functional vendor review meeting and connect accounting, purchasing, and HR clues before weak fraud signals get ignored.',
+    href: `${PAGES_BASE}/fraud-symptoms-roleplay-game/index.html`,
+    cta: 'Launch Fraud Symptoms Game',
+  },
+  {
+    tag: 'Cost Lab',
+    title: 'ACC 214 Study Game',
+    blurb:
+      'Run the departments of Saucy Apple Mfg. Co. — cost behavior, ABC, variances, and capital budgeting — as a managerial-accounting review.',
+    href: `${PAGES_BASE}/acc214-study-game/acc214_game.html`,
+    cta: 'Launch ACC 214 Game',
+  },
+];
 
 export default function HomePage() {
   return (
@@ -19,68 +66,28 @@ export default function HomePage() {
           <div>
             <h2 className="text-2xl font-black text-gray-900">Standalone Practice Games</h2>
             <p className="max-w-3xl text-sm text-gray-600">
-              Launch focused labs for decision trees, Benford&apos;s Law, and cash receipts
-              controls without leaving the accounting game branch.
+              Focused single-topic labs — decision trees, Benford&apos;s Law, cash receipts
+              controls, fraud signals, and a managerial-accounting review — each playable on its own.
             </p>
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Data Lab</p>
-            <h3 className="mt-2 text-xl font-black text-gray-900">Decision Tree Builder Lab</h3>
-            <p className="mt-2 text-sm leading-6 text-gray-600">
-              Explore how a decision tree is built, tested, and applied through an interactive
-              standalone game.
-            </p>
-            <Link
-              href="/decision-tree-game/index.html"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {standaloneGames.map((game) => (
+            <article
+              key={game.title}
+              className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm"
             >
-              Launch Decision Tree Game
-            </Link>
-          </article>
-          <article className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Audit Lab</p>
-            <h3 className="mt-2 text-xl font-black text-gray-900">Benford Audit Lab</h3>
-            <p className="mt-2 text-sm leading-6 text-gray-600">
-              Practice spotting when Benford&apos;s Law is useful, when it is misleading, and
-              how it supports audit follow-up.
-            </p>
-            <Link
-              href="/benford-law-game/index.html"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
-            >
-              Launch Benford Game
-            </Link>
-          </article>
-          <article className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Control Lab</p>
-            <h3 className="mt-2 text-xl font-black text-gray-900">Cash Receipts Control Lab</h3>
-            <p className="mt-2 text-sm leading-6 text-gray-600">
-              Walk the receipts cycle role by role and see how six internal control activities
-              protect custody, logging, deposit, and reconciliation.
-            </p>
-            <Link
-              href="/cash-receipts-control-game/index.html"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
-            >
-              Launch Cash Receipts Game
-            </Link>
-          </article>
-          <article className="rounded-3xl border border-white/70 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Fraud Lab</p>
-            <h3 className="mt-2 text-xl font-black text-gray-900">Fraud Signal Briefing</h3>
-            <p className="mt-2 text-sm leading-6 text-gray-600">
-              Lead a cross-functional vendor review meeting and connect accounting, purchasing,
-              and HR clues before weak fraud signals get ignored.
-            </p>
-            <Link
-              href="/fraud-symptoms-roleplay-game/index.html"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
-            >
-              Launch Fraud Symptoms Game
-            </Link>
-          </article>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{game.tag}</p>
+              <h3 className="mt-2 text-xl font-black text-gray-900">{game.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">{game.blurb}</p>
+              <a
+                href={game.href}
+                className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700"
+              >
+                {game.cta}
+              </a>
+            </article>
+          ))}
         </div>
       </section>
     </main>

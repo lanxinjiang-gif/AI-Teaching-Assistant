@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 90" width="80" height="90" fill="none">
+
+  <!-- === CAPE (rendered first, behind everything) === -->
+  <path d="M22 46 Q15 60 20 75 Q29 82 40 82 Q51 82 60 75 Q65 60 58 46 Q50 51 40 51 Q31 51 22 46Z" fill="#f0e8d4" stroke="#c8b89a" stroke-width="1"/>
+  <path d="M26 54 Q40 59 54 54" stroke="#c8b89a" stroke-width="0.7" stroke-dasharray="2.5,2" fill="none"/>
+  <circle cx="40" cy="47.5" r="2.5" fill="#f0c040" stroke="#b8902a" stroke-width="0.8"/>
+
+  <!-- === LEGS === -->
+  <rect x="30" y="62" width="9" height="10" rx="3" fill="#1e1b4b"/>
+  <rect x="41" y="62" width="9" height="10" rx="3" fill="#1e1b4b"/>
+
+  <!-- === BOOTS === -->
+  <rect x="26" y="68" width="16" height="11" rx="5.5" fill="#2c1806"/>
+  <rect x="38" y="68" width="16" height="11" rx="5.5" fill="#2c1806"/>
+  <ellipse cx="31" cy="71" rx="5" ry="2.5" fill="#4a2e0a" opacity="0.5"/>
+  <ellipse cx="43" cy="71" rx="5" ry="2.5" fill="#4a2e0a" opacity="0.5"/>
+
+  <!-- === BODY — Indigo vest === -->
+  <rect x="25" y="43" width="30" height="22" rx="7" fill="#4f46e5" stroke="#3730a3" stroke-width="1.2"/>
+  <!-- Lapels -->
+  <path d="M25 43 Q31 52 36 48 L36 43Z" fill="#3730a3"/>
+  <path d="M55 43 Q49 52 44 48 L44 43Z" fill="#3730a3"/>
+  <!-- White shirt -->
+  <rect x="36" y="43" width="8" height="13" rx="1" fill="#f8fafc"/>
+  <!-- Bow tie -->
+  <polygon points="37,47 40,50 37,53" fill="#818cf8"/>
+  <polygon points="43,47 40,50 43,53" fill="#818cf8"/>
+  <circle cx="40" cy="50" r="1.8" fill="#6366f1"/>
+
+  <!-- === HAIR BEHIND HEAD (drawn before face) === -->
+  <ellipse cx="40" cy="21" rx="22" ry="21" fill="#4e2c0d" stroke="#4a3728" stroke-width="1.5"/>
+  <!-- Hair highlight blob -->
+  <ellipse cx="33" cy="12" rx="8" ry="5" fill="white" opacity="0.22" transform="rotate(-20,33,12)"/>
+
+  <!-- === HEAD/FACE === -->
+  <ellipse cx="40" cy="26" rx="19" ry="18" fill="#fcebd8" stroke="#4a3728" stroke-width="1.8"/>
+
+  <!-- Ears -->
+  <ellipse cx="21.5" cy="27" rx="3" ry="4" fill="#fcebd8" stroke="#4a3728" stroke-width="1.2"/>
+  <ellipse cx="58.5" cy="27" rx="3" ry="4" fill="#fcebd8" stroke="#4a3728" stroke-width="1.2"/>
+  <ellipse cx="21.5" cy="27" rx="1.8" ry="2.5" fill="#f5b8a0" opacity="0.6"/>
+  <ellipse cx="58.5" cy="27" rx="1.8" ry="2.5" fill="#f5b8a0" opacity="0.6"/>
+
+  <!-- === BANGS (hair in front of face) === -->
+  <path d="M21 25 Q22 12 30 10 Q35 6 40 7 Q45 6 50 10 Q58 12 59 25 Q55 17 49 19 Q46 11 40 11 Q34 11 31 19 Q25 17 21 25Z" fill="#4e2c0d" stroke="#4a3728" stroke-width="1"/>
+
+  <!-- === CHEEK BLUSH === -->
+  <ellipse cx="27" cy="33" rx="6" ry="3.5" fill="#f9a8d4" opacity="0.35"/>
+  <ellipse cx="53" cy="33" rx="6" ry="3.5" fill="#f9a8d4" opacity="0.35"/>
+
+  <!-- === EYES — anime chibi style (LEFT) === -->
+  <!-- Eye white -->
+  <ellipse cx="31" cy="27" rx="7.5" ry="9" fill="white" stroke="#4a3728" stroke-width="0.5"/>
+  <!-- Top lash — THICK curved line, the key anime feature -->
+  <path d="M23 19 Q31 15 39 19" stroke="#4a3728" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Iris -->
+  <ellipse cx="31" cy="28" rx="6" ry="7.5" fill="#6da0c8"/>
+  <!-- Iris lighter top zone -->
+  <ellipse cx="31" cy="24" rx="5" ry="4" fill="white" opacity="0.3"/>
+  <!-- Pupil -->
+  <ellipse cx="31" cy="29" rx="3.2" ry="4.5" fill="#1a2540"/>
+  <!-- Large white highlight upper-left -->
+  <ellipse cx="27.5" cy="22.5" rx="3" ry="3.5" fill="white"/>
+  <!-- Small white highlight lower-right -->
+  <circle cx="36" cy="33" r="1.5" fill="white" opacity="0.85"/>
+  <!-- Bottom lash line (thin) -->
+  <path d="M23.5 35.5 Q31 38 38.5 35.5" stroke="#4a3728" stroke-width="1" fill="none" stroke-linecap="round"/>
+
+  <!-- === EYES — anime chibi style (RIGHT) === -->
+  <ellipse cx="49" cy="27" rx="7.5" ry="9" fill="white" stroke="#4a3728" stroke-width="0.5"/>
+  <path d="M41 19 Q49 15 57 19" stroke="#4a3728" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="49" cy="28" rx="6" ry="7.5" fill="#6da0c8"/>
+  <ellipse cx="49" cy="24" rx="5" ry="4" fill="white" opacity="0.3"/>
+  <ellipse cx="49" cy="29" rx="3.2" ry="4.5" fill="#1a2540"/>
+  <ellipse cx="45.5" cy="22.5" rx="3" ry="3.5" fill="white"/>
+  <circle cx="54" cy="33" r="1.5" fill="white" opacity="0.85"/>
+  <path d="M41.5 35.5 Q49 38 56.5 35.5" stroke="#4a3728" stroke-width="1" fill="none" stroke-linecap="round"/>
+
+  <!-- === NOSE — tiny two dots === -->
+  <circle cx="38.5" cy="36" r="1.2" fill="#c97b5a" opacity="0.6"/>
+  <circle cx="41.5" cy="36" r="1.2" fill="#c97b5a" opacity="0.6"/>
+
+  <!-- === MOUTH — small gentle smile === -->
+  <path d="M35 40 Q40 44 45 40" stroke="#c97b5a" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+  <!-- === GLASSES — round wire-frame (indigo) over eyes === -->
+  <circle cx="31" cy="27" r="9" stroke="#6366f1" stroke-width="1.5" fill="none" opacity="0.75"/>
+  <circle cx="49" cy="27" r="9" stroke="#6366f1" stroke-width="1.5" fill="none" opacity="0.75"/>
+  <path d="M39.5 27 Q40 26 40.5 27" stroke="#6366f1" stroke-width="1.5" fill="none"/>
+  <line x1="22" y1="24.5" x2="18" y2="23" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="58" y1="24.5" x2="62" y2="23" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round"/>
+
+</svg>

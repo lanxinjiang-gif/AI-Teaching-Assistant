@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import type { RoleId } from '@/lib/types/game';
+import { asset } from '@/lib/basePath';
 
 interface RoleAvatarProps {
   roleId: RoleId;
@@ -13,7 +14,7 @@ export function RoleAvatar({ roleId, size = 48, className = '' }: RoleAvatarProp
   // SVG viewBox is 80×90 — maintain that aspect ratio
   return (
     <Image
-      src={`/avatars/${roleId}.svg`}
+      src={asset(`/avatars/${roleId}.svg`)}
       alt={roleId}
       width={size}
       height={Math.round(size * 1.125)}
