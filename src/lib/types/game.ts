@@ -1,6 +1,11 @@
 export type RoleId = 'junior-accountant' | 'audit-associate' | 'controller';
 export type CompanyTypeId = 'retail' | 'saas' | 'manufacturing' | 'high-tech';
-export type TopicId = 'month-end-close' | 'revenue-recognition' | 'inventory-controls';
+export type TopicId =
+  | 'month-end-close'
+  | 'revenue-recognition'
+  | 'inventory-controls'
+  | 'bank-reconciliation'
+  | 'receivables-allowance';
 
 export interface Role {
   id: RoleId;
