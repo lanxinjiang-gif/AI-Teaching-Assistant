@@ -13,6 +13,8 @@ const topicBadge: Record<string, string> = {
   'month-end-close': 'bg-blue-100 text-blue-700',
   'revenue-recognition': 'bg-violet-100 text-violet-700',
   'inventory-controls': 'bg-orange-100 text-orange-700',
+  'bank-reconciliation': 'bg-teal-100 text-teal-700',
+  'receivables-allowance': 'bg-rose-100 text-rose-700',
 };
 
 export function CasePicker() {
