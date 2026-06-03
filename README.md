@@ -21,6 +21,7 @@ https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 | Cash Receipts Control Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/cash-receipts-control-game/ |
 | Decision Tree Builder Lab | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/decision-tree-game/ |
 | Fraud Symptoms Roleplay | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/fraud-symptoms-roleplay-game/ |
+| Audit Detective: Financial Fraud Investigation | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/audit-detective-game/ |
 | ACC 214 Study Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-study-game/acc214_game.html |
 | Accounting Case Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/accounting-case-game/ |
 
@@ -36,6 +37,7 @@ https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 | Cash Receipts Control Game | `public/cash-receipts-control-game/` | Static HTML | dkangaroo | Open in browser / Pages |
 | Decision Tree Builder Lab | `public/decision-tree-game/` | Static HTML | dkangaroo | Open in browser / Pages |
 | Fraud Symptoms Roleplay | `public/fraud-symptoms-roleplay-game/` | Static HTML | dkangaroo | Open in browser / Pages |
+| Audit Detective: Financial Fraud Investigation | `public/audit-detective-game/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
 | ACC 214 Study Game | `public/acc214-study-game/acc214_game.html` | Static HTML | Lanxin / Lexi | Open in browser |
 | Accounting Case Game | `src/` → builds into `public/accounting-case-game/` | Next.js (static export) | Lanxin / Lexi | Play on Pages, or `npm install && npm run dev` |
 
@@ -47,7 +49,7 @@ Index / landing pages: `index.html` ("Benford Audit Lab" landing) and `public/re
 
 This repo holds **two different technologies**. Don't let them confuse you:
 
-1. **Static HTML games** (Benford, Cash Receipts, Decision Tree, Fraud Roleplay, ACC 214) — single self-contained `.html` files. Just open them in a browser, or use the live Pages link above. No install, no build. Easiest for students.
+1. **Static HTML games** (Benford, Cash Receipts, Decision Tree, Fraud Roleplay, Audit Detective, ACC 214) — single self-contained `.html` files. Just open them in a browser, or use the live Pages link above. No install, no build. Easiest for students.
 
 2. **The Next.js app** ("Accounting Case Game") — a real web app with `src/`, `package.json`, etc. Unlike the others it has a build step, but it is **published to GitHub Pages as a static export** (in `public/accounting-case-game/`), so students open it with a plain link like every other game. For local development run `npm install && npm run dev`; after changing its code, run `npm run build:pages` to refresh what Pages serves.
 

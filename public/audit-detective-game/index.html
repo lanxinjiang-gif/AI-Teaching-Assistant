@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>审计侦探：财务舞弊案件调查</title>
+    <meta name="description" content="面向研究生会计专业学生的审计舞弊识别与决策教学游戏。" />
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #5d697c;
+        --paper: #f5f7fb;
+        --panel: #ffffff;
+        --panel-soft: #eef6ff;
+        --line: #dce4ef;
+        --blue: #2563eb;
+        --blue-deep: #1d4ed8;
+        --green: #17845b;
+        --amber: #b7791f;
+        --purple: #7c3aed;
+        --shadow: 0 18px 48px rgba(23, 32, 51, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.12), transparent 28rem),
+          radial-gradient(circle at 92% 12%, rgba(124, 58, 237, 0.1), transparent 24rem),
+          linear-gradient(180deg, #fbfdff 0%, #edf3fb 100%);
+      }
+
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      .screen {
+        width: min(1120px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 28px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .start-card,
+      .result-card,
+      .panel,
+      .choice,
+      .dialog {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .start-card {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: clamp(24px, 4vw, 44px);
+        text-align: center;
+      }
+
+      .title {
+        margin: 0 0 18px;
+        color: var(--blue);
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        line-height: 1.08;
+      }
+
+      .subtitle {
+        margin: 0 auto 24px;
+        max-width: 66ch;
+        color: var(--muted);
+        font-size: 1.04rem;
+        line-height: 1.8;
+        text-align: left;
+      }
+
+      .brief {
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        background: #eaf3ff;
+        color: #1d4f91;
+        text-align: left;
+      }
+
+      .brief h2 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      .brief ul {
+        margin: 0;
+        padding-left: 1.3rem;
+        line-height: 1.75;
+      }
+
+      .primary-btn {
+        min-height: 48px;
+        border: 0;
+        border-radius: 8px;
+        padding: 12px 22px;
+        color: #fff;
+        background: var(--blue);
+        font-weight: 800;
+        transition: transform 160ms ease, background 160ms ease;
+      }
+
+      .primary-btn:hover,
+      .primary-btn:focus-visible {
+        background: var(--blue-deep);
+        transform: translateY(-1px);
+      }
+
+      .progress {
+        height: 10px;
+        margin-bottom: 22px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #dbe4f0;
+      }
+
+      .progress span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--blue);
+        transition: width 300ms ease;
+      }
+
+      .stage-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .stage-head h1 {
+        margin: 0;
+        font-size: clamp(1.7rem, 3vw, 2.5rem);
+        line-height: 1.15;
+      }
+
+      .stage-count {
+        color: var(--muted);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .game-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+      }
+
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .panel h2,
+      .panel h3 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      .panel p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.72;
+      }
+
+      .scene {
+        background: var(--panel-soft);
+      }
+
+      .scene h2 {
+        color: #1e5c9f;
+      }
+
+      .image-frame {
+        min-height: 220px;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .image-frame img {
+        width: 100%;
+        max-height: 280px;
+        object-fit: cover;
+      }
+
+      .dialog {
+        display: flex;
+        gap: 14px;
+        padding: 16px;
+      }
+
+      .avatar {
+        width: 68px;
+        height: 68px;
+        flex: 0 0 68px;
+        border: 3px solid var(--blue);
+        border-radius: 999px;
+        object-fit: cover;
+        background: #edf2f7;
+      }
+
+      .speaker {
+        margin: 0 0 6px;
+        color: var(--blue);
+        font-weight: 850;
+      }
+
+      .quote {
+        margin: 0;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f4f7fb;
+        color: var(--ink);
+        line-height: 1.7;
+      }
+
+      .choice-head {
+        margin: 0 0 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--line);
+        font-size: 1.25rem;
+      }
+
+      .choice {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid transparent;
+        text-align: left;
+        transition: border-color 160ms ease, transform 160ms ease;
+      }
+
+      .choice:hover,
+      .choice:focus-visible {
+        border-color: var(--blue);
+        transform: translateY(-1px);
+      }
+
+      .choice-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .letter {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: var(--blue);
+        font-weight: 900;
+      }
+
+      .choice:hover .letter {
+        color: #fff;
+        background: var(--blue);
+      }
+
+      .choice-text {
+        color: #2d3748;
+        line-height: 1.68;
+        font-weight: 650;
+      }
+
+      .hint {
+        margin-top: 8px;
+        padding: 14px 16px;
+        border-left: 4px solid #d69e2e;
+        border-radius: 8px;
+        background: #fffbeb;
+        color: #825f14;
+        line-height: 1.65;
+        font-weight: 650;
+      }
+
+      .result-card {
+        overflow: hidden;
+      }
+
+      .result-hero {
+        padding: clamp(24px, 4vw, 42px);
+        color: #fff;
+        text-align: center;
+        background: linear-gradient(135deg, var(--blue), var(--purple));
+      }
+
+      .result-hero h1 {
+        margin: 10px 0 0;
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        line-height: 1.08;
+      }
+
+      .result-hero p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.82);
+        font-weight: 800;
+      }
+
+      .result-body {
+        display: grid;
+        gap: 24px;
+        padding: clamp(20px, 4vw, 36px);
+      }
+
+      .section h2 {
+        display: inline-block;
+        margin: 0 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 3px solid var(--blue);
+        font-size: 1.28rem;
+      }
+
+      .section p,
+      .history-item {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .callout {
+        padding: 16px;
+        border-radius: 8px;
+        background: #f7f9fc;
+      }
+
+      .analysis {
+        border-left: 4px solid var(--purple);
+        background: #f5f0ff;
+      }
+
+      .knowledge {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .knowledge li {
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: #ecfdf5;
+        color: #255646;
+        line-height: 1.65;
+      }
+
+      .history {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+        border-radius: 8px;
+        background: #f7f9fc;
+      }
+
+      .history-item {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .history-item:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+      }
+
+      .history-item strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #6b7280;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 820px) {
+        .screen {
+          width: min(100% - 24px, 1120px);
+          padding: 18px 0;
+          justify-content: flex-start;
+        }
+
+        .stage-head {
+          display: grid;
+        }
+
+        .game-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .avatar {
+          width: 56px;
+          height: 56px;
+          flex-basis: 56px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app"></main>
+    <script>
+      const GAME_STEPS = [
+        {
+          id: "step1",
+          title: "决策点1：识别红旗信号与舞弊类型初判",
+          sceneDescription: "X公司是一家处于行业转型期的上市公司。本年度其营业收入逆势大增40%，但经营活动现金流却呈现断崖式下跌，且多项大额预付账款去向不明。",
+          character: {
+            name: "刘合伙人 (资深合伙人)",
+            avatarUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_e9112c6a-bb13-42c2-b457-bc68881dcad2.jpg",
+            dialog: "利润与现金流的严重背离显然是一个强烈的“红旗信号”。基于我们掌握的两种主要财务舞弊类型，结合这些异常趋势，你在接下来的检测中会将重点放在哪里？"
+          },
+          imageUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_fbc3d252-f360-433f-b44a-9bc8935e685e.jpg",
+          options: [
+            { id: "1A", text: "现金流与营业收入背离是典型的“虚假财务报告”红旗，而大额不明预付账款提示“侵占资产”风险。需通过穿透式实质性分析验证收入真实性，并追查预付款的最终流向。", score: 1 },
+            { id: "1B", text: "重点执行分析程序，将营业收入与行业平均毛利率、同业增长率进行对标分析，若毛利率处于合理区间，则仅将大额预付款列为一般控制缺陷进行穿透测试。", score: 0 },
+            { id: "1C", text: "认为现金流背离主要由激进的信用政策导致，属于经营风险而非舞弊风险。审计重点应放在应收账款预期信用损失模型（ECL）的减值计提合理性上。", score: -1 }
+          ]
+        },
+        {
+          id: "step2",
+          title: "决策点2：运用舞弊三角理论评估风险",
+          sceneDescription: "深入调查后你发现，X公司管理层签订了严苛的业绩对赌协议（若未达标需巨额赔偿），同时核心财务系统的授权存在重大缺陷，允许人工任意修改期末分录。",
+          character: {
+            name: "王经理 (审计经理)",
+            avatarUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_242a00fe-efd5-4afd-9818-56bab66ffca7.jpg",
+            dialog: "结合“舞弊三角理论”，你如何解读目前的状况，并决定下一步的检测策略？"
+          },
+          imageUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_43a2a8ce-29c4-4630-9392-fde1789b5dbd.jpg",
+          options: [
+            { id: "2A", text: "对赌协议构成“动机/压力”，系统期末分录修改权限缺陷提供了“机会”。应假定收入存在舞弊风险，针对期末及非标准会计分录执行具有不可预见性的实质性测试。", score: 1 },
+            { id: "2B", text: "业绩对赌协议属于公司治理层面的“压力”，但由于业财一体化系统具备自动审批节点，应扩大控制测试的样本量，若控制运行有效，则可降低实质性程序的范围。", score: 0 },
+            { id: "2C", text: "虽然具备“动机”与“机会”，但未能观察到管理层存在明显的不满或“借口/合理化”迹象。因此仅需向管理层获取关于分录修改合规性的书面声明即可。", score: -1 }
+          ]
+        },
+        {
+          id: "step3",
+          title: "决策点3：深入检测与外部证据验证",
+          sceneDescription: "针对虚增收入的风险，你关注到数笔巨额海外软件授权收入。财务总监声称：“激进的收入确认是行业惯例，我们的处理完全合规”，并提供了一整套内部签字的审批单。",
+          character: {
+            name: "陈总监 (财务总监)",
+            avatarUrl: "https://miaoda-site-img.cdn.bcebos.com/images/MiaoTu_e7038650-108d-4b3a-af90-68c3f74fea39.jpg",
+            dialog: "这几笔海外收入的审批流程非常完美，是技术和业务部门联合签字的，内部证据十分充分。大家都在这么做。"
+          },
+          imageUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_5bfa3ee6-9fed-4395-8caa-da5fce5d2f10.jpg",
+          options: [
+            { id: "3A", text: "根据审计准则，外部证据可靠性高于内部证据。因此，向海外软件客户发送积极式询证函并取得回函，即可作为充分适当的审计证据，证明收入发生的认定。", score: -1 },
+            { id: "3B", text: "既然有内部技术委员会的专家签批，审计项目组可以直接利用该内部专家的工作成果，评估其胜任能力和客观性后，重新复核其完工百分比模型的测算逻辑。", score: 0 },
+            { id: "3C", text: "管理层以“行业惯例”为舞弊进行“合理化”辩解。当存在管理层凌驾控制风险时内部凭证不可靠，必须引入独立IT专家提取服务器访问日志获取外部证据。", score: 1 }
+          ]
+        },
+        {
+          id: "step4",
+          title: "决策点4：舞弊定性与关联穿透",
+          sceneDescription: "外部专家数据表明海外公司并无实际业务使用记录。进一步追查原始银行流水发现，X公司付出的多项“大额预付款”最终流向了这几个虚假的海外客户账户，进而转入实控人私人名下。",
+          character: {
+            name: "小李 (审计助理)",
+            avatarUrl: "https://miaoda-site-img.cdn.bcebos.com/images/MiaoTu_190ba96f-d1f6-49d7-9ba9-a5c192ead8d0.jpg",
+            dialog: "师兄/师姐，原来他们不仅虚构了海外收入，还把公司的钱套出去了！这到底算哪种类型的舞弊？"
+          },
+          imageUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_269c9cd2-fd21-4bee-a007-2d6f45cab5be.jpg",
+          options: [
+            { id: "4A", text: "这是相互交织的双重舞弊。管理层不仅实施了“虚假财务报告”以满足对赌协议，其本质更是为了掩盖资金流向实控人的“侵占资产”行为，性质恶劣且影响广泛。", score: 1 },
+            { id: "4B", text: "资金流向实控人虽违规，但“预付账款”在资产负债表内仍属资产，只要期后能够全额收回，就只构成关联方交易披露遗漏，属于一般披露错报。", score: 0 },
+            { id: "4C", text: "该情形本质上属于典型的“虚假财务报告”——通过虚构海外客户粉饰报表。资金流转只是财务造假的资金闭环手段，并未给公司造成直接当期亏损，不构成“侵占资产”。", score: -1 }
+          ]
+        },
+        {
+          id: "step5",
+          title: "决策点5：审计结论",
+          sceneDescription: "铁证如山，基于红旗信号追踪和外部证据验证，X公司“虚假财务报告”与“侵占资产”的系统性舞弊事实已清晰。但管理层拒绝按要求进行报表更正。",
+          character: {
+            name: "刘合伙人 (资深合伙人)",
+            avatarUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_e9112c6a-bb13-42c2-b457-bc68881dcad2.jpg",
+            dialog: "管理层拒绝做出任何调整和披露。这种系统性的舞弊已经彻底摧毁了财务报表的公允性基础。我们需要出具最终的审计报告。"
+          },
+          imageUrl: "https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_eee2917e-a092-4a89-a9a2-f2887d3894e2.jpg",
+          options: [
+            { id: "5A", text: "出具无法表示意见。由于海外客户配合造假且资金流向隐蔽，审计团队事实上无法获取充分证据量化实控人侵占资产的确切金额，属于审计范围受到重大限制。", score: -1 },
+            { id: "5B", text: "出具保留意见并在强调事项段中特别说明。将虚假的海外软件收入及关联方预付款进行量化，错报虽然重大，但仅局限于特定账户，尚未影响到报表的其他组成部分。", score: 0 },
+            { id: "5C", text: "出具否定意见。虚假财务报告与侵占资产双重舞弊导致财务报表存在重大且广泛的错报，完全丧失公允性，并在报告中详述舞弊机制。", score: 1 }
+          ]
+        }
+      ];
+
+      const GAME_ENDINGS = {
+        excellent: {
+          title: "卓越的审计侦探",
+          description: "表现堪称完美！你精准应用了舞弊三角理论，清晰区分并同时查出了两类舞弊（虚假财务报告与侵占资产），彻底击碎了管理层的系统性造假。",
+          analysis: "你的决策路径始终围绕高级审计理论展开：准确识别红旗信号，利用“压力”与“机会”评估风险；面对财务总监的“借口/合理化”，不轻信内部背书，运用外部证据验证推翻了虚假交易；最终识破了虚假财务报告掩盖侵占资产的本质。",
+          knowledgePoints: [
+            "舞弊的两种主要类型：编制虚假财务报告和侵占资产，两者经常伴生。",
+            "舞弊三角理论：压力/动机、机会、借口/合理化是判断舞弊风险的核心框架。",
+            "舞弊检测手段：识别红旗信号（如现金流与利润背离）、实质性分析程序、注重外部证据验证及追查原始凭证。",
+            "管理层凌驾于控制之上时，内部生成的凭证证明力极低，必须引入外部独立证据。"
+          ]
+        },
+        average: {
+          title: "具有潜力的审计分析师",
+          description: "你识别出了一些红旗信号，能够将舞弊三角的部分理论应用于实践，但在处理复杂的跨领域证据验证或判定舞弊类型时，仍带有一定的局限性。",
+          analysis: "你可能在证据收集时过度依赖了内部审批凭证，而忽视了外部独立验证的必要性；或者在分析阶段，未能敏锐地洞察出“虚假财务报告”背后其实隐藏着更严重的“侵占资产”行为。",
+          knowledgePoints: [
+            "不能仅仅停留在账面的数字核对，要深刻理解“借口/合理化”往往是管理层掩饰舞弊的常见话术。",
+            "在检测舞弊时，内部证据往往容易被篡改，外部证据和原始底层数据更具证明力。",
+            "当发现舞弊线索时，必须考虑是否存在多种舞弊类型的交织（如虚构收入以套取公司资金）。"
+          ]
+        },
+        poor: {
+          title: "陷入教条的审计新人",
+          description: "你的审计思维仍停留在课本表层，未能有效运用舞弊三角理论，导致完全被虚假的内部证据所蒙蔽，未能识别出明显的红旗信号。",
+          analysis: "在整个审计中，你忽略了利润与现金流背离的强红旗信号，未察觉管理层的压力与机会。你盲目信赖了企业的内控签字，未能在高风险领域执行恰当的实质性检测程序。",
+          knowledgePoints: [
+            "无视红旗信号和舞弊三角是导致审计失败的直接原因。",
+            "舞弊检测不能仅靠形式上的程序，必须进行深度的实质性分析和原始凭证追踪。",
+            "出具错误的审计意见（如在广泛舞弊下出具无保留意见），将使你面临极其严重的法律后果。"
+          ]
+        }
+      };
+
+      const app = document.getElementById("app");
+      let currentStepIndex = 0;
+      let score = 0;
+      let history = [];
+
+      function esc(value) {
+        return String(value).replace(/[&<>'"]/g, function (char) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;" }[char];
+        });
+      }
+
+      function imageFallback(img) {
+        img.removeAttribute("onerror");
+        img.src = "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22640%22%20height%3D%22360%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23eef2f7%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%20font-family%3D%22Arial%22%20font-size%3D%2224%22%20fill%3D%22%236b7280%22%3E%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%A4%B1%E8%B4%A5%3C%2Ftext%3E%3C%2Fsvg%3E";
+      }
+
+      function renderStart() {
+        app.innerHTML =
+          '<section class="screen"><div class="start-card">' +
+          '<h1 class="title">审计侦探：财务舞弊案件调查</h1>' +
+          '<p class="subtitle">你是一名审计专业的研究生，现在深度参与一家具有复杂关联交易网络和高度财务舞弊嫌疑的上市公司 X 公司的年报审计项目。你需要基于舞弊三角理论、舞弊类型识别以及舞弊检测手段，通过 5 个关键决策点完成调查。</p>' +
+          '<div class="brief"><h2>游戏目标与玩法</h2><ul><li>仔细阅读场景描述和角色对话。</li><li>在每个决策点选择最符合审计规范和职业怀疑精神的选项。</li><li>完成 5 个决策后，系统将根据你的表现给出最终结局。</li><li>决策不可撤销，请谨慎选择。</li></ul></div>' +
+          '<button class="primary-btn" type="button" data-start>开始调查</button>' +
+          '</div></section>';
+        app.querySelector("[data-start]").addEventListener("click", startGame);
+      }
+
+      function startGame() {
+        currentStepIndex = 0;
+        score = 0;
+        history = [];
+        renderStep();
+      }
+
+      function selectOption(option) {
+        const step = GAME_STEPS[currentStepIndex];
+        score += option.score;
+        history.push({ optionId: option.id, optionText: option.text, stepId: step.id });
+        if (currentStepIndex >= GAME_STEPS.length - 1) {
+          renderEnding();
+        } else {
+          currentStepIndex += 1;
+          renderStep();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+
+      function renderStep() {
+        const step = GAME_STEPS[currentStepIndex];
+        const progress = (currentStepIndex / GAME_STEPS.length) * 100;
+        app.innerHTML =
+          '<section class="screen">' +
+          '<div class="progress" aria-label="游戏进度"><span style="width: ' + progress + '%"></span></div>' +
+          '<header class="stage-head"><h1>' + esc(step.title) + '</h1><div class="stage-count">阶段 ' + (currentStepIndex + 1) + ' / ' + GAME_STEPS.length + '</div></header>' +
+          '<div class="game-grid"><div class="stack">' +
+          '<section class="panel scene"><h2>背景描述</h2><p>' + esc(step.sceneDescription) + '</p></section>' +
+          '<div class="image-frame"><img src="' + esc(step.imageUrl) + '" alt="场景配图" onerror="imageFallback(this)" /></div>' +
+          '<section class="dialog"><img class="avatar" src="' + esc(step.character.avatarUrl) + '" alt="' + esc(step.character.name) + '" onerror="imageFallback(this)" /><div><p class="speaker">' + esc(step.character.name) + '</p><p class="quote">“' + esc(step.character.dialog) + '”</p></div></section>' +
+          '</div><aside class="stack"><h2 class="choice-head">你的决策</h2>' +
+          step.options.map(function (option, index) {
+            return '<button class="choice" type="button" data-option="' + esc(option.id) + '"><span class="choice-content"><span class="letter">' + String.fromCharCode(65 + index) + '</span><span class="choice-text">' + esc(option.text) + '</span></span></button>';
+          }).join("") +
+          '<p class="hint">提示：作为一名审计人员，你需要始终保持职业怀疑态度，不要轻信管理层，也不要放弃核实任何异常线索。</p>' +
+          '</aside></div></section>';
+        app.querySelectorAll("[data-option]").forEach(function (button) {
+          const option = step.options.find(function (item) {
+            return item.id === button.dataset.option;
+          });
+          button.addEventListener("click", function () {
+            selectOption(option);
+          });
+        });
+      }
+
+      function renderEnding() {
+        const ending = score >= 4 ? GAME_ENDINGS.excellent : score >= 2 ? GAME_ENDINGS.average : GAME_ENDINGS.poor;
+        app.innerHTML =
+          '<section class="screen"><article class="result-card">' +
+          '<header class="result-hero"><p>审计调查结束 · 最终评价</p><h1>' + esc(ending.title) + '</h1></header>' +
+          '<div class="result-body">' +
+          '<section class="section"><h2>结局判定</h2><p class="callout">' + esc(ending.description) + '</p></section>' +
+          '<section class="section"><h2>决策分析</h2><p class="callout analysis">' + esc(ending.analysis) + '</p></section>' +
+          '<section class="section"><h2>知识点总结</h2><ul class="knowledge">' + ending.knowledgePoints.map(function (point) { return '<li>' + esc(point) + '</li>'; }).join("") + '</ul></section>' +
+          '<section class="section"><h2>决策路径回顾</h2><div class="history">' + history.map(function (record, index) { return '<div class="history-item"><strong>第 ' + (index + 1) + ' 步 · ' + esc(record.optionId) + '</strong>' + esc(record.optionText) + '</div>'; }).join("") + '</div></section>' +
+          '<button class="primary-btn" type="button" data-restart>重新开始游戏</button>' +
+          '</div></article></section>';
+        app.querySelector("[data-restart]").addEventListener("click", function () {
+          startGame();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }
+
+      renderStart();
+    </script>
+  </body>
+</html>
