@@ -1,5 +1,7 @@
-// Stub — to be implemented in a future sprint
 import type { CaseDefinition } from '@/lib/types/case';
+import { stages } from './stages';
+import { documents } from './documents';
+import { events } from './events';
 
 export const inventoryControlsCase: CaseDefinition = {
   id: 'inventory-controls',
@@ -8,11 +10,12 @@ export const inventoryControlsCase: CaseDefinition = {
   companyTypes: ['retail', 'manufacturing'],
   availableRoles: ['junior-accountant', 'audit-associate', 'controller'],
   difficulty: 3,
-  description: 'Coming soon.',
+  description:
+    'The year-end physical count is $12,000 short of the books. Decompose the variance: reverse a FOB-destination shipment booked too early, write off the true shrinkage, then apply lower of cost or net realizable value to obsolete stock — and do not get fooled by a next-quarter purchase order.',
   estimatedMinutes: 25,
-  stages: [],
-  documents: [],
-  events: [],
+  stages,
+  documents,
+  events,
   maxScore: 100,
   passingScore: 70,
 };

@@ -14,7 +14,7 @@ The static HTML games are published automatically with GitHub Pages:
 
 Anything pushed to the `main` branch goes live there — students just open the link, nothing to install.
 
-> ⚠️ Known issue to check: `public/repository.html` links games as `/<game>/index.html`, but the game files live under `public/`. Some links may 404 on the live site until the paths are aligned. See COLLABORATION.md → "Publishing to students."
+> The game index (`public/repository.html`) uses **relative** links so they resolve correctly on the project Pages site (absolute `/...` paths break on GitHub project pages).
 
 ---
 
@@ -45,8 +45,11 @@ This repo holds **two different technologies**. Don't let them confuse you:
 
 Immersive, visual-novel style. 3 roles (Junior Accountant, Audit Associate, Controller), 4 company types (Retail, SaaS, Manufacturing, High Tech), branching cases with scoring and document review.
 
-- ✅ Playable case: **Month-End Close: Missing Accruals** (4 stages, 100-pt scoring)
-- 🚧 Stubs (coming soon): **Revenue Recognition**, **Inventory Controls**
+Three playable cases (each 4 stages, 100-pt scoring, perfect run = 100%):
+
+- ✅ **Month-End Close: Missing Accruals** — accruals, prepaid amortization, deferred revenue
+- ✅ **Revenue Recognition: The Multi-Element Deal** — ASC 606 five-step model on a bundled SaaS contract
+- ✅ **Inventory Controls: The Missing Count** — count reconciliation, FOB cutoff, shrinkage, lower-of-cost-or-NRV
 
 ```bash
 npm install
