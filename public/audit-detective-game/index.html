@@ -36,6 +36,35 @@
           linear-gradient(180deg, #fbfdff 0%, #edf3fb 100%);
       }
 
+      .repo-return {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 50;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--blue-deep);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: var(--shadow);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        transition: color 160ms ease, border-color 160ms ease;
+      }
+
+      .repo-return:hover,
+      .repo-return:focus-visible {
+        background: #ffffff;
+        color: var(--blue);
+        border-color: var(--blue);
+      }
+
       button {
         font: inherit;
         cursor: pointer;
@@ -427,6 +456,7 @@
     </style>
   </head>
   <body>
+    <a class="repo-return" href="../repository.html">← All games</a>
     <main id="app"></main>
     <script>
       const GAME_STEPS = [

@@ -1322,7 +1322,7 @@ a:focus-visible {
 </style>
   </head>
   <body class="decision-tree-page">
-    <a id="repoLink" class="repo-return" href="../../repository.html">Back to game repository</a>
+    <a id="repoLink" class="repo-return" href="../repository.html">Back to game repository</a>
     <main id="app" class="lesson-shell">
       <noscript>
         <section class="noscript-card">
@@ -1343,7 +1343,7 @@ a:focus-visible {
         }
 
         if (window.location.protocol !== "file:") {
-          repoLink.setAttribute("href", "/repository.html");
+          repoLink.setAttribute("href", new URL("../repository.html", window.location.href).href);
         }
       })();
     </script>

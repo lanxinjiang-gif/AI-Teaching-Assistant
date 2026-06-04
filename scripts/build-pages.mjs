@@ -22,6 +22,7 @@ const dropFromExport = [
   'decision-tree-game',
   'fraud-symptoms-roleplay-game',
   'acc214-study-game',
+  'audit-detective-game',
   'repository.html',
 ];
 

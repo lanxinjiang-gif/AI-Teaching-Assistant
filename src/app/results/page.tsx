@@ -11,7 +11,7 @@ import { roleById } from '@/data/roles';
 import { companyById } from '@/data/companies';
 import { computeScore } from '@/lib/utils/scoring';
 import { fadeUp } from '@/lib/motion/variants';
-import { asset } from '@/lib/basePath';
+import { asset, REPOSITORY_HREF } from '@/lib/basePath';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -59,12 +59,12 @@ export default function ResultsPage() {
         >
           Play Again
         </button>
-        <button
-          onClick={() => router.push('/')}
-          className="flex-1 py-3 rounded-2xl border-2 border-gray-200 hover:border-gray-300 bg-white text-gray-700 font-bold text-sm transition-colors"
+        <a
+          href={REPOSITORY_HREF}
+          className="flex-1 flex items-center justify-center py-3 rounded-2xl border-2 border-gray-200 hover:border-gray-300 bg-white text-gray-700 font-bold text-sm text-center transition-colors"
         >
-          Home
-        </button>
+          ← All games
+        </a>
       </motion.div>
     </main>
   );

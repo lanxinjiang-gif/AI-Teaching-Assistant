@@ -1290,7 +1290,7 @@ button:disabled {
 </style>
 </head>
 <body>
-  <a id="repoLink" class="repo-link" href="/">Back to home</a>
+  <a id="repoLink" class="repo-link" href="../repository.html">Back to home</a>
 
   <main class="app-shell">
     <section class="hero-panel" aria-labelledby="game-title">
@@ -3081,7 +3081,7 @@ function syncRepositoryLink() {
     return;
   }
 
-  const repositoryUrl = new URL("/", window.location.href).href;
+  const repositoryUrl = new URL("../repository.html", window.location.href).href;
   elements.repoLink.setAttribute("href", repositoryUrl);
   elements.repoLink.addEventListener("click", (event) => {
     event.preventDefault();
