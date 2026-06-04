@@ -3060,19 +3060,15 @@ function renderTreeBoard(options) {
   const revealGender = options.revealGender;
   const revealIncome = options.revealIncome;
   const nodes = {
-    marital: Object.assign({}, TREE_LAYOUT.nodes.marital, { type: "decision", label: "Marital
-Status" }),
+    marital: Object.assign({}, TREE_LAYOUT.nodes.marital, { type: "decision", label: "Marital\nStatus" }),
     sportsSingle: Object.assign({}, TREE_LAYOUT.nodes.sportsSingle, { type: "leaf", label: "Sports Car" }),
     gender: Object.assign({}, TREE_LAYOUT.nodes.gender, {
       type: revealGender ? "decision" : "placeholder",
-      label: revealGender ? "Gender" : "Pick next
-question",
+      label: revealGender ? "Gender" : "Pick next\nquestion",
     }),
     income: Object.assign({}, TREE_LAYOUT.nodes.income, {
       type: revealIncome ? "decision" : "placeholder",
-      label: revealIncome ? "Annual
-Income" : "One more
-question",
+      label: revealIncome ? "Annual\nIncome" : "One more\nquestion",
     }),
     familyFemale: Object.assign({}, TREE_LAYOUT.nodes.familyFemale, { type: "leaf", label: "Family Car" }),
     familyIncome: Object.assign({}, TREE_LAYOUT.nodes.familyIncome, { type: "leaf", label: "Family Car" }),
@@ -3247,8 +3243,7 @@ function renderNode(id, node, active, placeholderGlow = false) {
     classes.push("is-active");
   }
 
-  const lines = node.label.split("
-");
+  const lines = node.label.split("\n");
   const centerX = node.width / 2;
   const startY = (node.height / 2) - (((lines.length - 1) * 16) / 2);
   const textMarkup = lines
