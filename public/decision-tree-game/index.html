@@ -1322,7 +1322,7 @@ a:focus-visible {
 </style>
   </head>
   <body class="decision-tree-page">
-    <a class="repo-return" href="/">Back to home</a>
+    <a id="repoLink" class="repo-return" href="../../repository.html">Back to game repository</a>
     <main id="app" class="lesson-shell">
       <noscript>
         <section class="noscript-card">
@@ -1335,6 +1335,18 @@ a:focus-visible {
       </noscript>
     </main>
     <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <script>
+      (function () {
+        const repoLink = document.getElementById("repoLink");
+        if (!repoLink) {
+          return;
+        }
+
+        if (window.location.protocol !== "file:") {
+          repoLink.setAttribute("href", "/repository.html");
+        }
+      })();
+    </script>
     <script>
 const PHASES = [
   { id: "intro", title: "Spot the Parts", slideRef: "Slide 18" },
