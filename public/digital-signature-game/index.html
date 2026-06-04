@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Digital Signature Learning Game</title>
+    <meta
+      name="description"
+      content="Interactive tutorial and challenge game for learning the digital signature process."
+    />
+    <style>
+      :root {
+        --ink: #0f4c5c;
+        --ink-soft: rgba(15, 76, 92, 0.72);
+        --paper: #f5f7fa;
+        --panel: #ffffff;
+        --line: #0f4c5c;
+        --accent: #e36414;
+        --accent-soft: #fff3ec;
+        --good: #16a34a;
+        --good-soft: #dcfce7;
+        --shadow: 0 16px 40px rgba(15, 76, 92, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        background:
+          linear-gradient(90deg, rgba(15, 76, 92, 0.04) 1px, transparent 1px),
+          linear-gradient(rgba(15, 76, 92, 0.04) 1px, transparent 1px),
+          var(--paper);
+        background-size: 36px 36px;
+      }
+
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .app {
+        min-height: 100vh;
+      }
+
+      .screen {
+        width: min(1060px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 28px 0;
+      }
+
+      .center {
+        display: grid;
+        place-items: center;
+      }
+
+      .hero {
+        width: min(820px, 100%);
+        text-align: center;
+      }
+
+      .mark {
+        width: 64px;
+        height: 64px;
+        display: inline-grid;
+        place-items: center;
+        margin-bottom: 14px;
+        border: 2px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        font-size: 2rem;
+        font-weight: 900;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 12px;
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 64ch;
+        margin: 0 auto 28px;
+        color: var(--ink-soft);
+        line-height: 1.7;
+      }
+
+      .menu {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .card,
+      .topbar,
+      .step-panel,
+      .choice,
+      .result-line {
+        border: 2px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .card {
+        min-height: 164px;
+        padding: 22px;
+        text-align: left;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .card:hover,
+      .card:focus-visible,
+      .nav-btn:hover,
+      .nav-btn:focus-visible,
+      .choice:hover,
+      .choice:focus-visible {
+        transform: translateY(-2px);
+      }
+
+      .card h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      .card p {
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+
+      .card small {
+        color: var(--accent);
+        font-weight: 900;
+      }
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      .topbar {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 16px;
+        margin-bottom: 18px;
+      }
+
+      .topbar h1 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .nav-btn,
+      .primary {
+        min-height: 40px;
+        border: 2px solid var(--line);
+        padding: 8px 12px;
+        color: var(--ink);
+        background: var(--panel);
+        font-weight: 900;
+      }
+
+      .primary {
+        color: #fff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .progress {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .bar {
+        height: 12px;
+        flex: 1;
+        border: 2px solid var(--line);
+        background: #fff;
+      }
+
+      .bar span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--ink);
+        transition: width 220ms ease;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 18px;
+      }
+
+      .step-panel {
+        padding: 18px;
+      }
+
+      .step-title {
+        margin-bottom: 8px;
+        font-size: clamp(1.4rem, 3vw, 2rem);
+      }
+
+      .step-desc,
+      .hint,
+      .explanation,
+      .muted {
+        color: var(--ink-soft);
+        line-height: 1.65;
+      }
+
+      .side-label {
+        display: inline-flex;
+        margin-bottom: 14px;
+        padding: 6px 9px;
+        color: #fff;
+        background: var(--ink);
+        font-size: 0.8rem;
+        font-weight: 900;
+      }
+
+      .visual {
+        display: grid;
+        gap: 14px;
+        align-content: center;
+        min-height: 330px;
+        text-align: center;
+      }
+
+      .flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .token,
+      .target {
+        min-width: 132px;
+        min-height: 82px;
+        display: grid;
+        place-items: center;
+        gap: 4px;
+        padding: 12px;
+        border: 2px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        font-weight: 900;
+      }
+
+      .target {
+        border-style: dashed;
+        background: var(--paper);
+      }
+
+      .token.done,
+      .target.done {
+        background: #e8f4f7;
+      }
+
+      .target.hot {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .arrow {
+        color: var(--ink-soft);
+        font-weight: 900;
+      }
+
+      .feedback {
+        min-height: 48px;
+        padding: 12px;
+        border-left: 5px solid var(--line);
+        background: #fff;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+
+      .feedback.ok {
+        border-left-color: var(--good);
+        background: var(--good-soft);
+        color: #14532d;
+      }
+
+      .choice {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 14px;
+        color: var(--ink);
+        text-align: left;
+      }
+
+      .choice[disabled] {
+        cursor: default;
+      }
+
+      .choice.correct {
+        border-color: var(--good);
+        background: var(--good-soft);
+        color: var(--good);
+      }
+
+      .choice.wrong {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .badge {
+        min-width: 28px;
+        font-weight: 900;
+      }
+
+      .explanation {
+        margin: 4px 0 16px;
+        padding: 14px;
+        border-left: 5px solid var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .score {
+        color: var(--accent);
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 900;
+      }
+
+      .result-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .result-line {
+        padding: 14px;
+        box-shadow: none;
+      }
+
+      .result-line.good {
+        border-color: var(--good);
+        background: var(--good-soft);
+      }
+
+      .result-line.bad {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .history {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      @media (max-width: 780px) {
+        .screen {
+          width: min(100% - 24px, 1060px);
+          padding: 16px 0;
+        }
+
+        .menu,
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .topbar h1 {
+          order: -1;
+        }
+
+        .visual {
+          min-height: 260px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app" class="app"></main>
+    <script>
+      const tutorialSteps = [
+        { id: 1, title: "A Creates a Document", description: "Sender A first creates an original document that needs to be transmitted.", side: "sender", actionType: "click", targetLabel: "Create Document", feedbackCorrect: "Correct! A has created an original document.", feedbackIncorrect: "Please click the Create Document button to start the process." },
+        { id: 2, title: "A Hashes the Document", description: "A uses the SHA-256 hash algorithm to process the document, generating a fixed-length Message Digest (MD).", side: "sender", actionType: "drag", targetLabel: "SHA-256 Hash Function", feedbackCorrect: "Correct! The document has been hashed with SHA-256 to generate the Message Digest (MD).", feedbackIncorrect: "Please send the document into the SHA-256 hash function area." },
+        { id: 3, title: "A Encrypts MD with Private Key", description: "A uses their own private key to encrypt the Message Digest, creating a Digital Signature (DS).", side: "sender", actionType: "drag", targetLabel: "A's Private Key", feedbackCorrect: "Correct! The MD has been encrypted with A's private key, generating the Digital Signature (DS).", feedbackIncorrect: "Please send the Message Digest into A's private key area for encryption." },
+        { id: 4, title: "A Packages Document and Signature", description: "A packages the original document together with the digital signature, preparing to send it.", side: "sender", actionType: "click", targetLabel: "Package & Send", feedbackCorrect: "Correct! The original document and digital signature have been packaged.", feedbackIncorrect: "Please click Package & Send to combine the document and signature." },
+        { id: 5, title: "A Encrypts with B's Public Key", description: "A uses receiver B's public key to encrypt the entire package, ensuring confidentiality during transmission.", side: "sender", actionType: "drag", targetLabel: "B's Public Key", feedbackCorrect: "Correct! The package has been encrypted with B's public key and is ready for secure transmission.", feedbackIncorrect: "Please send the package into B's public key area for encryption." },
+        { id: 6, title: "B Decrypts with Private Key", description: "B receives the encrypted package and uses their own private key to decrypt it, obtaining the original document and A's digital signature.", side: "receiver", actionType: "drag", targetLabel: "B's Private Key", feedbackCorrect: "Correct! B has decrypted the package with their private key, obtaining the original document and digital signature.", feedbackIncorrect: "Please send the encrypted package into B's private key area for decryption." },
+        { id: 7, title: "B Verifies Signature with A's Public Key", description: "B uses A's public key to decrypt the digital signature, obtaining the original Message Digest while verifying the sender's identity (non-repudiation).", side: "receiver", actionType: "drag", targetLabel: "A's Public Key", feedbackCorrect: "Correct! B has verified the signature with A's public key, confirming the sender's identity.", feedbackIncorrect: "Please send the digital signature into A's public key area for verification." },
+        { id: 8, title: "B Hashes the Received Document", description: "B makes a copy of the received document and uses the same SHA-256 algorithm to hash it, producing a calculated Message Digest.", side: "receiver", actionType: "drag", targetLabel: "SHA-256 Hash Function", feedbackCorrect: "Correct! B has computed a new Message Digest.", feedbackIncorrect: "Please send the received document into the SHA-256 hash function area." },
+        { id: 9, title: "B Compares the Message Digests", description: "B compares the two Message Digests: if they are identical, the document has not been tampered with during transmission, and data integrity is assured.", side: "receiver", actionType: "click", targetLabel: "Verify Integrity", feedbackCorrect: "Correct! The two Message Digests match. Data integrity verified!", feedbackIncorrect: "Please click Verify Integrity to compare the two Message Digests." }
+      ];
+
+      const quizQuestions = [
+        { id: 1, question: "In the digital signature process, what does Sender A use to encrypt the Message Digest to create the Digital Signature?", options: ["A's Public Key", "A's Private Key", "B's Public Key", "B's Private Key"], correctIndex: 1, explanation: "Sender A uses their own private key to encrypt the Message Digest, so the receiver can verify identity with A's public key, ensuring non-repudiation." },
+        { id: 2, question: "Which hash algorithm is used in the digital signature process?", options: ["MD5", "SHA-1", "SHA-256", "SHA-512"], correctIndex: 2, explanation: "According to the process, both sender and receiver use the SHA-256 hash algorithm to generate the Message Digest." },
+        { id: 3, question: "What does Sender A use to encrypt the package before transmission to ensure security?", options: ["A's Private Key", "A's Public Key", "B's Private Key", "B's Public Key"], correctIndex: 3, explanation: "A uses B's public key to encrypt the package, so only B, who possesses B's private key, can decrypt it." },
+        { id: 4, question: "What does Receiver B use to verify A's digital signature?", options: ["A's Public Key", "A's Private Key", "B's Public Key", "B's Private Key"], correctIndex: 0, explanation: "B uses A's public key to decrypt the digital signature, verifying the sender's identity and non-repudiation." },
+        { id: 5, question: "If the original Message Digest does not match the calculated Message Digest, what does this indicate?", options: ["The sender identity is incorrect", "The document was tampered with during transmission", "The encryption algorithm failed", "The private keys do not match"], correctIndex: 1, explanation: "If the two Message Digests do not match, the document content was modified during transmission, and data integrity has been compromised." },
+        { id: 6, question: "What three security properties does digital signature technology simultaneously provide?", options: ["Confidentiality, Availability, Controllability", "Authentication, Integrity, Non-repudiation", "Confidentiality, Integrity, Availability", "Authentication, Controllability, Auditability"], correctIndex: 1, explanation: "Digital signatures provide authentication and non-repudiation through private key signing, and integrity through hash comparison." },
+        { id: 7, question: "In Step 5 of the process, what is the purpose of A encrypting with B's public key?", options: ["To verify A's identity", "To ensure only B can read the content", "To generate the digital signature", "To create the Message Digest"], correctIndex: 1, explanation: "Encrypting with B's public key ensures confidentiality. Only B, who holds B's private key, can decrypt and view the content." },
+        { id: 8, question: "Why does B need to re-hash the received document?", options: ["To generate a new digital signature", "To compare with the original digest and verify data integrity", "To decrypt the document content", "To confirm the sender's identity"], correctIndex: 1, explanation: "B re-hashes to obtain a calculated Message Digest, then compares it with the original digest to verify whether the document was tampered with during transmission." },
+        { id: 9, question: "What does Receiver B use to decrypt the received encrypted package?", options: ["A's Public Key", "A's Private Key", "B's Public Key", "B's Private Key"], correctIndex: 3, explanation: "B uses their own private key to decrypt the package, because the package was encrypted with B's public key." },
+        { id: 10, question: "How is non-repudiation achieved in the digital signature process?", options: ["Through the SHA-256 hash algorithm", "Through B's public key encryption", "Through A's private key signing: only A can generate that signature", "Through symmetric encryption transmission"], correctIndex: 2, explanation: "Because only A possesses A's private key, a signature generated with A's private key proves the document was sent by A, and A cannot deny it." }
+      ];
+
+      const app = document.getElementById("app");
+      const storageKey = "digitalSignatureGameProgress";
+      let state = loadState();
+      let tutorialIndex = 0;
+      let completedCurrent = false;
+      let quizIndex = 0;
+      let selectedOption = null;
+      let answers = [];
+      let totalScore = 0;
+
+      function loadState() {
+        try {
+          return JSON.parse(localStorage.getItem(storageKey)) || { tutorialCompleted: false, challengeAttempts: 0, challengeHistory: [] };
+        } catch {
+          return { tutorialCompleted: false, challengeAttempts: 0, challengeHistory: [] };
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+      }
+
+      function esc(value) {
+        return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;" }[char]));
+      }
+
+      function bestScore() {
+        return state.challengeHistory.length ? Math.max(...state.challengeHistory.map((item) => item.score)) : 0;
+      }
+
+      function shell(title, body, right) {
+        app.innerHTML = `<section class="screen">
+          <div class="topbar">
+            <button class="nav-btn" type="button" data-home>Home</button>
+            <h1>${esc(title)}</h1>
+            <div>${right || ""}</div>
+          </div>
+          ${body}
+        </section>`;
+        app.querySelector("[data-home]").addEventListener("click", renderHome);
+      }
+
+      function renderHome() {
+        const best = bestScore();
+        app.innerHTML = `<section class="screen center">
+          <div class="hero">
+            <div class="mark">DS</div>
+            <h1>Digital Signature Learning Game</h1>
+            <p class="lead">Learn the complete digital signature process through interactive lessons, then test your understanding of authentication, integrity, confidentiality, and non-repudiation.</p>
+            <div class="menu">
+              <button class="card" type="button" data-mode="tutorial">
+                <h2>Tutorial Mode ${state.tutorialCompleted ? "<small>Completed</small>" : ""}</h2>
+                <p>Step through all 9 key steps of digital signatures with guided click-and-send interactions.</p>
+                <small>Start Learning -></small>
+              </button>
+              <button class="card" type="button" data-mode="challenge">
+                <h2>Challenge Mode</h2>
+                <p>Answer 10 selected questions to test your understanding of the digital signature process.</p>
+                <small>Start Challenge -></small>
+              </button>
+              <button class="card wide" type="button" data-mode="progress">
+                <h2>Learning Progress</h2>
+                <p>Tutorial Progress: <strong>${state.tutorialCompleted ? "100%" : "0%"}</strong> | Challenges Taken: <strong>${state.challengeAttempts}</strong> | Best Score: <strong>${best ? best + " / 100" : "-"}</strong></p>
+                <small>View History -></small>
+              </button>
+            </div>
+          </div>
+        </section>`;
+        app.querySelector('[data-mode="tutorial"]').addEventListener("click", startTutorial);
+        app.querySelector('[data-mode="challenge"]').addEventListener("click", startChallenge);
+        app.querySelector('[data-mode="progress"]').addEventListener("click", renderProgress);
+      }
+
+      function startTutorial() {
+        tutorialIndex = 0;
+        completedCurrent = false;
+        renderTutorial();
+      }
+
+      function actionLabel(step) {
+        if (step.actionType === "click") return step.targetLabel;
+        return "Send to " + step.targetLabel;
+      }
+
+      function renderTutorial(feedback = "") {
+        const step = tutorialSteps[tutorialIndex];
+        const pct = ((tutorialIndex + (completedCurrent ? 1 : 0)) / tutorialSteps.length) * 100;
+        const source = tutorialIndex < 1 ? "Original Document" : tutorialIndex < 3 ? "Message Digest MD" : tutorialIndex < 5 ? "Document + Digital Signature" : tutorialIndex < 7 ? "Encrypted Package / DS" : "Received Document / MD";
+        const body = `<div class="progress"><span>${tutorialIndex + 1} / ${tutorialSteps.length}</span><div class="bar"><span style="width:${pct}%"></span></div></div>
+          <div class="layout">
+            <article class="step-panel">
+              <span class="side-label">${step.side === "sender" ? "Sender A" : "Receiver B"}</span>
+              <h2 class="step-title">${esc(step.title)}</h2>
+              <p class="step-desc">${esc(step.description)}</p>
+              <p class="hint">Target: <strong>${esc(step.targetLabel)}</strong></p>
+              <div class="feedback ${completedCurrent ? "ok" : ""}">${feedback || esc(step.feedbackIncorrect)}</div>
+            </article>
+            <article class="step-panel visual">
+              <div class="flow">
+                <div class="token ${completedCurrent ? "done" : ""}">${esc(source)}</div>
+                <span class="arrow">-></span>
+                <button class="target ${completedCurrent ? "done" : "hot"}" type="button" data-complete>${esc(step.targetLabel)}</button>
+                ${completedCurrent ? `<span class="arrow">-></span><div class="token done">${step.id === 9 ? "Integrity Verified" : "Step Output"}</div>` : ""}
+              </div>
+              <button class="primary" type="button" data-complete>${esc(actionLabel(step))}</button>
+              ${completedCurrent ? '<button class="nav-btn" type="button" data-next>Next Step</button>' : ""}
+            </article>
+          </div>`;
+        shell("Tutorial Mode", body, '<button class="nav-btn" type="button" data-reset>Reset</button>');
+        app.querySelector("[data-reset]").addEventListener("click", startTutorial);
+        app.querySelectorAll("[data-complete]").forEach((button) => button.addEventListener("click", () => {
+          completedCurrent = true;
+          renderTutorial(step.feedbackCorrect);
+        }));
+        const next = app.querySelector("[data-next]");
+        if (next) {
+          next.addEventListener("click", () => {
+            if (tutorialIndex >= tutorialSteps.length - 1) {
+              state.tutorialCompleted = true;
+              saveState();
+              renderHome();
+            } else {
+              tutorialIndex += 1;
+              completedCurrent = false;
+              renderTutorial();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          });
+        }
+      }
+
+      function startChallenge() {
+        quizIndex = 0;
+        selectedOption = null;
+        answers = [];
+        totalScore = 0;
+        renderChallenge();
+      }
+
+      function renderChallenge() {
+        const q = quizQuestions[quizIndex];
+        const pct = (quizIndex / quizQuestions.length) * 100;
+        const show = selectedOption !== null;
+        const body = `<div class="progress"><span>${quizIndex + 1} / ${quizQuestions.length}</span><div class="bar"><span style="width:${pct}%"></span></div><strong>${totalScore} pts</strong></div>
+          <article class="step-panel">
+            <h2 class="step-title">Q${quizIndex + 1}. ${esc(q.question)}</h2>
+            ${q.options.map((option, idx) => {
+              const correct = idx === q.correctIndex;
+              const chosen = selectedOption === idx;
+              const klass = show && correct ? "correct" : show && chosen && !correct ? "wrong" : "";
+              return `<button class="choice ${klass}" type="button" data-option="${idx}" ${show ? "disabled" : ""}><span class="badge">${String.fromCharCode(65 + idx)}.</span><span>${esc(option)}</span></button>`;
+            }).join("")}
+            ${show ? `<p class="explanation">${selectedOption === q.correctIndex ? "Correct. " : "Not quite. "}${esc(q.explanation)}</p><button class="primary" type="button" data-next>${quizIndex + 1 >= quizQuestions.length ? "Show Result" : "Next Question"}</button>` : ""}
+          </article>`;
+        shell("Challenge Mode", body, `<strong>${totalScore} pts</strong>`);
+        app.querySelectorAll("[data-option]").forEach((button) => button.addEventListener("click", () => {
+          selectedOption = Number(button.dataset.option);
+          renderChallenge();
+        }));
+        const next = app.querySelector("[data-next]");
+        if (next) {
+          next.addEventListener("click", () => {
+            const correct = selectedOption === q.correctIndex;
+            answers.push(correct);
+            if (correct) totalScore += 10;
+            if (quizIndex + 1 >= quizQuestions.length) {
+              state.challengeAttempts += 1;
+              state.challengeHistory.push({ date: new Date().toLocaleDateString(), score: totalScore, total: 100 });
+              saveState();
+              renderChallengeResult();
+            } else {
+              quizIndex += 1;
+              selectedOption = null;
+              renderChallenge();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          });
+        }
+      }
+
+      function renderChallengeResult() {
+        const correctCount = answers.filter(Boolean).length;
+        const percentage = Math.round((correctCount / quizQuestions.length) * 100);
+        const body = `<article class="step-panel">
+          <p class="muted">Challenge Result</p>
+          <h2 class="step-title">${percentage >= 90 ? "Excellent!" : percentage >= 70 ? "Good Job!" : "Keep Trying!"}</h2>
+          <p class="score">${totalScore} <span class="muted">/ 100 pts</span></p>
+          <p class="muted">Correct: ${correctCount} / ${quizQuestions.length} (${percentage}%)</p>
+          <div class="result-list">
+            ${quizQuestions.map((q, idx) => `<div class="result-line ${answers[idx] ? "good" : "bad"}"><strong>${idx + 1}. ${esc(q.question)}</strong>${answers[idx] ? "" : `<p>Correct Answer: ${esc(q.options[q.correctIndex])}</p>`}<p class="muted">${esc(q.explanation)}</p></div>`).join("")}
+          </div>
+          <p><button class="primary" type="button" data-again>Challenge Again</button> <button class="nav-btn" type="button" data-review>Review Tutorial</button></p>
+        </article>`;
+        shell("Challenge Result", body);
+        app.querySelector("[data-again]").addEventListener("click", startChallenge);
+        app.querySelector("[data-review]").addEventListener("click", startTutorial);
+      }
+
+      function renderProgress() {
+        const history = state.challengeHistory;
+        const body = `<article class="step-panel">
+          <h2 class="step-title">Learning Progress</h2>
+          <p class="muted">Tutorial Progress: <strong>${state.tutorialCompleted ? "100%" : "0%"}</strong></p>
+          <p class="muted">Challenges Taken: <strong>${state.challengeAttempts}</strong></p>
+          <p class="muted">Best Score: <strong>${bestScore() ? bestScore() + " / 100" : "-"}</strong></p>
+          <div class="history">
+            ${history.length ? history.map((item, idx) => `<div class="result-line"><strong>Attempt ${idx + 1}</strong><p>${esc(item.date)} - ${item.score} / ${item.total}</p></div>`).join("") : '<p class="muted">No challenge attempts yet.</p>'}
+          </div>
+          <p><button class="primary" type="button" data-challenge>Start Challenge</button></p>
+        </article>`;
+        shell("Learning Progress", body);
+        app.querySelector("[data-challenge]").addEventListener("click", startChallenge);
+      }
+
+      renderHome();
+    </script>
+  </body>
+</html>
