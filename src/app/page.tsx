@@ -48,6 +48,14 @@ const standaloneGames = [
     href: `${PAGES_BASE}/acc214-study-game/acc214_game.html`,
     cta: 'Launch ACC 214 Game',
   },
+  {
+    tag: 'Cost Lab',
+    title: 'Cost Estimation Challenge',
+    blurb:
+      'Clear three missions — account analysis, high-low, and regression — with instant feedback, hints, a light/dark theme, and a mistake log for review (ACC 214, Chapter 3).',
+    href: `${PAGES_BASE}/cost-estimation-game/index.html`,
+    cta: 'Launch Cost Estimation Game',
+  },
 ];
 
 export default function HomePage() {
