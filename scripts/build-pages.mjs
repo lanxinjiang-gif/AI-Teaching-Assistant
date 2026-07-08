@@ -21,7 +21,8 @@ const dropFromExport = [
   'cash-receipts-control-game',
   'decision-tree-game',
   'fraud-symptoms-roleplay-game',
-  'acc214-study-game',
+  'acc214-course-review',
+  'acc214-cost-estimation',
   'audit-detective-game',
   'repository.html',
 ];

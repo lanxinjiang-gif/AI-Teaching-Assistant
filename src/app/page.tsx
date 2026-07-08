@@ -41,19 +41,19 @@ const standaloneGames = [
     cta: 'Launch Fraud Symptoms Game',
   },
   {
-    tag: 'Cost Lab',
-    title: 'ACC 214 Study Game',
+    tag: 'Review Lab',
+    title: 'ACC 214 · Full Course Review',
     blurb:
-      'Run the departments of Saucy Apple Mfg. Co. — cost behavior, ABC, variances, and capital budgeting — as a managerial-accounting review.',
-    href: `${PAGES_BASE}/acc214-study-game/acc214_game.html`,
-    cta: 'Launch ACC 214 Game',
+      'Run the departments of Saucy Apple Mfg. Co. — cost behavior, ABC, variances, and capital budgeting — as a whole-semester managerial-accounting review.',
+    href: `${PAGES_BASE}/acc214-course-review/index.html`,
+    cta: 'Launch Full Course Review',
   },
   {
     tag: 'Cost Lab',
-    title: 'Cost Estimation Challenge',
+    title: 'ACC 214 · Cost Estimation Challenge',
     blurb:
-      'Clear three missions — account analysis, high-low, and regression — with instant feedback, hints, a light/dark theme, and a mistake log for review (ACC 214, Chapter 3).',
-    href: `${PAGES_BASE}/cost-estimation-game/index.html`,
+      'Chapter 3 deep-dive — clear three missions (account analysis, high-low, regression) with instant feedback, hints, a light/dark theme, and a mistake log for review.',
+    href: `${PAGES_BASE}/acc214-cost-estimation/index.html`,
     cta: 'Launch Cost Estimation Game',
   },
 ];

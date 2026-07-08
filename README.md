@@ -23,8 +23,8 @@ https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 | Fraud Symptoms Roleplay | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/fraud-symptoms-roleplay-game/ |
 | Audit Detective: Financial Fraud Investigation | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/audit-detective-game/ |
 | Digital Signature Learning Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/digital-signature-game/ |
-| ACC 214 Study Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-study-game/acc214_game.html |
-| Cost Estimation Challenge (ACC 214, Ch.3) | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/cost-estimation-game/ |
+| ACC 214 · Full Course Review | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-course-review/ |
+| ACC 214 · Cost Estimation Challenge (Ch.3) | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-cost-estimation/ |
 | Accounting Case Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/accounting-case-game/ |
 
 > The **bare site URL** (`…/AI-Teaching-Assistant/`) redirects to the game hub. The **Accounting Case Game** is a Next.js app that is now published to Pages as a **static export** (folder `public/accounting-case-game/`), so students reach it with a plain link like every other game. After changing its code, rebuild it with `npm run build:pages` (see below).
@@ -41,8 +41,8 @@ https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 | Fraud Symptoms Roleplay | `public/fraud-symptoms-roleplay-game/` | Static HTML | dkangaroo | Open in browser / Pages |
 | Audit Detective: Financial Fraud Investigation | `public/audit-detective-game/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
 | Digital Signature Learning Game | `public/digital-signature-game/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
-| ACC 214 Study Game | `public/acc214-study-game/acc214_game.html` | Static HTML | Lanxin / Lexi | Open in browser |
-| Cost Estimation Challenge (ACC 214, Ch.3) | `public/cost-estimation-game/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
+| ACC 214 · Full Course Review | `public/acc214-course-review/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
+| ACC 214 · Cost Estimation Challenge (Ch.3) | `public/acc214-cost-estimation/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
 | Accounting Case Game | `src/` → builds into `public/accounting-case-game/` | Next.js (static export) | Lanxin / Lexi | Play on Pages, or `npm install && npm run dev` |
 
 Index / landing pages: `index.html` ("Benford Audit Lab" landing) and `public/repository.html` ("Educational Game Repository").
@@ -53,7 +53,7 @@ Index / landing pages: `index.html` ("Benford Audit Lab" landing) and `public/re
 
 This repo holds **two different technologies**. Don't let them confuse you:
 
-1. **Static HTML games** (Benford, Cash Receipts, Decision Tree, Fraud Roleplay, Audit Detective, Digital Signature, ACC 214, Cost Estimation) — single self-contained `.html` files. Just open them in a browser, or use the live Pages link above. No install, no build. Easiest for students.
+1. **Static HTML games** (Benford, Cash Receipts, Decision Tree, Fraud Roleplay, Audit Detective, Digital Signature, ACC 214 Full Course Review, ACC 214 Cost Estimation) — single self-contained `.html` files. Just open them in a browser, or use the live Pages link above. No install, no build. Easiest for students.
 
 2. **The Next.js app** ("Accounting Case Game") — a real web app with `src/`, `package.json`, etc. Unlike the others it has a build step, but it is **published to GitHub Pages as a static export** (in `public/accounting-case-game/`), so students open it with a plain link like every other game. For local development run `npm install && npm run dev`; after changing its code, run `npm run build:pages` to refresh what Pages serves.
 
