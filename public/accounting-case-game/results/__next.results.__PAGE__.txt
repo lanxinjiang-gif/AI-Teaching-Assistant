@@ -3,7 +3,7 @@
 3:I[70935,["/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0elio9.~xtt~1.js","/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0acfi_w9cgfsj.js","/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0lb2ln-m2_o~q.js","/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0ys9~j3njejd0.js"],"default"]
 6:I[97367,["/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0elio9.~xtt~1.js","/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0acfi_w9cgfsj.js","/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0lb2ln-m2_o~q.js"],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0ys9~j3njejd0.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"bRTGqlAv0jKy-0HL1drv1"}
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/AI-Teaching-Assistant/public/accounting-case-game/_next/static/chunks/0ys9~j3njejd0.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"IyfP4_vV5Uu461fh-lKK2"}
 4:{}
 5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
 8:null

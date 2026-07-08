@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cost Estimation Challenge — ACC 214, Chapter 3</title>
+<style>
+  :root{                                  /* LIGHT theme (default) — WCAG-AA contrast */
+    --bg1:#eef2f8; --bg2:#dce6f2; --card:#ffffff; --card2:#f4f7fb;
+    --ink:#0f172a; --muted:#475569; --line:#cbd5e1;
+    --accent:#4f46e5; --accent2:#0e7490;
+    --gold:#b45309; --green:#047857; --green-d:#d1fae5;
+    --red:#dc2626; --red-d:#fee2e2; --good:#059669;
+    --sunken:#eef2f7; --hud-bg:rgba(255,255,255,.82); --shadow:0 8px 24px rgba(15,23,42,.12);
+  }
+  body.dark{                              /* DARK theme (opt-in via toggle) */
+    --bg1:#0f172a; --bg2:#243154; --card:#1f2a44; --card2:#27324f;
+    --ink:#f1f5f9; --muted:#9fb0c9; --line:#33415c;
+    --accent:#6366f1; --accent2:#22d3ee;
+    --gold:#fbbf24; --green:#34d399; --green-d:#065f46;
+    --red:#f87171; --red-d:#7f1d1d; --good:#10b981;
+    --sunken:#0b1426; --hud-bg:rgba(20,28,48,.7); --shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 20% -10%, var(--bg2) 0%, var(--bg1) 55%) fixed;
+    color:var(--ink); min-height:100vh; font-size:17px; line-height:1.45;
+  }
+  body.big{font-size:21px}            /* competition / projector view */
+  #app{max-width:960px;margin:0 auto;padding:14px 16px 60px}
+  h1,h2,h3{margin:0 0 .4em;line-height:1.15}
+  h1{font-size:2.0rem;letter-spacing:.5px}
+  h2{font-size:1.45rem}
+  h3{font-size:1.15rem;color:var(--accent2)}
+  p{margin:.4em 0}
+  .muted{color:var(--muted)}
+  .center{text-align:center}
+  /* HUD */
+  #hud{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;
+       padding:10px 14px;background:var(--hud-bg);border:1px solid var(--line);
+       border-radius:14px;backdrop-filter:blur(6px);position:sticky;top:8px;z-index:30;margin-bottom:16px}
+  #hud .brand{font-weight:700;letter-spacing:.5px}
+  #hud .brand span{color:var(--accent2)}
+  .scoreboard{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .team-chip{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+             font-weight:600;display:flex;gap:8px;align-items:center;font-size:.92em}
+  .team-chip .pts{color:var(--gold)}
+  .team-chip.active{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(34,211,238,.35);background:var(--card2)}
+  .solo-score{font-weight:700;color:var(--gold);font-size:1.1em}
+  .streak{font-size:.85em;color:var(--accent2)}
+  .hud-btns{display:flex;gap:6px}
+  /* generic */
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+        border-radius:16px;padding:22px;margin:14px 0;box-shadow:var(--shadow)}
+  .btn{cursor:pointer;border:none;border-radius:12px;padding:12px 18px;font-size:1rem;font-weight:600;
+       background:var(--accent);color:#fff;transition:transform .06s ease,filter .15s ease}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn.gold{background:linear-gradient(90deg,#f59e0b,#fbbf24);color:#3b2a00}
+  .btn.sm{padding:7px 12px;font-size:.85rem;border-radius:10px}
+  .btn.cyan{background:linear-gradient(90deg,#0891b2,#22d3ee);color:#04222a}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .spread{justify-content:space-between}
+  input[type=text],input[type=number]{
+    background:var(--sunken);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    padding:11px 12px;font-size:1.05rem;width:160px;outline:none}
+  input:focus{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(34,211,238,.25)}
+  label.fld{display:flex;flex-direction:column;gap:5px;font-size:.9em;color:var(--muted);font-weight:600}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--sunken);border:1px solid var(--line);font-size:.8em;color:var(--muted)}
+  .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;
+         background:linear-gradient(90deg,#7c3aed,#22d3ee);font-weight:700;color:#04101a}
+  .progress-dots{display:flex;gap:7px}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--line)}
+  .dot.done{background:var(--green)} .dot.cur{background:var(--accent2);box-shadow:0 0 0 3px rgba(34,211,238,.3)}
+  /* feedback */
+  .feedback{border-radius:12px;padding:14px 16px;margin-top:14px;font-weight:600;display:none}
+  .feedback.show{display:block;animation:pop .2s ease}
+  .feedback.ok{background:rgba(16,185,129,.16);border:1px solid var(--green)}
+  .feedback.no{background:rgba(248,113,113,.14);border:1px solid var(--red)}
+  .feedback .why{font-weight:400;color:var(--ink);margin-top:6px}
+  @keyframes pop{from{transform:scale(.97);opacity:.3}to{transform:scale(1);opacity:1}}
+  /* level chrome */
+  .level-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .stepcount{font-size:.85em;color:var(--muted)}
+  .hintbox{margin-top:10px;font-size:.92em;color:var(--gold);background:rgba(251,191,36,.08);
+           border:1px dashed rgba(251,191,36,.4);border-radius:10px;padding:10px 12px;display:none}
+  .hintbox.show{display:block}
+  /* classify */
+  .buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  .bucket{min-height:120px;border:2px dashed var(--line);border-radius:14px;padding:10px;background:var(--sunken)}
+  .bucket h4{margin:0 0 8px;text-align:center;color:var(--accent2);font-size:1rem}
+  .item{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+  .item .ctrls{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .item.wrong{border-color:var(--red);box-shadow:0 0 0 2px rgba(248,113,113,.3)}
+  .item.right{border-color:var(--green)}
+  /* points (high-low) */
+  .points{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .pt{cursor:pointer;border:1px solid var(--line);background:var(--sunken);border-radius:12px;padding:10px 14px;
+      font-variant-numeric:tabular-nums;font-weight:600;text-align:center;min-width:130px}
+  .pt small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+  .pt.sel{border-color:var(--accent2);background:var(--card2);box-shadow:0 0 0 2px rgba(34,211,238,.3)}
+  table.data{border-collapse:collapse;width:100%;margin-top:10px;font-variant-numeric:tabular-nums}
+  table.data th,table.data td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+  table.data th{background:var(--sunken);color:var(--accent2)}
+  /* options */
+  .opts{display:grid;gap:10px;margin-top:14px}
+  .opt{text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+       cursor:pointer;font-weight:600;font-size:1rem;color:var(--ink)}
+  .opt:hover{border-color:var(--accent2)}
+  .opt.ok{border-color:var(--green);background:rgba(16,185,129,.16)}
+  .opt.no{border-color:var(--red);background:rgba(248,113,113,.14)}
+  .opt:disabled{cursor:default}
+  /* regression svg */
+  .ssrbar{height:16px;background:var(--sunken);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:6px}
+  .ssrbar > div{height:100%;background:linear-gradient(90deg,#f87171,#fbbf24,#34d399);transition:width .12s linear}
+  .sliders{display:grid;gap:14px;margin-top:14px}
+  .sliders label{display:grid;grid-template-columns:200px 1fr 90px;gap:12px;align-items:center;font-weight:600}
+  input[type=range]{width:100%}
+  svg .pt-dot{fill:var(--accent2)}
+  svg .resid{stroke:var(--red);stroke-width:1.5;stroke-dasharray:3 3;opacity:.7}
+  svg .fitline{stroke:var(--gold);stroke-width:3}
+  svg .axis{stroke:var(--line);stroke-width:1}
+  svg text{fill:var(--muted);font-size:12px}
+  /* mode select */
+  .modecards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:680px){.modecards{grid-template-columns:1fr}.buckets{grid-template-columns:1fr}
+    .sliders label{grid-template-columns:1fr}
+    body.big{font-size:18px} #hud .brand{font-size:1rem} h1{font-size:1.6rem}
+    #hud{gap:6px} .sliders label{grid-template-columns:1fr 1fr}}
+  .modecard{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card);cursor:pointer}
+  .modecard.sel{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(34,211,238,.35)}
+  .modecard h3{color:var(--ink)}
+  .teaminputs{display:grid;gap:8px;margin-top:8px}
+  .kvtable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:8px}
+  .kvtable td{border:1px solid var(--line);padding:7px 10px}
+  .kvtable td:first-child{color:var(--muted)}
+  .billref{margin:12px 0;border:1px solid var(--line);border-left:4px solid var(--accent2);
+           border-radius:10px;background:var(--sunken);padding:10px 14px;max-width:460px}
+  .billref-h{font-weight:700;color:var(--accent2);margin-bottom:4px;font-size:.95em}
+  .billref .kvtable{margin-top:4px}
+  .billref .kvtable td{border:none;border-bottom:1px solid var(--line);padding:6px 4px}
+  .billref .kvtable tr:last-child td{border-bottom:none}
+  .eqn{font-size:1.2em;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+  .recap li{margin:.35em 0}
+  /* section menu (table of contents) */
+  .toc{display:grid;gap:14px;margin-top:12px}
+  .toc-lvl{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card2)}
+  .toc-head{display:block;width:100%;text-align:left;cursor:pointer;border:none;background:transparent;
+            padding:12px 14px;border-bottom:1px solid var(--line)}
+  .toc-head:hover{background:var(--sunken)}
+  .toc-title{display:block;font-weight:700;font-size:1.05rem;color:var(--ink)}
+  .toc-sub{display:block;font-size:.85em;color:var(--muted);margin-top:2px}
+  .toc-done{color:var(--good);font-size:.8em;font-weight:700}
+  .toc-steps{list-style:none;margin:0;padding:8px;display:grid;gap:6px}
+  .toc-step{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+            border:1px solid transparent;border-radius:8px;background:transparent;padding:8px 10px;
+            color:var(--ink);font-size:.95rem}
+  .toc-step:hover{border-color:var(--accent2);background:var(--sunken)}
+  .toc-num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+           display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
+  /* mistake log */
+  .mistake{border:1px solid var(--line);border-radius:10px;background:var(--card2);overflow:hidden}
+  .mistake .toc-step{border-radius:0;border:none;align-items:flex-start}
+  .mistake .toc-num{margin-top:2px}
+  .mistake-why{padding:8px 12px 10px 44px;font-size:.9em;color:var(--muted);border-top:1px solid var(--line)}
+  .mistake-why b{color:var(--good)}
+  /* confetti */
+  #fx{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+  .confetti{position:absolute;top:-12px;width:9px;height:14px;opacity:.95;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+  .tag{font-size:.78em;padding:2px 8px;border-radius:999px;background:var(--sunken);border:1px solid var(--line);color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hud"></header>
+  <main id="screen"></main>
+</div>
+<div id="fx"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   COST ESTIMATION CHALLENGE — ACC 214, Chapter 3
+   Self-contained. No external dependencies. Works offline.
+   All numbers match Chapter_3_Slides - S (slides 12-47).
+   ============================================================ */
+
+var $ = function(s,r){return (r||document).querySelector(s);};
+var screenEl = document.getElementById('screen');
+var hudEl    = document.getElementById('hud');
+
+/* ---------------- State ---------------- */
+var state = {
+  mode:'solo',            // 'solo' | 'competition'
+  teams:[],               // [{name,score}]
+  turnIndex:0,            // whose turn (competition)
+  soloScore:0,
+  streak:0,
+  muted:false,
+  level:0,                // 0 = home, 1..3 = levels, 9 = wrap
+  step:0,
+  badges:[],
+  done:{1:false,2:false,3:false},
+  mistakes:[],            // mistake log — logged wrong answers (persisted)
+  // per-step scratch
+  curUsedHint:false,
+  curRetried:false,
+  curLogged:false,
+  stepStart:0
+};
+
+var BADGES = {1:'Invoice Investigator',2:'Outlier Hunter',3:'Regression Referee'};
+
+/* ---------------- Scoring ---------------- */
+function scorerName(){
+  if(state.mode==='competition' && state.teams.length)
+    return state.teams[state.turnIndex % state.teams.length].name;
+  return 'You';
+}
+function addScore(pts){
+  if(state.mode==='competition' && state.teams.length){
+    state.teams[state.turnIndex % state.teams.length].score += pts;
+  } else { state.soloScore += pts; }
+}
+function award(base){
+  var firstTry = !state.curUsedHint && !state.curRetried, pts;
+  if(firstTry){
+    state.streak++;
+    var mult = 1 + Math.min(state.streak,5)*0.1;
+    pts = Math.round(base*mult);
+    if(state.mode==='competition'){
+      var el = (performance.now()-state.stepStart)/1000;
+      pts += Math.max(0, Math.round(25-el))*4;   // speed bonus
+    }
+  } else { state.streak = 0; pts = Math.round(base*0.5); }
+  addScore(pts);
+  return pts;
+}
+
+/* ---------------- HUD ---------------- */
+function renderHUD(){
+  var h = '<div class="brand">COST&nbsp;ESTIMATION&nbsp;<span>CHALLENGE</span></div>';
+  if(state.level>=1 && state.level<=3){
+    h += '<div class="progress-dots" title="Levels">';
+    for(var i=1;i<=3;i++){
+      var c = state.done[i]?'done':(i===state.level?'cur':'');
+      h += '<div class="dot '+c+'"></div>';
+    }
+    h += '</div>';
+  }
+  if(state.mode==='competition' && state.teams.length){
+    h += '<div class="scoreboard">';
+    for(var t=0;t<state.teams.length;t++){
+      var act = (t===state.turnIndex%state.teams.length && state.level>=1 && state.level<=3)?' active':'';
+      h += '<span class="team-chip'+act+'">'+escapeHtml(state.teams[t].name)+
+           ' <span class="pts">'+state.teams[t].score+'★</span></span>';
+    }
+    h += '</div>';
+  } else {
+    h += '<div class="scoreboard"><span class="solo-score">'+state.soloScore+'★</span>'+
+         (state.streak>1?'<span class="streak">🔥 '+state.streak+' streak</span>':'')+'</div>';
+  }
+  var isDark = document.body.classList.contains('dark');
+  h += '<div class="hud-btns">'+
+       '<button class="btn ghost sm" id="themeBtn" title="Toggle light / dark theme" aria-label="Toggle light or dark theme">'+(isDark?'🌙':'☀️')+'</button>'+
+       '<button class="btn ghost sm" id="muteBtn" title="Toggle sound" aria-label="Toggle sound">'+(state.muted?'🔇':'🔈')+'</button>'+
+       '<button class="btn ghost sm" id="homeBtn">Home</button></div>';
+  hudEl.innerHTML = h;
+  $('#themeBtn').onclick = function(){
+    document.body.classList.toggle('dark');
+    try{ localStorage.setItem('ce_theme', document.body.classList.contains('dark')?'dark':'light'); }catch(e){}
+    renderHUD();
+  };
+  $('#muteBtn').onclick = function(){ state.muted=!state.muted; renderHUD(); };
+  $('#homeBtn').onclick = function(){
+    if(confirm('Return to the start screen? Current progress will reset.')) resetAll();
+  };
+}
+
+/* ---------------- Home / mode select ---------------- */
+function renderHome(){
+  state.level=0;
+  renderHUD();
+  var teamRows='';
+  for(var i=0;i<4;i++){
+    teamRows += '<input type="text" id="team'+i+'" placeholder="Team '+(i+1)+(i<2?' (required)':' (optional)')+'" style="width:100%">';
+  }
+  screenEl.innerHTML =
+  '<div class="card center">'+
+    '<h1>🎮 Cost Estimation Challenge</h1>'+
+    '<p class="muted" style="max-width:620px;margin:6px auto 0">'+
+      'You’re a junior <b>cost analyst</b>. Clear three missions — one per estimation method — '+
+      'using real data from Chapter 3. Earn ★, build streaks, and collect badges.</p>'+
+  '</div>'+
+  '<div class="card">'+
+    '<h2>Choose how to play</h2>'+
+    '<div class="modecards">'+
+      '<div class="modecard sel" id="mc-solo">'+
+        '<h3>🧑‍🎓 Solo Practice</h3>'+
+        '<p class="muted">Self-paced review. Hints available, explanations always shown, no clock pressure. '+
+        'Great for studying on your own device.</p></div>'+
+      '<div class="modecard" id="mc-comp">'+
+        '<h3>🏆 Class Competition</h3>'+
+        '<p class="muted">Teams take turns on the projector. Speed bonus on, live scoreboard, '+
+        'big bold text. Enter 2–4 team names below.</p>'+
+        '<div class="teaminputs" id="teamFields" style="display:none">'+teamRows+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="row" style="margin-top:18px;justify-content:center">'+
+      '<button class="btn gold" id="startBtn" style="font-size:1.15rem;padding:14px 30px">Start ▶</button>'+
+    '</div>'+
+    '<p class="muted center" style="margin-top:14px;font-size:.85em">'+
+      'Methods covered: Account Analysis • High-Low • Regression &nbsp;|&nbsp; ACC 214, Chapter 3</p>'+
+  '</div>'+
+  sectionListHtml('📚 Jump to a section', 'Prefer to practice one method at a time? Pick any level — or a specific step — below. It opens in solo mode.')+
+  mistakesHtml();
+
+  var chosen='solo';
+  function pick(m){
+    chosen=m;
+    $('#mc-solo').classList.toggle('sel',m==='solo');
+    $('#mc-comp').classList.toggle('sel',m==='competition');
+    $('#teamFields').style.display = (m==='competition')?'grid':'none';
+  }
+  $('#mc-solo').onclick=function(){pick('solo');};
+  $('#mc-comp').onclick=function(){pick('competition');};
+  $('#startBtn').onclick=function(){
+    state.mode=chosen; state.teams=[]; state.turnIndex=0; state.soloScore=0; state.streak=0;
+    state.badges=[]; state.done={1:false,2:false,3:false};
+    if(chosen==='competition'){
+      for(var i=0;i<4;i++){
+        var v=$('#team'+i).value.trim();
+        if(v) state.teams.push({name:v,score:0});
+      }
+      if(state.teams.length<2){ alert('Please enter at least two team names for Class Competition.'); return; }
+      document.body.classList.add('big');
+    } else { document.body.classList.remove('big'); }
+    goLevel(1);
+  };
+  wireSectionList();
+  wireMistakes();
+}
+
+function resetAll(){
+  document.body.classList.remove('big');
+  state.mode='solo'; state.teams=[]; state.turnIndex=0; state.soloScore=0;
+  state.streak=0; state.badges=[]; state.done={1:false,2:false,3:false};
+  state.level=0; state.step=0; renderHome();
+}
+
+/* ---------------- Section menu (table of contents) ---------------- */
+function stripTags(s){
+  return String(s).replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ')
+    .replace(/&amp;/g,'&').replace(/&mdash;/g,'—').replace(/\s+/g,' ').trim();
+}
+function stepLabel(stp){
+  if(stp.type==='classify')   return 'Sort the bill into cost types';
+  if(stp.type==='pickpoints') return 'Pick the high & low points';
+  if(stp.type==='residual')   return 'Drag the line of best fit';
+  return stp.prompt ? stripTags(stp.prompt) : stp.type;
+}
+function sectionListHtml(heading, blurb){
+  var h='<div class="card"><h2>'+heading+'</h2>'+
+        (blurb?'<p class="muted">'+blurb+'</p>':'')+'<div class="toc">';
+  [1,2,3].forEach(function(n){
+    var lvl=LEVELS[n];
+    var done = state.done[n] ? ' <span class="toc-done">✓ done</span>' : '';
+    h+='<div class="toc-lvl">'+
+         '<button class="toc-head" data-lvl="'+n+'" data-step="0">'+
+           '<span class="toc-title">'+lvl.title+done+'</span>'+
+           '<span class="toc-sub">'+lvl.sub+'</span>'+
+         '</button><ol class="toc-steps">';
+    lvl.steps.forEach(function(stp,i){
+      h+='<li><button class="toc-step" data-lvl="'+n+'" data-step="'+i+'">'+
+           '<span class="toc-num">'+(i+1)+'</span> '+escapeHtml(stepLabel(stp))+'</button></li>';
+    });
+    h+='</ol></div>';
+  });
+  return h+'</div></div>';
+}
+function wireSectionList(){
+  document.querySelectorAll('.toc-head,.toc-step').forEach(function(b){
+    b.onclick=function(){ jumpTo(+b.getAttribute('data-lvl'), +b.getAttribute('data-step')); };
+  });
+}
+function jumpTo(level, step){
+  state.mode='solo';                 // free navigation is always solo practice/review
+  document.body.classList.remove('big');
+  state.streak=0;
+  state.level=level; state.step=step||0;
+  renderHUD(); renderStep();
+}
+
+/* ---------------- Mistake log ---------------- */
+function loadMistakes(){
+  try{ var s=localStorage.getItem('ce_mistakes'); state.mistakes = s?JSON.parse(s):[]; }
+  catch(e){ state.mistakes=[]; }
+}
+function saveMistakes(){ try{ localStorage.setItem('ce_mistakes', JSON.stringify(state.mistakes)); }catch(e){} }
+function stepExplanation(stp){
+  if(stp.why) return stripTags(stp.why);
+  if(stp.type==='classify')   return 'Fixed = charged even at zero activity (constant in total); Variable = driven by the cost driver (moves with activity); Mixed = a fixed base plus a variable part combined.';
+  if(stp.type==='pickpoints') return 'High-low uses the highest and lowest activity (X) points — the cost driver — not the highest/lowest cost (Y).';
+  return 'Review this step to see the correct approach.';
+}
+function logMistake(){
+  var lvl=LEVELS[state.level], stp=lvl.steps[state.step];
+  var entry={ level:state.level, step:state.step, levelTitle:lvl.title,
+              stepNo:state.step+1, label:stepLabel(stp), explain:stepExplanation(stp) };
+  state.mistakes = state.mistakes.filter(function(m){ return !(m.level===entry.level && m.step===entry.step); });
+  state.mistakes.push(entry);
+  saveMistakes();
+}
+function mistakesHtml(){
+  var h='<div class="card"><div class="row spread" style="align-items:center">'+
+        '<h2 style="margin:0">📕 Mistake Log</h2>'+
+        (state.mistakes.length?'<button class="btn ghost sm" id="clearMistakes">Clear all</button>':'')+
+        '</div>';
+  if(!state.mistakes.length){
+    return h+'<p class="muted">No mistakes logged yet — any question you miss (on the first try) will be saved here so you can review it later.</p></div>';
+  }
+  h+='<p class="muted">You missed these on the first try. Tap one to practice it again.</p><div class="toc">';
+  var ms=state.mistakes.slice().sort(function(a,b){return a.level-b.level||a.step-b.step;});
+  ms.forEach(function(m){
+    h+='<div class="mistake">'+
+         '<button class="toc-step" data-lvl="'+m.level+'" data-step="'+m.step+'">'+
+           '<span class="toc-num" style="background:var(--red)">✗</span>'+
+           '<span><b>'+escapeHtml(m.levelTitle)+' · Step '+m.stepNo+'</b><br>'+escapeHtml(m.label)+'</span>'+
+         '</button>'+
+         '<div class="mistake-why"><b>✔ Correct:</b> '+escapeHtml(m.explain)+'</div>'+
+       '</div>';
+  });
+  return h+'</div></div>';
+}
+function wireMistakes(){
+  var c=document.getElementById('clearMistakes');
+  if(c) c.onclick=function(){
+    if(confirm('Clear the whole mistake log?')){
+      state.mistakes=[]; saveMistakes();
+      if(state.level===9) renderWrap(); else renderHome();
+    }
+  };
+}
+
+/* ---------------- Level data ---------------- */
+/* Dover water bill — kept visible on the steps that say "from the bill" */
+var BILL_REF =
+  '<div class="billref">'+
+    '<div class="billref-h">🧾 Dover Mfg. — Monthly Water Bill</div>'+
+    '<table class="kvtable">'+
+      '<tr><td>Meter base fee <span class="tag">fixed</span></td><td style="text-align:right">$800</td></tr>'+
+      '<tr><td>Water usage — 1,000 units <span class="tag">variable</span></td><td style="text-align:right">$2,000</td></tr>'+
+      '<tr><td><b>Total this month</b> <span class="tag">mixed</span></td><td style="text-align:right"><b>$2,800</b></td></tr>'+
+    '</table>'+
+  '</div>';
+
+var LEVELS = {
+  1:{ title:'Level 1 — Account Analysis', sub:'🔎 Invoice Investigator · Dover Mfg. water bill',
+      steps:[
+        {type:'classify'},
+        {type:'numeric',
+          prompt:'What is the <b>variable cost per unit</b> of water?',
+          caption:'The usage charge was <b>$2,000</b> for <b>1,000</b> units this month.',
+          ref:BILL_REF,
+          expected:2, tol:0.1, unit:'$ / unit', base:100,
+          hint:'Variable rate = variable dollars ÷ units used → $2,000 ÷ 1,000.',
+          why:'2,000 ÷ 1,000 = <b>$2 per unit</b> — this is the cost of each additional unit of water, i.e., the <b>slope</b> of the cost line.'},
+        {type:'multi',
+          prompt:'Assemble the mixed-cost equation &nbsp;<span class="muted">Y = b + mX</span>',
+          caption:'Pull the fixed part (b) and the variable rate (m) from the bill.',
+          ref:BILL_REF,
+          blanks:[
+            {label:'Fixed cost  b  ($)', expected:800, tol:0.5},
+            {label:'Variable rate  m  ($/unit)', expected:2, tol:0.1}],
+          base:120,
+          hint:'b is the meter base fee charged even at zero usage; m is the per-unit rate you just found.',
+          why:'<span class="eqn">Y = 800 + 2&middot;X</span> &mdash; an $800 fixed base plus $2 for every unit. With this equation you can now <b>predict the bill at any usage level X</b>, which is the whole point of separating a mixed cost.'},
+        {type:'multi',
+          prompt:'Forecast <b>next year</b>’s water expense (usage drops 10%)',
+          caption:'Annualize over 12 months. Fixed stays put; variable scales to 90%.',
+          ref:BILL_REF,
+          blanks:[
+            {label:'Fixed for the year ($)',    expected:9600,  tol:1},
+            {label:'Variable for the year ($)', expected:21600, tol:2},
+            {label:'Total expense ($)',         expected:31200, tol:2}],
+          base:150,
+          hint:'Fixed = 800 × 12. Variable = 0.90 × 2,000 × 12. Total = the two added together.',
+          why:'$9,600 + $21,600 = <b>$31,200</b>. Notice only the <b>variable</b> part shrank with the 10% usage cut — the fixed meter fee didn’t move at all. That’s the payoff of splitting a mixed cost: you can flex the variable piece and leave the fixed piece alone.'}
+      ]},
+  2:{ title:'Level 2 — High-Low Method', sub:'📈 High-Low Heist · Zeffani’s pottery mugs',
+      steps:[
+        {type:'pickpoints'},
+        {type:'numeric',
+          prompt:'Step 2 — Compute the <b>slope (m)</b>, the variable cost per mug.',
+          caption:'High point (500, $9,000) and low point (100, $4,200).',
+          expected:12, tol:0.2, unit:'$ / mug', base:120,
+          hint:'Slope = change in cost ÷ change in activity = ΔY ÷ ΔX = (9,000 − 4,200) ÷ (500 − 100).',
+          why:'m = 4,800 ÷ 400 = <b>$12</b> — the <b>variable cost of making one more mug</b>, i.e., the slope of the cost line.'},
+        {type:'numeric',
+          prompt:'Step 3 — Solve for the <b>intercept (b)</b>, the fixed cost.',
+          caption:'Substitute the high point into Y = mX + b:&nbsp; 9,000 = 12(500) + b. Now solve for b.',
+          expected:3000, tol:15, unit:'$', base:120,
+          hint:'12 × 500 = 6,000. Then b = 9,000 − 6,000.',
+          why:'b = 9,000 − 6,000 = <b>$3,000</b> — the <b>fixed cost</b> Zeffani pays even if she makes zero mugs. Full equation: <span class="eqn">Y = 12X + 3,000</span>.'},
+        {type:'numeric',
+          prompt:'Use your equation to <b>predict the cost of 300 mugs</b>.',
+          caption:'Your cost equation from the last step: <b>Y = 12X + 3,000</b>. Substitute X = 300.',
+          expected:6600, tol:20, unit:'$', base:110,
+          hint:'Multiply 12 by 300, then add the fixed $3,000.',
+          why:'Y = 12(300) + 3,000 = <b>$6,600</b>. This is the model doing its job — plug in <i>any</i> volume to budget the cost before you produce a single mug.'},
+        {type:'choice',
+          prompt:'What is the <b>main risk</b> of the high-low method?',
+          options:[
+            {text:'The highest/lowest points may be outliers, making the line a poor predictor.', correct:true},
+            {text:'It uses too many data points and over-fits.', correct:false},
+            {text:'It always understates fixed cost.', correct:false},
+            {text:'It cannot be graphed.', correct:false}],
+          base:100,
+          why:'High-low uses only two points. If either is an outlier (unrepresentative), the equation predicts poorly. Regression, which uses every point, addresses this.'}
+      ]},
+  3:{ title:'Level 3 — Regression', sub:'📊 Line of Best Fit · Xavier Co. repairs & maintenance',
+      steps:[
+        {type:'residual'},
+        {type:'choice',
+          prompt:'<b>Economic plausibility:</b> do machine hours plausibly drive repairs & maintenance cost?',
+          options:[
+            {text:'Yes — the more machines run, the more they need repair, so the relationship makes sense.', correct:true},
+            {text:'No — repairs are random and unrelated to machine use.', correct:false},
+            {text:'Only if R² is exactly 1.', correct:false}],
+          base:100,
+          why:'Economic plausibility asks whether the X→Y story makes sense. More machine hours → more wear → more repairs. Plausible.'},
+        {type:'choice',
+          prompt:'<b>Goodness of fit:</b> the regression reports <b>R² = 0.65</b>. Rule of thumb is R² ≥ 0.30.',
+          options:[
+            {text:'PASS — 0.65 is well above 0.30, a good fit.', correct:true},
+            {text:'FAIL — R² must be above 0.90.', correct:false},
+            {text:'FAIL — 0.65 is below the 0.30 threshold.', correct:false}],
+          base:100,
+          why:'R² = 0.65 means 65% of the variation in cost is explained by machine hours — above the 0.30 rule of thumb, so it passes.'},
+        {type:'choice',
+          prompt:'<b>Significance of slope:</b> t-stat = <b>4.53</b> and p-value = <b>0.00086</b>.',
+          options:[
+            {text:'Significant — t = 4.53 > 1.96 and p = 0.00086 < 0.05.', correct:true},
+            {text:'Not significant — p is too small.', correct:false},
+            {text:'Cannot tell without the R².', correct:false}],
+          base:100,
+          why:'t = 4.53 exceeds 1.96 and p = 0.00086 is well under 0.05, so the slope is statistically different from zero — a significant driver.'},
+        {type:'multi',
+          prompt:'Read the cost function from the Excel output.',
+          caption:'Excel: <span class="pill">Intercept&nbsp;8,773.72</span> '+
+                  '<span class="pill">Machine&nbsp;hours&nbsp;coefficient&nbsp;14.98</span> &nbsp; Form: Y = mX + b',
+          blanks:[
+            {label:'Slope  m  ($/machine hr)', expected:14.98, tol:0.05},
+            {label:'Intercept  b  ($)',        expected:8773.72, tol:0.5}],
+          base:120,
+          hint:'The coefficient on machine hours is the slope (m); the Intercept row is b.',
+          why:'<span class="eqn">Y = 14.98X + 8,773.72</span> — $14.98 variable per machine hour plus $8,773.72 fixed.'},
+        {type:'choice',
+          prompt:'<b>Final verdict:</b> is this regression model valid for predicting cost?',
+          options:[
+            {text:'Yes — it is economically plausible, R² ≥ 0.30, and the slope is significant.', correct:true},
+            {text:'No — it fails goodness of fit.', correct:false},
+            {text:'No — the slope is not significant.', correct:false}],
+          base:120,
+          why:'All three checks pass — plausible driver, R² = 0.65 ≥ 0.30, p = 0.00086 < 0.05. The model is valid.'}
+      ]}
+};
+
+/* high-low data (slide 20) */
+var POTTERY = [
+  {x:100,y:4200},{x:180,y:4000},{x:250,y:6200},{x:320,y:6500},
+  {x:380,y:7800},{x:440,y:8100},{x:500,y:9000}
+];
+
+/* ---------------- Level / step flow ---------------- */
+function goLevel(n){
+  state.level=n; state.step=0;
+  renderHUD();
+  renderStep();
+}
+function renderStep(){
+  var lvl = LEVELS[state.level];
+  var stp = lvl.steps[state.step];
+  state.curUsedHint=false; state.curRetried=false; state.curLogged=false; state.stepStart=performance.now();
+
+  var turnBanner='';
+  if(state.mode==='competition' && state.teams.length){
+    turnBanner = '<span class="tag" style="background:rgba(34,211,238,.12);border-color:var(--accent2);color:var(--accent2)">'+
+                 '🎯 '+escapeHtml(scorerName())+'’s turn</span>';
+  }
+  var html =
+  '<div class="card">'+
+    '<div class="level-head">'+
+      '<div><div class="pill">'+lvl.sub+'</div><h2 style="margin-top:8px">'+lvl.title+'</h2></div>'+
+      '<div class="center">'+turnBanner+
+        '<div class="stepcount">Step '+(state.step+1)+' of '+lvl.steps.length+'</div></div>'+
+    '</div>'+
+    '<div id="stepBody" style="margin-top:8px"></div>'+
+    (stp.hint?'<div class="row" style="margin-top:12px"><button class="btn ghost sm" id="hintBtn">💡 Hint'+
+        (state.mode==='competition'?' (−half points)':'')+'</button></div><div class="hintbox" id="hintBox"></div>':'')+
+    '<div class="feedback" id="fb"></div>'+
+    '<div class="row" id="navRow" style="margin-top:16px"></div>'+
+  '</div>';
+  screenEl.innerHTML = html;
+
+  if(stp.hint){
+    $('#hintBtn').onclick=function(){
+      state.curUsedHint=true;
+      $('#hintBox').innerHTML=stp.hint; $('#hintBox').classList.add('show');
+      $('#hintBtn').disabled=true; renderHUD();
+    };
+  }
+  var body=$('#stepBody');
+  if(stp.type==='numeric')      renderNumeric(stp,body);
+  else if(stp.type==='multi')   renderMulti(stp,body);
+  else if(stp.type==='choice')  renderChoice(stp,body);
+  else if(stp.type==='classify')renderClassify(stp,body);
+  else if(stp.type==='pickpoints')renderPickPoints(stp,body);
+  else if(stp.type==='residual')renderResidual(stp,body);
+}
+
+/* feedback + advance helpers */
+function showCorrect(whyHtml, pts){
+  beep(true);
+  var fb=$('#fb');
+  fb.className='feedback ok show';
+  fb.innerHTML='✅ Correct! <span style="color:var(--gold)">+'+pts+'★</span> to '+escapeHtml(scorerName())+
+               '<div class="why">'+(whyHtml||'')+'</div>';
+  renderHUD();
+  var nav=$('#navRow'); nav.innerHTML='';
+  var b=document.createElement('button');
+  var last = (state.step === LEVELS[state.level].steps.length-1);
+  b.className='btn gold'; b.textContent = last ? 'Finish level ✔' : 'Next ▶';
+  b.onclick=advanceStep; nav.appendChild(b);
+  confetti(pts>180?60:24);
+}
+function showWrong(msg, soft){
+  beep(false);
+  state.curRetried=true; state.streak=0; renderHUD();
+  if(!soft && !state.curLogged){ logMistake(); state.curLogged=true; }  // record in mistake log
+  var fb=$('#fb');
+  fb.className='feedback no show';
+  fb.innerHTML='❌ '+(msg||'Not quite — try again.');
+}
+function advanceStep(){
+  var lvl=LEVELS[state.level];
+  if(state.mode==='competition' && state.teams.length) state.turnIndex++;
+  if(state.step < lvl.steps.length-1){ state.step++; renderHUD(); renderStep(); }
+  else completeLevel(state.level);
+}
+
+/* ---------------- Step renderers ---------------- */
+function renderNumeric(stp,body){
+  body.innerHTML =
+    '<h3>'+stp.prompt+'</h3>'+
+    (stp.caption?'<p class="muted">'+stp.caption+'</p>':'')+
+    (stp.ref?stp.ref:'')+
+    (stp.formula?'<p class="eqn">'+stp.formula+'</p>':'')+
+    '<div class="row" style="margin-top:8px">'+
+      '<input type="number" step="any" id="num" inputmode="decimal" autocomplete="off">'+
+      (stp.unit?'<span class="muted">'+stp.unit+'</span>':'')+
+      '<button class="btn" id="ck">Check</button>'+
+    '</div>';
+  var inp=$('#num');
+  inp.focus();
+  function check(){
+    var v=parseFloat(inp.value);
+    if(isNaN(v)){ showWrong('Enter a number first.', true); return; }
+    if(Math.abs(v-stp.expected)<=stp.tol){ showCorrect(stp.why, award(stp.base||100)); inp.disabled=true; $('#ck').disabled=true; }
+    else showWrong('Check your arithmetic and try again.');
+  }
+  $('#ck').onclick=check;
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter') check(); });
+}
+
+function renderMulti(stp,body){
+  var rows='';
+  for(var i=0;i<stp.blanks.length;i++){
+    var bl=stp.blanks[i];
+    rows += '<label class="fld">'+bl.label+(bl.note?' <span class="tag">'+bl.note+'</span>':'')+
+            '<input type="number" step="any" inputmode="decimal" id="b'+i+'" autocomplete="off"></label>';
+  }
+  body.innerHTML =
+    '<h3>'+stp.prompt+'</h3>'+
+    (stp.caption?'<p class="muted">'+stp.caption+'</p>':'')+
+    (stp.ref?stp.ref:'')+
+    '<div class="row" style="margin-top:8px;align-items:flex-end">'+rows+'</div>'+
+    '<div class="row" style="margin-top:12px"><button class="btn" id="ck">Check</button></div>';
+  $('#b0').focus();
+  function check(){
+    var allFilled=true, allRight=true;
+    for(var i=0;i<stp.blanks.length;i++){
+      var v=parseFloat($('#b'+i).value);
+      if(isNaN(v)){ allFilled=false; break; }
+      if(Math.abs(v-stp.blanks[i].expected)>stp.blanks[i].tol) allRight=false;
+    }
+    if(!allFilled){ showWrong('Fill in every box first.', true); return; }
+    if(allRight){
+      showCorrect(stp.why, award(stp.base||120));
+      for(var j=0;j<stp.blanks.length;j++) $('#b'+j).disabled=true;
+      $('#ck').disabled=true;
+    } else showWrong('At least one value is off — recheck and try again.');
+  }
+  $('#ck').onclick=check;
+  for(var k=0;k<stp.blanks.length;k++){
+    $('#b'+k).addEventListener('keydown',function(e){ if(e.key==='Enter') check(); });
+  }
+}
+
+function renderChoice(stp,body){
+  var opts='';
+  for(var i=0;i<stp.options.length;i++)
+    opts += '<button class="opt" data-i="'+i+'">'+stp.options[i].text+'</button>';
+  body.innerHTML =
+    '<h3>'+stp.prompt+'</h3>'+
+    (stp.caption?'<p class="muted">'+stp.caption+'</p>':'')+
+    '<div class="opts">'+opts+'</div>';
+  var btns=body.querySelectorAll('.opt');
+  btns.forEach(function(btn){
+    btn.onclick=function(){
+      var i=+btn.getAttribute('data-i');
+      if(stp.options[i].correct){
+        btn.classList.add('ok');
+        btns.forEach(function(b){b.disabled=true;});
+        showCorrect(stp.why, award(stp.base||100));
+      } else {
+        btn.classList.add('no'); btn.disabled=true;
+        showWrong('Not that one — try again.');
+      }
+    };
+  });
+}
+
+function renderClassify(stp,body){
+  var items=[
+    {id:'meter', text:'Meter base fee — $800 / month <span class="muted">(charged even at zero usage)</span>', correct:'fixed'},
+    {id:'usage', text:'Water usage charge — $2,000 / month <span class="muted">(1,000 units used)</span>', correct:'variable'},
+    {id:'total', text:'Total water bill — $2,800 / month <span class="muted">($800 + $2,000)</span>', correct:'mixed'}
+  ];
+  var assigned={}; // id -> bucket
+  body.innerHTML =
+    '<h3>Sort each line of Dover’s water bill into the right cost type.</h3>'+
+    '<p class="muted">Account analysis means reading the actual bill to separate fixed from variable.</p>'+
+    '<div id="tray"></div>'+
+    '<div class="buckets">'+
+      '<div class="bucket" data-b="fixed"><h4>Fixed</h4></div>'+
+      '<div class="bucket" data-b="variable"><h4>Variable</h4></div>'+
+      '<div class="bucket" data-b="mixed"><h4>Mixed</h4></div>'+
+    '</div>'+
+    '<div class="row" style="margin-top:14px"><button class="btn" id="ck" disabled>Check</button></div>';
+
+  function drawTray(){
+    var tray=$('#tray'); tray.innerHTML='';
+    items.forEach(function(it){
+      if(assigned[it.id]) return;
+      var d=document.createElement('div'); d.className='item';
+      d.innerHTML='<div>'+it.text+'</div><div class="ctrls">'+
+        '<button class="btn ghost sm" data-b="fixed">→ Fixed</button>'+
+        '<button class="btn ghost sm" data-b="variable">→ Variable</button>'+
+        '<button class="btn ghost sm" data-b="mixed">→ Mixed</button></div>';
+      d.querySelectorAll('button').forEach(function(b){
+        b.onclick=function(){ assigned[it.id]=b.getAttribute('data-b'); redraw(); };
+      });
+      tray.appendChild(d);
+    });
+  }
+  function drawBuckets(){
+    ['fixed','variable','mixed'].forEach(function(bk){
+      var box=body.querySelector('.bucket[data-b="'+bk+'"]');
+      box.innerHTML='<h4>'+bk.charAt(0).toUpperCase()+bk.slice(1)+'</h4>';
+      items.forEach(function(it){
+        if(assigned[it.id]!==bk) return;
+        var d=document.createElement('div'); d.className='item'; d.id='asg-'+it.id;
+        d.innerHTML='<div>'+it.text+'</div><div class="ctrls">'+
+          '<button class="btn ghost sm">↩ Return</button></div>';
+        d.querySelector('button').onclick=function(){ delete assigned[it.id]; redraw(); };
+        box.appendChild(d);
+      });
+    });
+  }
+  function redraw(){
+    drawTray(); drawBuckets();
+    $('#ck').disabled = (Object.keys(assigned).length !== items.length);
+  }
+  redraw();
+  $('#ck').onclick=function(){
+    var allRight=true;
+    items.forEach(function(it){
+      var el=$('#asg-'+it.id); if(!el) return;
+      el.classList.remove('right','wrong');
+      if(assigned[it.id]===it.correct) el.classList.add('right');
+      else { el.classList.add('wrong'); allRight=false; }
+    });
+    if(allRight){
+      $('#ck').disabled=true;
+      showCorrect('<b>Fixed</b> — the $800 meter fee is charged even at zero usage and stays constant in total no matter how much water is used, so it doesn’t vary with the activity. '+
+        '<b>Variable</b> — the $2,000 usage charge is driven by the cost driver (units used): use more water and the total rises, use none and it’s $0. '+
+        '<b>Mixed</b> — the $2,800 bill has both a fixed base and a usage-driven variable part, which is exactly why we have to <i>split</i> it before we can predict it.', award(100));
+    } else showWrong('Some cards are in the wrong bucket (marked red). Reassign them and check again.');
+  };
+}
+
+function renderPickPoints(stp,body){
+  var sel=[]; // indices
+  var rows='';
+  POTTERY.forEach(function(p,i){
+    rows += '<tr><td>'+(i+1)+'</td><td>'+p.x+'</td><td>$'+p.y.toLocaleString()+'</td></tr>';
+  });
+  var chips='';
+  POTTERY.forEach(function(p,i){
+    chips += '<div class="pt" data-i="'+i+'">'+p.x+' mugs<small>$'+p.y.toLocaleString()+'</small></div>';
+  });
+  body.innerHTML =
+    '<h3>Step 1 — Pick the two points the high-low method uses.</h3>'+
+    '<p class="muted">Zeffani made mugs (X) at these costs (Y) over 7 years. Select exactly <b>two</b> points.</p>'+
+    '<table class="data"><tr><th>Year</th><th>Mugs (X)</th><th>Cost (Y)</th></tr>'+rows+'</table>'+
+    '<div class="points">'+chips+'</div>'+
+    '<div class="row" style="margin-top:14px"><button class="btn" id="ck" disabled>Check</button></div>';
+  var chipEls=body.querySelectorAll('.pt');
+  chipEls.forEach(function(c){
+    c.onclick=function(){
+      var i=+c.getAttribute('data-i'), pos=sel.indexOf(i);
+      if(pos>=0){ sel.splice(pos,1); c.classList.remove('sel'); }
+      else { if(sel.length>=2){ return; } sel.push(i); c.classList.add('sel'); }
+      $('#ck').disabled = (sel.length!==2);
+    };
+  });
+  // index 0 = (100,4200) lowest X; index 6 = (500,9000) highest X; index 1 = (180,4000) lowest Y
+  $('#ck').onclick=function(){
+    var has=function(i){return sel.indexOf(i)>=0;};
+    if(has(0)&&has(6)){
+      chipEls.forEach(function(c){c.style.pointerEvents='none';});
+      $('#ck').disabled=true;
+      showCorrect('Correct — high-low always uses the <b>highest and lowest activity (X)</b>: 100 mugs ($4,200) and 500 mugs ($9,000). Their corresponding costs come along for the ride.', award(150));
+    } else if(has(1)){
+      showWrong('You picked the point with the lowest <b>cost (Y = $4,000)</b>. High-low keys off the <b>activity (X)</b> — the cost driver. The lowest activity is <b>100 mugs</b>, not 180. Reselect.');
+    } else {
+      showWrong('Not quite. Choose the <b>highest and lowest number of mugs (X)</b> — the lowest is 100 and the highest is 500.');
+    }
+  };
+}
+
+function renderResidual(stp,body){
+  // intuition dataset (separate from Xavier numbers; OLS computed live)
+  var P=[[1,23],[2,33],[3,47],[4,57],[5,72],[6,80],[7,95],[8,104]];
+  // OLS
+  var n=P.length, sx=0,sy=0,sxx=0,sxy=0;
+  P.forEach(function(p){sx+=p[0];sy+=p[1];sxx+=p[0]*p[0];sxy+=p[0]*p[1];});
+  var olsM=(n*sxy-sx*sy)/(n*sxx-sx*sx);
+  var olsB=(sy-olsM*sx)/n;
+  function ssr(m,b){var s=0;P.forEach(function(p){var e=p[1]-(m*p[0]+b);s+=e*e;});return s;}
+  var ssrOLS=ssr(olsM,olsB);
+  var ssrBad=ssr(2,5);            // a poor starting fit -> bar scale
+  var target=ssrOLS*1.35;
+  var solved=false;
+
+  // plot scales
+  var W=600,H=340,padL=46,padB=34,padT=14,padR=14;
+  var xmin=0,xmax=9,ymin=0,ymax=120;
+  function sx_(x){return padL+(x-xmin)/(xmax-xmin)*(W-padL-padR);}
+  function sy_(y){return H-padB-(y-ymin)/(ymax-ymin)*(H-padT-padB);}
+
+  body.innerHTML =
+    '<h3>Drag the line to fit the points — minimize the squared residuals.</h3>'+
+    '<p class="muted">Regression finds the one line with the <b>smallest total squared residual</b> '+
+    '(red gaps). The intercept is the fixed cost; the slope is the variable cost.</p>'+
+    '<svg id="svg" viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;background:var(--sunken);border:1px solid var(--line);border-radius:12px"></svg>'+
+    '<div class="sliders">'+
+      '<label>Intercept&nbsp;<span class="muted">(fixed)</span>'+
+        '<input type="range" id="sB" min="-10" max="40" step="1" value="5">'+
+        '<span id="vB" class="eqn"></span></label>'+
+      '<label>Slope&nbsp;<span class="muted">(variable)</span>'+
+        '<input type="range" id="sM" min="0" max="20" step="0.2" value="2">'+
+        '<span id="vM" class="eqn"></span></label>'+
+    '</div>'+
+    '<div style="margin-top:12px">Total squared residual (SSR): <b id="ssrV" class="eqn"></b> '+
+      '<span class="muted">— target ≤ '+Math.round(target)+'</span>'+
+      '<div class="ssrbar"><div id="ssrFill"></div></div></div>'+
+    '<div class="row" style="margin-top:14px">'+
+      '<button class="btn cyan sm" id="snap">💡 Snap to best fit (−half points)</button>'+
+      '<button class="btn" id="ck" disabled>Lock in this line</button></div>';
+
+  var svg=$('#svg'), sM=$('#sM'), sB=$('#sB');
+  function draw(){
+    var m=parseFloat(sM.value), b=parseFloat(sB.value);
+    var s='';
+    // axes
+    s+='<line class="axis" x1="'+padL+'" y1="'+sy_(0)+'" x2="'+(W-padR)+'" y2="'+sy_(0)+'"/>';
+    s+='<line class="axis" x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(H-padB)+'"/>';
+    s+='<text x="'+(W/2)+'" y="'+(H-6)+'" text-anchor="middle">Activity (X)</text>';
+    s+='<text x="14" y="'+(H/2)+'" text-anchor="middle" transform="rotate(-90 14 '+(H/2)+')">Cost (Y)</text>';
+    // fit line across plot
+    var x1=xmin, x2=xmax;
+    s+='<line class="fitline" x1="'+sx_(x1)+'" y1="'+sy_(m*x1+b)+'" x2="'+sx_(x2)+'" y2="'+sy_(m*x2+b)+'"/>';
+    // residuals + points
+    P.forEach(function(p){
+      var py=sy_(p[1]), ly=sy_(m*p[0]+b), px=sx_(p[0]);
+      s+='<line class="resid" x1="'+px+'" y1="'+py+'" x2="'+px+'" y2="'+ly+'"/>';
+      s+='<circle class="pt-dot" cx="'+px+'" cy="'+py+'" r="5"/>';
+    });
+    svg.innerHTML=s;
+    var cur=ssr(m,b);
+    $('#vM').textContent=m.toFixed(1); $('#vB').textContent=b.toFixed(0);
+    $('#ssrV').textContent=Math.round(cur);
+    var pct=Math.max(2,Math.min(100, 100*(1-(cur-ssrOLS)/(ssrBad-ssrOLS))));
+    $('#ssrFill').style.width=pct+'%';
+    $('#ck').disabled = (cur>target) || solved;
+  }
+  sM.oninput=draw; sB.oninput=draw;
+  $('#snap').onclick=function(){
+    state.curUsedHint=true; renderHUD();
+    sM.value=Math.round(olsM*5)/5; sB.value=Math.round(olsB); draw();
+    $('#snap').disabled=true;
+  };
+  $('#ck').onclick=function(){
+    if(solved) return; solved=true;
+    sM.disabled=true; sB.disabled=true; $('#ck').disabled=true; $('#snap').disabled=true;
+    showCorrect('That’s the idea of regression: the <b>line of best fit</b> minimizes the sum of squared residuals across <b>all</b> points — not just two, like high-low.', award(200));
+  };
+  draw();
+}
+
+/* ---------------- Level complete ---------------- */
+function completeLevel(n){
+  state.done[n]=true;
+  if(state.badges.indexOf(BADGES[n])<0) state.badges.push(BADGES[n]);
+  confetti(80);
+  renderHUD();
+  var next = n<3 ? n+1 : null;
+  screenEl.innerHTML =
+  '<div class="card center">'+
+    '<h2>🎉 '+LEVELS[n].title+' complete!</h2>'+
+    '<p style="margin:14px 0"><span class="badge">🏅 Badge earned: '+BADGES[n]+'</span></p>'+
+    (state.mode==='competition'? scoreboardHtml() :
+       '<p class="muted">Score so far: <b class="solo-score">'+state.soloScore+'★</b></p>')+
+    '<div class="row" style="justify-content:center;margin-top:18px">'+
+      (next? '<button class="btn gold" id="nextLvl" style="font-size:1.1rem;padding:13px 26px">Next level ▶</button>'
+           : '<button class="btn gold" id="finish" style="font-size:1.1rem;padding:13px 26px">See results 🏁</button>')+
+    '</div>'+
+  '</div>';
+  if(next) $('#nextLvl').onclick=function(){ goLevel(next); };
+  else $('#finish').onclick=renderWrap;
+}
+
+function scoreboardHtml(){
+  var t=state.teams.slice().sort(function(a,b){return b.score-a.score;});
+  var s='<table class="kvtable" style="max-width:380px;margin:10px auto">';
+  t.forEach(function(tm,i){
+    s+='<tr><td>'+(i===0?'🥇 ':(i===1?'🥈 ':(i===2?'🥉 ':'')))+escapeHtml(tm.name)+
+       '</td><td style="text-align:right;color:var(--gold);font-weight:700">'+tm.score+'★</td></tr>';
+  });
+  return s+'</table>';
+}
+
+/* ---------------- Wrap-up ---------------- */
+function renderWrap(){
+  state.level=9; renderHUD(); confetti(120);
+  screenEl.innerHTML =
+  '<div class="card center">'+
+    '<h1>🏁 Challenge Complete!</h1>'+
+    (state.mode==='competition'?
+       '<h3 style="color:var(--ink);margin-top:10px">Final standings</h3>'+scoreboardHtml() :
+       '<p style="font-size:1.3em">Final score: <b class="solo-score">'+state.soloScore+'★</b></p>'+saveBest())+
+    '<p style="margin-top:6px">Badges: '+(state.badges.map(function(b){return '<span class="badge" style="margin:3px">🏅 '+b+'</span>';}).join(' '))+'</p>'+
+  '</div>'+
+  '<div class="card">'+
+    '<h2>📚 One-glance recap</h2>'+
+    '<h3>The three cost equations you built</h3>'+
+    '<ul class="recap">'+
+      '<li><b>Account Analysis</b> — read the invoices: <span class="eqn">Y = 800 + 2X</span></li>'+
+      '<li><b>High-Low</b> — highest & lowest <i>activity (X)</i> points: <span class="eqn">Y = 12X + 3,000</span></li>'+
+      '<li><b>Regression</b> — line of best fit over all points: <span class="eqn">Y = 14.98X + 8,773.72</span></li>'+
+    '</ul>'+
+    '<h3 style="margin-top:14px">When is a regression valid? Check all three:</h3>'+
+    '<ul class="recap">'+
+      '<li><b>Economic plausibility</b> — does the X → Y story make sense?</li>'+
+      '<li><b>Goodness of fit</b> — R² ≥ 0.30 (Xavier: 0.65 ✓)</li>'+
+      '<li><b>Significance of slope</b> — p ≤ 0.05 and t ≥ 1.96 (Xavier: p = 0.00086, t = 4.53 ✓)</li>'+
+    '</ul>'+
+    '<div class="row" style="justify-content:center;margin-top:18px">'+
+      '<button class="btn gold" id="again">Play again 🔁</button>'+
+    '</div>'+
+  '</div>'+
+  mistakesHtml()+
+  sectionListHtml('🔁 Review any section', 'Jump back to any level — or a specific step — to review it.');
+  $('#again').onclick=resetAll;
+  wireSectionList();
+  wireMistakes();
+}
+
+function saveBest(){
+  try{
+    var k='ce_best_solo', prev=parseInt(localStorage.getItem(k)||'0',10);
+    if(state.soloScore>prev){ localStorage.setItem(k,String(state.soloScore));
+      return '<p class="muted">🌟 New personal best!</p>'; }
+    return '<p class="muted">Personal best: '+prev+'★</p>';
+  }catch(e){ return ''; }
+}
+
+/* ---------------- Effects ---------------- */
+function confetti(n){
+  var fx=document.getElementById('fx');
+  var colors=['#fbbf24','#22d3ee','#34d399','#f87171','#a78bfa','#f472b6'];
+  for(var i=0;i<n;i++){
+    var d=document.createElement('div'); d.className='confetti';
+    d.style.left=(Math.random()*100)+'vw';
+    d.style.background=colors[i%colors.length];
+    var dur=(1.1+Math.random()*1.3);
+    d.style.animationDuration=dur+'s';
+    d.style.animationDelay=(Math.random()*0.3)+'s';
+    d.style.transform='rotate('+(Math.random()*360)+'deg)';
+    fx.appendChild(d);
+    (function(el,ms){ setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, ms); })(d,(dur+0.5)*1000);
+  }
+}
+var actx=null;
+function beep(ok){
+  if(state.muted) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    var t=actx.currentTime;
+    var o=actx.createOscillator(), g=actx.createGain();
+    o.connect(g); g.connect(actx.destination); o.type='sine';
+    o.frequency.value = ok?660:170;
+    g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+    o.start(t); o.stop(t+0.26);
+    if(ok){
+      var o2=actx.createOscillator(), g2=actx.createGain();
+      o2.connect(g2); g2.connect(actx.destination); o2.type='sine'; o2.frequency.value=990;
+      g2.gain.setValueAtTime(0.10,t+0.12); g2.gain.exponentialRampToValueAtTime(0.0008,t+0.42);
+      o2.start(t+0.12); o2.stop(t+0.42);
+    }
+  }catch(e){}
+}
+
+/* ---------------- util ---------------- */
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+/* ---------------- boot ---------------- */
+try{ if(localStorage.getItem('ce_theme')==='dark') document.body.classList.add('dark'); }catch(e){}  /* light by default */
+loadMistakes();
+renderHome();
+</script>
+</body>
+</html>
