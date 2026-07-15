@@ -39,8 +39,8 @@ https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
 | Cash Receipts Control Game | `public/cash-receipts-control-game/` | Static HTML | dkangaroo | Open in browser / Pages |
 | Decision Tree Builder Lab | `public/decision-tree-game/` | Static HTML | dkangaroo | Open in browser / Pages |
 | Fraud Symptoms Roleplay | `public/fraud-symptoms-roleplay-game/` | Static HTML | dkangaroo | Open in browser / Pages |
-| Audit Detective: Financial Fraud Investigation | `public/audit-detective-game/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
-| Digital Signature Learning Game | `public/digital-signature-game/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
+| Audit Detective: Financial Fraud Investigation | `public/audit-detective-game/` | Static HTML | yugu431 | Open in browser / Pages |
+| Digital Signature Learning Game | `public/digital-signature-game/` | Static HTML | yugu431 | Open in browser / Pages |
 | ACC 214 · Full Course Review | `public/acc214-course-review/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
 | ACC 214 · Cost Estimation Challenge (Ch.3) | `public/acc214-cost-estimation/` | Static HTML | Lanxin / Lexi | Open in browser / Pages |
 | Accounting Case Game | `src/` → builds into `public/accounting-case-game/` | Next.js (static export) | Lanxin / Lexi | Play on Pages, or `npm install && npm run dev` |
