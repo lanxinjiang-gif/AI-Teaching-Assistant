@@ -52,7 +52,7 @@ const standaloneGames = [
     tag: 'Cost Lab',
     title: 'ACC 214 · Cost Estimation Challenge',
     blurb:
-      'Chapter 3 deep-dive — clear three missions (account analysis, high-low, regression) with instant feedback, hints, a light/dark theme, and a mistake log for review.',
+      'A Chapter 3 detective story: play the consultant on three client cases — a baffling water bill, vanishing pottery profits, and a $200K regression bet — solved with account analysis, high-low, and regression. Wrong turns play out in the client’s P&L; a mistake log tracks what to review.',
     href: `${PAGES_BASE}/acc214-cost-estimation/index.html`,
     cta: 'Launch Cost Estimation Game',
   },

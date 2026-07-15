@@ -167,6 +167,26 @@
   .mistake .toc-num{margin-top:2px}
   .mistake-why{padding:8px 12px 10px 44px;font-size:.9em;color:var(--muted);border-top:1px solid var(--line)}
   .mistake-why b{color:var(--good)}
+  /* story scenes */
+  .scene{display:grid;gap:10px}
+  .bubble{display:flex;gap:10px;align-items:flex-start;max-width:88%;animation:pop .25s ease}
+  .bubble .av{flex:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+              font-size:21px;border:2px solid var(--line);background:var(--sunken)}
+  .bubble .msg{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+  .bubble .who{font-size:.75em;font-weight:700;letter-spacing:.3px;margin-bottom:2px}
+  .bubble.you{margin-left:auto;flex-direction:row-reverse}
+  .bubble.you .msg{background:rgba(99,102,241,.10);border-color:var(--accent)}
+  .narrline{text-align:center;color:var(--muted);font-style:italic;font-size:.92em;margin:4px 0;animation:pop .25s ease}
+  /* flash-forward simulation panel */
+  .sim{border:2px dashed var(--red);background:rgba(220,38,38,.07);border-radius:12px;padding:12px 14px;margin-top:12px;animation:pop .25s ease}
+  .sim .simtag{display:inline-block;font-weight:800;color:#fff;background:var(--red);border-radius:6px;padding:2px 8px;font-size:.75em;letter-spacing:1px}
+  .sim .rew{margin-top:8px;font-weight:700;color:var(--accent2)}
+  /* outcome (fast-forward) */
+  .stamp{font-weight:900;letter-spacing:2px;color:var(--accent2);text-align:center;font-size:1.15em;margin:4px 0 10px;animation:pop .3s ease}
+  .orow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:7px 2px;
+        font-variant-numeric:tabular-nums;animation:pop .25s ease}
+  .quip{margin-top:10px;padding:8px 12px;border-left:3px solid var(--accent2);background:var(--sunken);border-radius:8px;font-style:italic;animation:pop .25s ease}
+  .trustchip{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:700;color:var(--red);font-size:.92em}
   /* confetti */
   #fx{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
   .confetti{position:absolute;top:-12px;width:9px;height:14px;opacity:.95;animation:fall linear forwards}
@@ -206,10 +226,12 @@ var state = {
   badges:[],
   done:{1:false,2:false,3:false},
   mistakes:[],            // mistake log — logged wrong answers (persisted)
+  trust:100,              // client trust for the current case (story mechanic)
   // per-step scratch
   curUsedHint:false,
   curRetried:false,
   curLogged:false,
+  curFlashShown:false,
   stepStart:0
 };
 
@@ -245,12 +267,13 @@ function award(base){
 function renderHUD(){
   var h = '<div class="brand">COST&nbsp;ESTIMATION&nbsp;<span>CHALLENGE</span></div>';
   if(state.level>=1 && state.level<=3){
-    h += '<div class="progress-dots" title="Levels">';
+    h += '<div class="progress-dots" title="Cases">';
     for(var i=1;i<=3;i++){
       var c = state.done[i]?'done':(i===state.level?'cur':'');
       h += '<div class="dot '+c+'"></div>';
     }
     h += '</div>';
+    h += '<span class="trustchip" title="Client trust — wrong answers and hints lower it; high trust earns a bonus when the case closes">❤️ '+state.trust+'</span>';
   }
   if(state.mode==='competition' && state.teams.length){
     h += '<div class="scoreboard">';
@@ -291,10 +314,11 @@ function renderHome(){
   }
   screenEl.innerHTML =
   '<div class="card center">'+
-    '<h1>🎮 Cost Estimation Challenge</h1>'+
-    '<p class="muted" style="max-width:620px;margin:6px auto 0">'+
-      'You’re a junior <b>cost analyst</b>. Clear three missions — one per estimation method — '+
-      'using real data from Chapter 3. Earn ★, build streaks, and collect badges.</p>'+
+    '<h1>🕵️ Cost Estimation Challenge</h1>'+
+    '<p class="muted" style="max-width:640px;margin:6px auto 0">'+
+      'You’re the newest analyst at <b>Rivera &amp; Park, Cost Consultants</b>. Three clients walk in with three money mysteries — '+
+      'a baffling water bill, profits that vanish, and a $200K budget riding on an intern’s regression. '+
+      'Crack each case with a Chapter 3 cost-estimation method. Earn ★, keep client trust ❤️, and collect badges.</p>'+
   '</div>'+
   '<div class="card">'+
     '<h2>Choose how to play</h2>'+
@@ -361,6 +385,8 @@ function stepLabel(stp){
   if(stp.type==='classify')   return 'Sort the bill into cost types';
   if(stp.type==='pickpoints') return 'Pick the high & low points';
   if(stp.type==='residual')   return 'Drag the line of best fit';
+  if(stp.type==='scene')      return '📖 '+(stp.label||'Story scene');
+  if(stp.type==='outcome')    return '🎬 '+(stp.label||'The outcome');
   return stp.prompt ? stripTags(stp.prompt) : stp.type;
 }
 function sectionListHtml(heading, blurb){
@@ -390,7 +416,7 @@ function wireSectionList(){
 function jumpTo(level, step){
   state.mode='solo';                 // free navigation is always solo practice/review
   document.body.classList.remove('big');
-  state.streak=0;
+  state.streak=0; state.trust=100;
   state.level=level; state.step=step||0;
   renderHUD(); renderStep();
 }
@@ -446,6 +472,88 @@ function wireMistakes(){
   };
 }
 
+/* ---------------- Story cast & narrative helpers ---------------- */
+var CHARACTERS = {
+  rivera:{name:'Ms. Rivera · Partner',        emoji:'👩🏽‍💼', color:'#8b5cf6'},
+  priya: {name:'Priya · Dover Facilities',    emoji:'🧑‍🔧',  color:'#0891b2'},
+  zeff:  {name:'Zeffani · Potter',            emoji:'👩‍🎨',  color:'#d97706'},
+  marcus:{name:'Marcus · Xavier Co. CFO',     emoji:'👨🏾‍💼', color:'#64748b'},
+  you:   {name:'You · Cost Analyst',          emoji:'🕵️',   color:'#6366f1'}
+};
+var CLOSING = {
+  1:{who:'priya',  text:'Budget approved, zero follow-up questions. You’ve got a client for life.'},
+  2:{who:'zeff',   text:'New prices, same sold-out markets — and profit that finally shows up. You saved the studio.'},
+  3:{who:'marcus', text:'Four-minute board approval. I owe you one — and the intern owes you two.'}
+};
+function oRow(l,a,b){return '<div class="orow"><span>'+l+'</span><span class="muted">'+a+'</span><b>'+b+'</b></div>';}
+function quipHtml(q){
+  var c=CHARACTERS[q.who];
+  return '<div class="quip">💬 <b style="color:'+c.color+'">'+c.name.split(' ·')[0]+':</b> “'+q.text+'”</div>';
+}
+function flashHtml(html){
+  return '<div class="sim"><span class="simtag">⏩ SIMULATION</span><div style="margin-top:8px">'+html+'</div>'+
+         '<div class="rew">↺ Rewind — good thing that wasn’t real. Try again.</div></div>';
+}
+function renderScene(stp,body){
+  var i=0;
+  body.innerHTML=
+    '<div class="row spread" style="margin-bottom:6px">'+
+      '<span class="stamp" style="margin:0;font-size:.95em">📖 '+(stp.label||'Story')+'</span>'+
+      '<button class="btn ghost sm" id="scSkip">Skip ▸▸</button></div>'+
+    '<div class="scene" id="scLines"></div>';
+  var box=$('#scLines');
+  function lineHtml(L){
+    if(L.who==='narrator') return '<p class="narrline">'+L.text+'</p>';
+    var c=CHARACTERS[L.who]||CHARACTERS.you;
+    var side=(L.who==='you')?' you':'';
+    return '<div class="bubble'+side+'"><div class="av" style="border-color:'+c.color+'">'+c.emoji+'</div>'+
+           '<div class="msg"><div class="who" style="color:'+c.color+'">'+c.name+'</div>'+L.text+'</div></div>';
+  }
+  function finish(){
+    var sk=$('#scSkip'); if(sk) sk.style.display='none';
+    var nav=$('#navRow'); nav.innerHTML='';
+    var b=document.createElement('button'); b.className='btn gold';
+    b.textContent=stp.cta||'Let’s get to work ▶';
+    b.onclick=function(){ advanceStep(false); };
+    nav.appendChild(b);
+  }
+  function next(){
+    box.insertAdjacentHTML('beforeend', lineHtml(stp.lines[i])); i++;
+    if(i>=stp.lines.length){ var nb=$('#scNextBtn'); if(nb) nb.remove(); finish(); }
+  }
+  var nav=$('#navRow');
+  nav.innerHTML='<button class="btn" id="scNextBtn">Continue ▸</button>';
+  $('#scNextBtn').onclick=next;
+  $('#scSkip').onclick=function(){ while(i<stp.lines.length){ box.insertAdjacentHTML('beforeend', lineHtml(stp.lines[i])); i++; } var nb=$('#scNextBtn'); if(nb) nb.remove(); finish(); };
+  next();
+}
+function renderOutcome(stp,body){
+  var i=0, timer=null;
+  body.innerHTML='<p class="stamp">⏩ '+(stp.stamp||'SOME TIME LATER…')+'</p>'+
+                 '<div id="ocBlocks" class="scene"></div>';
+  var box=$('#ocBlocks');
+  function done(){
+    if(timer){clearTimeout(timer); timer=null;}
+    beep(true); confetti(40);
+    var nav=$('#navRow'); nav.innerHTML='';
+    var b=document.createElement('button'); b.className='btn gold'; b.textContent='Continue ▶';
+    b.onclick=function(){ advanceStep(false); };
+    nav.appendChild(b);
+  }
+  function reveal(){
+    box.insertAdjacentHTML('beforeend', stp.blocks[i]); i++;
+    if(i>=stp.blocks.length) done(); else timer=setTimeout(reveal, 950);
+  }
+  var nav=$('#navRow');
+  nav.innerHTML='<button class="btn ghost sm" id="ocSkip">Skip ▸▸</button>';
+  $('#ocSkip').onclick=function(){
+    if(timer){clearTimeout(timer); timer=null;}
+    while(i<stp.blocks.length){ box.insertAdjacentHTML('beforeend', stp.blocks[i]); i++; }
+    done();
+  };
+  reveal();
+}
+
 /* ---------------- Level data ---------------- */
 /* Dover water bill — kept visible on the steps that say "from the bill" */
 var BILL_REF =
@@ -458,17 +566,27 @@ var BILL_REF =
     '</table>'+
   '</div>';
 
+var SIGNOFF_CAP = '🪞 <b>Partner sign-off</b> — Ms. Rivera: “Before my signature goes on this…”';
+
 var LEVELS = {
-  1:{ title:'Level 1 — Account Analysis', sub:'🔎 Invoice Investigator · Dover Mfg. water bill',
+  1:{ title:'Case 1 — The Water Bill Mystery', sub:'🔎 Account Analysis · Client: Dover Mfg.',
       steps:[
-        {type:'classify'},
+        {type:'scene', label:'Client briefing', cta:'Open the bill 🧾',
+          lines:[
+            {who:'rivera', text:'Welcome to <b>Rivera &amp; Park, Cost Consultants</b>. No time for a tour — Dover Manufacturing is on line two, and their facilities manager sounds stressed.'},
+            {who:'priya', text:'Corporate wants next year’s <b>water budget</b> on my desk by Friday. If my number is wrong, Facilities eats the difference. And honestly? I can’t even tell what we’re paying for.'},
+            {who:'you', text:'Send over the bill. We’ll take it apart line by line — that’s literally what <b>account analysis</b> means.'},
+            {who:'narrator', text:'ENGAGEMENT #1 — separate fixed from variable, build the cost equation, forecast next year.'}]},
+        {type:'classify',
+          quip:{who:'priya', text:'Hold on — they charge me the $800 even in a month we use zero water?!'}},
         {type:'numeric',
           prompt:'What is the <b>variable cost per unit</b> of water?',
           caption:'The usage charge was <b>$2,000</b> for <b>1,000</b> units this month.',
           ref:BILL_REF,
           expected:2, tol:0.1, unit:'$ / unit', base:100,
           hint:'Variable rate = variable dollars ÷ units used → $2,000 ÷ 1,000.',
-          why:'2,000 ÷ 1,000 = <b>$2 per unit</b> — this is the cost of each additional unit of water, i.e., the <b>slope</b> of the cost line.'},
+          why:'2,000 ÷ 1,000 = <b>$2 per unit</b> — this is the cost of each additional unit of water, i.e., the <b>slope</b> of the cost line.',
+          quip:{who:'priya', text:'Two dollars a unit. Finally a number I can explain to corporate.'}},
         {type:'multi',
           prompt:'Assemble the mixed-cost equation &nbsp;<span class="muted">Y = b + mX</span>',
           caption:'Pull the fixed part (b) and the variable rate (m) from the bill.',
@@ -478,7 +596,8 @@ var LEVELS = {
             {label:'Variable rate  m  ($/unit)', expected:2, tol:0.1}],
           base:120,
           hint:'b is the meter base fee charged even at zero usage; m is the per-unit rate you just found.',
-          why:'<span class="eqn">Y = 800 + 2&middot;X</span> &mdash; an $800 fixed base plus $2 for every unit. With this equation you can now <b>predict the bill at any usage level X</b>, which is the whole point of separating a mixed cost.'},
+          why:'<span class="eqn">Y = 800 + 2&middot;X</span> &mdash; an $800 fixed base plus $2 for every unit. With this equation you can now <b>predict the bill at any usage level X</b>, which is the whole point of separating a mixed cost.',
+          quip:{who:'priya', text:'One line that explains the whole bill. Where were you last budget season?'}},
         {type:'multi',
           prompt:'Forecast <b>next year</b>’s water expense (usage drops 10%)',
           caption:'Annualize over 12 months. Fixed stays put; variable scales to 90%.',
@@ -489,66 +608,140 @@ var LEVELS = {
             {label:'Total expense ($)',         expected:31200, tol:2}],
           base:150,
           hint:'Fixed = 800 × 12. Variable = 0.90 × 2,000 × 12. Total = the two added together.',
-          why:'$9,600 + $21,600 = <b>$31,200</b>. Notice only the <b>variable</b> part shrank with the 10% usage cut — the fixed meter fee didn’t move at all. That’s the payoff of splitting a mixed cost: you can flex the variable piece and leave the fixed piece alone.'}
+          simFail:'Your budget goes on file… and January’s bill already runs ahead of it. By Q2, Facilities is <b>$1,900 over budget</b> and corporate wants a memo with your name on it.',
+          why:'$9,600 + $21,600 = <b>$31,200</b>. Notice only the <b>variable</b> part shrank with the 10% usage cut — the fixed meter fee didn’t move at all. That’s the payoff of splitting a mixed cost: you can flex the variable piece and leave the fixed piece alone.',
+          quip:{who:'priya', text:'$31,200 — filed. If this lands, I owe you coffee for a year.'}},
+        {type:'outcome', label:'The outcome', stamp:'ONE YEAR LATER…',
+          blocks:[
+            '<p>Your budget goes in at <b>$31,200</b>. The quarters roll by…</p>',
+            oRow('Q1','budget $7,800','actual $7,760'),
+            oRow('Q2','budget $7,800','actual $7,850'),
+            oRow('Q3','budget $7,800','actual $7,790'),
+            oRow('Q4','budget $7,800','actual $7,810'),
+            '<p>Actual for the year: <b>$31,210</b> — your forecast was off by <b>0.03%</b>. Priya’s budget survives untouched.</p>',
+            quipHtml({who:'priya', text:'Corporate approved it without a single question. You’re doing my budget every year now, deal?'})]},
+        {type:'choice',
+          prompt:'The city announces the meter base fee rises from $800 to $900 next year. What happens to your equation <b>Y = 800 + 2X</b>?',
+          caption:SIGNOFF_CAP,
+          options:[
+            {text:'The intercept shifts: Y = 900 + 2X. The slope doesn’t change.', correct:true},
+            {text:'The slope rises to $2.25 per unit.', correct:false},
+            {text:'Both the intercept and the slope increase.', correct:false},
+            {text:'Nothing changes.', correct:false}],
+          base:110,
+          why:'The base fee is the <b>fixed</b> part — the intercept b. The per-unit rate m is set by usage pricing and is untouched.'},
+        {type:'choice',
+          prompt:'Dover expects to <b>double</b> its water usage next year. Which statement is true?',
+          caption:SIGNOFF_CAP,
+          options:[
+            {text:'Total fixed cost stays $9,600, so fixed cost per unit is cut in half.', correct:true},
+            {text:'Total fixed cost doubles along with usage.', correct:false},
+            {text:'Variable cost per unit doubles to $4.', correct:false},
+            {text:'Total variable cost stays the same.', correct:false}],
+          base:110,
+          why:'Within the relevant range, fixed cost is constant <b>in total</b> (so per-unit fixed falls as volume rises), while variable cost is constant <b>per unit</b> (so its total scales with usage).',
+          quip:{who:'rivera', text:'Signed. Nice work on your first case, analyst.'}}
       ]},
-  2:{ title:'Level 2 — High-Low Method', sub:'📈 High-Low Heist · Zeffani’s pottery mugs',
+  2:{ title:'Case 2 — The Vanishing Profits', sub:'📈 High-Low Method · Client: Zeffani Ceramics',
       steps:[
-        {type:'pickpoints'},
+        {type:'scene', label:'Client briefing', cta:'Look at her numbers 📊',
+          lines:[
+            {who:'rivera', text:'Next client is a referral. Zeffani — ceramic artist. Sells every mug she makes. And somehow… she’s broke.'},
+            {who:'zeff', text:'Sold-out markets. 40K followers. And my bank balance after seven years? Basically pottery dust. Either math is broken or I am.'},
+            {who:'you', text:'Math isn’t broken — I promise. You have seven years of cost data. Let’s find the line hiding in it and see what each mug <i>really</i> costs you.'},
+            {who:'narrator', text:'ENGAGEMENT #2 — use the high-low method to uncover where the money goes.'}]},
+        {type:'pickpoints',
+          quip:{who:'zeff', text:'So we read it by how many mugs I made, not by what I spent. Noted.'}},
         {type:'numeric',
           prompt:'Step 2 — Compute the <b>slope (m)</b>, the variable cost per mug.',
           caption:'High point (500, $9,000) and low point (100, $4,200).',
           expected:12, tol:0.2, unit:'$ / mug', base:120,
           hint:'Slope = change in cost ÷ change in activity = ΔY ÷ ΔX = (9,000 − 4,200) ÷ (500 − 100).',
-          why:'m = 4,800 ÷ 400 = <b>$12</b> — the <b>variable cost of making one more mug</b>, i.e., the slope of the cost line.'},
+          why:'m = 4,800 ÷ 400 = <b>$12</b> — the <b>variable cost of making one more mug</b>, i.e., the slope of the cost line.',
+          quip:{who:'zeff', text:'TWELVE dollars per mug?! I charge twenty. Oh no. Oh no no no.'}},
         {type:'numeric',
           prompt:'Step 3 — Solve for the <b>intercept (b)</b>, the fixed cost.',
           caption:'Substitute the high point into Y = mX + b:&nbsp; 9,000 = 12(500) + b. Now solve for b.',
           expected:3000, tol:15, unit:'$', base:120,
           hint:'12 × 500 = 6,000. Then b = 9,000 − 6,000.',
-          why:'b = 9,000 − 6,000 = <b>$3,000</b> — the <b>fixed cost</b> Zeffani pays even if she makes zero mugs. Full equation: <span class="eqn">Y = 12X + 3,000</span>.'},
+          why:'b = 9,000 − 6,000 = <b>$3,000</b> — the <b>fixed cost</b> Zeffani pays even if she makes zero mugs. Full equation: <span class="eqn">Y = 12X + 3,000</span>.',
+          quip:{who:'zeff', text:'Three grand a month before I even touch clay. My studio is eating me alive.'}},
         {type:'numeric',
           prompt:'Use your equation to <b>predict the cost of 300 mugs</b>.',
           caption:'Your cost equation from the last step: <b>Y = 12X + 3,000</b>. Substitute X = 300.',
           expected:6600, tol:20, unit:'$', base:110,
           hint:'Multiply 12 by 300, then add the fixed $3,000.',
-          why:'Y = 12(300) + 3,000 = <b>$6,600</b>. This is the model doing its job — plug in <i>any</i> volume to budget the cost before you produce a single mug.'},
+          why:'Y = 12(300) + 3,000 = <b>$6,600</b>. This is the model doing its job — plug in <i>any</i> volume to budget the cost before you produce a single mug.',
+          quip:{who:'zeff', text:'$6,600 for 300 mugs. I can actually plan for once.'}},
+        {type:'outcome', label:'The reveal', stamp:'THE REVEAL',
+          blocks:[
+            '<p>You walk Zeffani through it: every mug costs <b>$12</b> to make, and the studio burns <b>$3,000</b> a month before she touches clay.</p>',
+            oRow('Her price per mug','', '$20'),
+            oRow('What each mug leaves behind','$20 − $12','$8'),
+            oRow('Mugs sold per month','','≈ 400'),
+            oRow('Left to cover $3,000 fixed','400 × $8','$3,200'),
+            '<p>Monthly profit: <b>$200</b>. That’s not a business — that’s a tip jar. <b>Mystery solved:</b> the money was never vanishing. It was never there.</p>',
+            '<p>Your advice: reprice to <b>$25</b>. Then 400 × ($25 − $12) = <b>$5,200</b> against $3,000 fixed → <b>+$2,200 profit per month</b>.</p>',
+            quipHtml({who:'zeff', text:'I raised prices, the markets STILL sold out, and my bank account finally does the thing.'})]},
         {type:'choice',
-          prompt:'What is the <b>main risk</b> of the high-low method?',
+          prompt:'What is the <b>main risk</b> of the high-low method we just used?',
+          caption:SIGNOFF_CAP,
           options:[
             {text:'The highest/lowest points may be outliers, making the line a poor predictor.', correct:true},
             {text:'It uses too many data points and over-fits.', correct:false},
             {text:'It always understates fixed cost.', correct:false},
             {text:'It cannot be graphed.', correct:false}],
           base:100,
-          why:'High-low uses only two points. If either is an outlier (unrepresentative), the equation predicts poorly. Regression, which uses every point, addresses this.'}
-      ]},
-  3:{ title:'Level 3 — Regression', sub:'📊 Line of Best Fit · Xavier Co. repairs & maintenance',
-      steps:[
-        {type:'residual'},
+          why:'High-low uses only two points. If either is an outlier (unrepresentative), the equation predicts poorly. Regression, which uses every point, addresses this.',
+          quip:{who:'rivera', text:'Exactly. Two points is a sketch, not a portrait. Regression next time we have the budget.'}},
         {type:'choice',
-          prompt:'<b>Economic plausibility:</b> do machine hours plausibly drive repairs & maintenance cost?',
+          prompt:'Zeffani asks: “Could I use <b>Y = 12X + 3,000</b> to plan a mega-order of 2,000 mugs?”',
+          caption:SIGNOFF_CAP,
+          options:[
+            {text:'Careful — her data only covers 100–500 mugs. Outside that relevant range she’d need new kilns and space, so new fixed costs and a new line.', correct:true},
+            {text:'Yes — the equation works at any volume.', correct:false},
+            {text:'No — the equation only works at exactly 300 mugs.', correct:false}],
+          base:110,
+          why:'The <b>relevant range</b> is the band of activity the data actually covers (here ~100–500 mugs). Beyond capacity, fixed costs step up and the old line no longer holds.',
+          quip:{who:'zeff', text:'2,000 mugs would also require me to never sleep, so. Good call.'}}
+      ]},
+  3:{ title:'Case 3 — The $200K Bet', sub:'📊 Regression · Client: Xavier Co.',
+      steps:[
+        {type:'scene', label:'Client briefing', cta:'Open the regression output 📈',
+          lines:[
+            {who:'rivera', text:'Big fish. Xavier Company — insulated windows, a factory full of machines. Their CFO needs an answer before the board meets.'},
+            {who:'marcus', text:'Our intern built a regression: machine hours predicting repair &amp; maintenance costs. The board wants to lock <b>$200K of next year’s budget</b> on it. I’m not betting my credibility on homework I can’t verify. Validate it — or kill it.'},
+            {who:'you', text:'Three checks: does it make economic sense, does it fit, is it significant. Let’s open the output.'},
+            {who:'narrator', text:'ENGAGEMENT #3 — audit the intern’s model before the board does.'}]},
+        {type:'residual',
+          quip:{who:'marcus', text:'So the intern’s line is the one that minimizes those gaps. Fine. Continue.'}},
+        {type:'choice',
+          prompt:'<b>Check 1 · Economic plausibility:</b> do machine hours plausibly drive repairs & maintenance cost?',
           options:[
             {text:'Yes — the more machines run, the more they need repair, so the relationship makes sense.', correct:true},
             {text:'No — repairs are random and unrelated to machine use.', correct:false},
             {text:'Only if R² is exactly 1.', correct:false}],
           base:100,
-          why:'Economic plausibility asks whether the X→Y story makes sense. More machine hours → more wear → more repairs. Plausible.'},
+          why:'Economic plausibility asks whether the X→Y story makes sense. More machine hours → more wear → more repairs. Plausible.',
+          quip:{who:'marcus', text:'Machines that run more break more. Even the board will follow that.'}},
         {type:'choice',
-          prompt:'<b>Goodness of fit:</b> the regression reports <b>R² = 0.65</b>. Rule of thumb is R² ≥ 0.30.',
+          prompt:'<b>Check 2 · Goodness of fit:</b> the regression reports <b>R² = 0.65</b>. Rule of thumb is R² ≥ 0.30.',
           options:[
             {text:'PASS — 0.65 is well above 0.30, a good fit.', correct:true},
             {text:'FAIL — R² must be above 0.90.', correct:false},
             {text:'FAIL — 0.65 is below the 0.30 threshold.', correct:false}],
           base:100,
-          why:'R² = 0.65 means 65% of the variation in cost is explained by machine hours — above the 0.30 rule of thumb, so it passes.'},
+          why:'R² = 0.65 means 65% of the variation in cost is explained by machine hours — above the 0.30 rule of thumb, so it passes.',
+          quip:{who:'marcus', text:'65%. Better than my gut, which explains roughly nothing.'}},
         {type:'choice',
-          prompt:'<b>Significance of slope:</b> t-stat = <b>4.53</b> and p-value = <b>0.00086</b>.',
+          prompt:'<b>Check 3 · Significance of slope:</b> t-stat = <b>4.53</b> and p-value = <b>0.00086</b>.',
           options:[
             {text:'Significant — t = 4.53 > 1.96 and p = 0.00086 < 0.05.', correct:true},
             {text:'Not significant — p is too small.', correct:false},
             {text:'Cannot tell without the R².', correct:false}],
           base:100,
-          why:'t = 4.53 exceeds 1.96 and p = 0.00086 is well under 0.05, so the slope is statistically different from zero — a significant driver.'},
+          why:'t = 4.53 exceeds 1.96 and p = 0.00086 is well under 0.05, so the slope is statistically different from zero — a significant driver.',
+          quip:{who:'marcus', text:'p = 0.00086. So, not luck. Good.'}},
         {type:'multi',
           prompt:'Read the cost function from the Excel output.',
           caption:'Excel: <span class="pill">Intercept&nbsp;8,773.72</span> '+
@@ -558,15 +751,36 @@ var LEVELS = {
             {label:'Intercept  b  ($)',        expected:8773.72, tol:0.5}],
           base:120,
           hint:'The coefficient on machine hours is the slope (m); the Intercept row is b.',
-          why:'<span class="eqn">Y = 14.98X + 8,773.72</span> — $14.98 variable per machine hour plus $8,773.72 fixed.'},
+          why:'<span class="eqn">Y = 14.98X + 8,773.72</span> — $14.98 variable per machine hour plus $8,773.72 fixed.',
+          quip:{who:'marcus', text:'$14.98 per machine hour plus $8,773.72 base. Put it on the slide.'}},
         {type:'choice',
-          prompt:'<b>Final verdict:</b> is this regression model valid for predicting cost?',
+          prompt:'<b>Final verdict for the board:</b> is this regression model valid for predicting cost?',
           options:[
             {text:'Yes — it is economically plausible, R² ≥ 0.30, and the slope is significant.', correct:true},
             {text:'No — it fails goodness of fit.', correct:false},
             {text:'No — the slope is not significant.', correct:false}],
           base:120,
-          why:'All three checks pass — plausible driver, R² = 0.65 ≥ 0.30, p = 0.00086 < 0.05. The model is valid.'}
+          simFail:'You kill the model. Xavier reverts to “last year + 10%” budgeting… and Q3 repairs blow through it by <b>$38,000</b>. The board asks why a valid analysis was ignored — and the intern quietly updates her résumé.',
+          why:'All three checks pass — plausible driver, R² = 0.65 ≥ 0.30, p = 0.00086 < 0.05. The model is valid.',
+          quip:{who:'rivera', text:'Signed. Now let’s see if it survives the quarter.'}},
+        {type:'outcome', label:'The board meeting', stamp:'BOARD MEETING — 9:00 AM',
+          blocks:[
+            '<p>You present: <b>plausible driver ✓ &nbsp; R² = 0.65 ✓ &nbsp; p = 0.00086 ✓</b>. The model stands, and the board locks next year’s maintenance budget on <span class="eqn">Y = 14.98X + 8,773.72</span>.</p>',
+            oRow('Q1','predicted $41,730','actual $41,190'),
+            oRow('Q2','predicted $41,730','actual $42,310'),
+            oRow('Q3','predicted $41,730','actual $40,880'),
+            '<p>Every quarter lands within <b>±2%</b> of the model. The $200K bet pays off.</p>',
+            quipHtml({who:'marcus', text:'The board approved it in four minutes. The intern says thanks, by the way — I promoted her.'})]},
+        {type:'choice',
+          prompt:'A board member asks: “R² = 0.65 means machine hours explain 65% of cost variation. What about the other 35%?”',
+          caption:SIGNOFF_CAP,
+          options:[
+            {text:'Other drivers and randomness — worth testing a multiple regression (e.g., adding direct-labor hours) to see if fit improves.', correct:true},
+            {text:'It proves the model is invalid.', correct:false},
+            {text:'The intern must have made an arithmetic error.', correct:false}],
+          base:110,
+          why:'R² below 1 is normal. The unexplained 35% is other drivers plus noise — <b>multiple regression</b> adds a second X (like DL hours) and can improve the fit if that variable is significant.',
+          quip:{who:'rivera', text:'Multiple regression is next quarter’s proposal. Nice work, consultant.'}}
       ]}
 };
 
@@ -578,17 +792,18 @@ var POTTERY = [
 
 /* ---------------- Level / step flow ---------------- */
 function goLevel(n){
-  state.level=n; state.step=0;
+  state.level=n; state.step=0; state.trust=100;
   renderHUD();
   renderStep();
 }
 function renderStep(){
   var lvl = LEVELS[state.level];
   var stp = lvl.steps[state.step];
-  state.curUsedHint=false; state.curRetried=false; state.curLogged=false; state.stepStart=performance.now();
+  state.curUsedHint=false; state.curRetried=false; state.curLogged=false; state.curFlashShown=false; state.stepStart=performance.now();
 
+  var isStory = (stp.type==='scene' || stp.type==='outcome');
   var turnBanner='';
-  if(state.mode==='competition' && state.teams.length){
+  if(!isStory && state.mode==='competition' && state.teams.length){
     turnBanner = '<span class="tag" style="background:rgba(34,211,238,.12);border-color:var(--accent2);color:var(--accent2)">'+
                  '🎯 '+escapeHtml(scorerName())+'’s turn</span>';
   }
@@ -610,6 +825,7 @@ function renderStep(){
   if(stp.hint){
     $('#hintBtn').onclick=function(){
       state.curUsedHint=true;
+      state.trust=Math.max(20,state.trust-5);
       $('#hintBox').innerHTML=stp.hint; $('#hintBox').classList.add('show');
       $('#hintBtn').disabled=true; renderHUD();
     };
@@ -621,34 +837,48 @@ function renderStep(){
   else if(stp.type==='classify')renderClassify(stp,body);
   else if(stp.type==='pickpoints')renderPickPoints(stp,body);
   else if(stp.type==='residual')renderResidual(stp,body);
+  else if(stp.type==='scene')   renderScene(stp,body);
+  else if(stp.type==='outcome') renderOutcome(stp,body);
 }
 
 /* feedback + advance helpers */
+function curStep(){
+  var lvl=LEVELS[state.level];
+  return (lvl && lvl.steps[state.step]) || {};
+}
 function showCorrect(whyHtml, pts){
   beep(true);
+  var stp=curStep();
+  var quip = stp.quip ? quipHtml(stp.quip) : '';
   var fb=$('#fb');
   fb.className='feedback ok show';
   fb.innerHTML='✅ Correct! <span style="color:var(--gold)">+'+pts+'★</span> to '+escapeHtml(scorerName())+
-               '<div class="why">'+(whyHtml||'')+'</div>';
+               '<div class="why">'+(whyHtml||'')+'</div>'+quip;
   renderHUD();
   var nav=$('#navRow'); nav.innerHTML='';
   var b=document.createElement('button');
   var last = (state.step === LEVELS[state.level].steps.length-1);
-  b.className='btn gold'; b.textContent = last ? 'Finish level ✔' : 'Next ▶';
-  b.onclick=advanceStep; nav.appendChild(b);
+  b.className='btn gold'; b.textContent = last ? 'Close the case ✔' : 'Next ▶';
+  b.onclick=function(){ advanceStep(); }; nav.appendChild(b);
   confetti(pts>180?60:24);
 }
 function showWrong(msg, soft){
   beep(false);
-  state.curRetried=true; state.streak=0; renderHUD();
-  if(!soft && !state.curLogged){ logMistake(); state.curLogged=true; }  // record in mistake log
+  state.curRetried=true; state.streak=0;
+  if(!soft){
+    state.trust=Math.max(20,state.trust-12);
+    if(!state.curLogged){ logMistake(); state.curLogged=true; }  // record in mistake log
+  }
+  renderHUD();
+  var stp=curStep(), extra='';
+  if(!soft && stp.simFail && !state.curFlashShown){ state.curFlashShown=true; extra=flashHtml(stp.simFail); }
   var fb=$('#fb');
   fb.className='feedback no show';
-  fb.innerHTML='❌ '+(msg||'Not quite — try again.');
+  fb.innerHTML='❌ '+(msg||'Not quite — try again.')+extra;
 }
-function advanceStep(){
+function advanceStep(rotate){
   var lvl=LEVELS[state.level];
-  if(state.mode==='competition' && state.teams.length) state.turnIndex++;
+  if(rotate!==false && state.mode==='competition' && state.teams.length) state.turnIndex++;
   if(state.step < lvl.steps.length-1){ state.step++; renderHUD(); renderStep(); }
   else completeLevel(state.level);
 }
@@ -837,7 +1067,8 @@ function renderPickPoints(stp,body){
       $('#ck').disabled=true;
       showCorrect('Correct — high-low always uses the <b>highest and lowest activity (X)</b>: 100 mugs ($4,200) and 500 mugs ($9,000). Their corresponding costs come along for the ride.', award(150));
     } else if(has(1)){
-      showWrong('You picked the point with the lowest <b>cost (Y = $4,000)</b>. High-low keys off the <b>activity (X)</b> — the cost driver. The lowest activity is <b>100 mugs</b>, not 180. Reselect.');
+      showWrong('You picked the point with the lowest <b>cost (Y = $4,000)</b>. High-low keys off the <b>activity (X)</b> — the cost driver. The lowest activity is <b>100 mugs</b>, not 180. Reselect.'+
+        flashHtml('You fit a line through (180, $4,000) anyway, and Zeffani uses it to quote a 350-mug wholesale order. Your line says those mugs cost about <b>$6,656</b>… they actually cost <b>$7,200</b>. Her “profitable” order <b>loses money</b>, and she finds out from her bank app.'));
     } else {
       showWrong('Not quite. Choose the <b>highest and lowest number of mugs (X)</b> — the lowest is 100 and the highest is 500.');
     }
@@ -928,18 +1159,22 @@ function renderResidual(stp,body){
 function completeLevel(n){
   state.done[n]=true;
   if(state.badges.indexOf(BADGES[n])<0) state.badges.push(BADGES[n]);
+  var bonus=0;
+  if(state.mode!=='competition'){ bonus=state.trust; state.soloScore+=bonus; }
   confetti(80);
   renderHUD();
   var next = n<3 ? n+1 : null;
   screenEl.innerHTML =
   '<div class="card center">'+
-    '<h2>🎉 '+LEVELS[n].title+' complete!</h2>'+
+    '<h2>🎉 Case closed: '+LEVELS[n].title.split('— ')[1]+'</h2>'+
+    '<div style="max-width:560px;margin:12px auto 0;text-align:left">'+quipHtml(CLOSING[n])+'</div>'+
     '<p style="margin:14px 0"><span class="badge">🏅 Badge earned: '+BADGES[n]+'</span></p>'+
+    '<p>❤️ Client trust: <b>'+state.trust+'</b>'+(bonus?' <span style="color:var(--gold)">→ bonus +'+bonus+'★</span>':'')+'</p>'+
     (state.mode==='competition'? scoreboardHtml() :
        '<p class="muted">Score so far: <b class="solo-score">'+state.soloScore+'★</b></p>')+
     '<div class="row" style="justify-content:center;margin-top:18px">'+
-      (next? '<button class="btn gold" id="nextLvl" style="font-size:1.1rem;padding:13px 26px">Next level ▶</button>'
-           : '<button class="btn gold" id="finish" style="font-size:1.1rem;padding:13px 26px">See results 🏁</button>')+
+      (next? '<button class="btn gold" id="nextLvl" style="font-size:1.1rem;padding:13px 26px">Next case ▶</button>'
+           : '<button class="btn gold" id="finish" style="font-size:1.1rem;padding:13px 26px">See engagement report 🏁</button>')+
     '</div>'+
   '</div>';
   if(next) $('#nextLvl').onclick=function(){ goLevel(next); };
@@ -961,7 +1196,9 @@ function renderWrap(){
   state.level=9; renderHUD(); confetti(120);
   screenEl.innerHTML =
   '<div class="card center">'+
-    '<h1>🏁 Challenge Complete!</h1>'+
+    '<h1>🏁 Engagement Report</h1>'+
+    '<p class="narrline">Three clients. Three mysteries. All solved.</p>'+
+    '<p style="margin:10px 0">🎓 Title earned: <span class="badge">Cost Consultant</span></p>'+
     (state.mode==='competition'?
        '<h3 style="color:var(--ink);margin-top:10px">Final standings</h3>'+scoreboardHtml() :
        '<p style="font-size:1.3em">Final score: <b class="solo-score">'+state.soloScore+'★</b></p>'+saveBest())+
