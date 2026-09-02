@@ -35,7 +35,8 @@ Each game has its own folder. If two people never edit the same file, you can **
 | `public/cash-receipts-control-game/` | dkangaroo | Cash Receipts Control game |
 | `public/decision-tree-game/` | dkangaroo | Decision Tree Builder Lab |
 | `public/fraud-symptoms-roleplay-game/` | dkangaroo | Fraud Symptoms Roleplay |
-| `public/acc214-study-game/` | Lanxin / Lexi | ACC 214 Study Game |
+| `public/acc214-course-review/` | Lanxin / Lexi | ACC 214 Full Course Review |
+| `public/acc214-cost-estimation/` | Lanxin / Lexi | ACC 214 Cost Estimation Challenge |
 | `src/`, `package.json`, configs (repo root) | Lanxin / Lexi | Next.js "Accounting Case Game" |
 | `index.html`, `public/repository.html` | dkangaroo | Landing + game-index pages |
 
@@ -105,7 +106,7 @@ After it's merged, everyone does a normal `git pull` to get it.
 
 The repo is already live at:
 
-**https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/**
+**https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/**
 
 - It publishes the **static HTML games** automatically: push to `main` → live in ~1 minute.
 - The **Next.js app** is *not* published here (Pages can't build it). Run it locally with `npm run dev`, or deploy it separately to Vercel.

@@ -11,21 +11,21 @@ A growing collection of interactive games that make accounting classes fun, buil
 All static HTML games are published with GitHub Pages — students just click a link, nothing to install. Pushing to `main` updates them automatically.
 
 **🎯 Game hub (all games in one page):**
-https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/repository.html
+https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/repository.html
 
 **Direct links:**
 
 | Game | Live link |
 |------|-----------|
-| Benford's Law Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/benford-law-game/ |
-| Cash Receipts Control Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/cash-receipts-control-game/ |
-| Decision Tree Builder Lab | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/decision-tree-game/ |
-| Fraud Symptoms Roleplay | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/fraud-symptoms-roleplay-game/ |
-| Audit Detective: Financial Fraud Investigation | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/audit-detective-game/ |
-| Digital Signature Learning Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/digital-signature-game/ |
-| ACC 214 · Full Course Review | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-course-review/ |
-| ACC 214 · Cost Estimation Challenge (Ch.3) | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/acc214-cost-estimation/ |
-| Accounting Case Game | https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/accounting-case-game/ |
+| Benford's Law Game | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/benford-law-game/ |
+| Cash Receipts Control Game | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/cash-receipts-control-game/ |
+| Decision Tree Builder Lab | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/decision-tree-game/ |
+| Fraud Symptoms Roleplay | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/fraud-symptoms-roleplay-game/ |
+| Audit Detective: Financial Fraud Investigation | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/audit-detective-game/ |
+| Digital Signature Learning Game | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/digital-signature-game/ |
+| ACC 214 · Full Course Review | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/acc214-course-review/ |
+| ACC 214 · Cost Estimation Challenge (Ch.3) | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/acc214-cost-estimation/ |
+| Accounting Case Game | https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/accounting-case-game/ |
 
 > The **bare site URL** (`…/AI-Teaching-Assistant/`) redirects to the game hub. The **Accounting Case Game** is a Next.js app that is now published to Pages as a **static export** (folder `public/accounting-case-game/`), so students reach it with a plain link like every other game. After changing its code, rebuild it with `npm run build:pages` (see below).
 
@@ -67,7 +67,7 @@ Three playable cases (each 4 stages, 100-pt scoring, perfect run = 100%):
 - ✅ **Revenue Recognition: The Multi-Element Deal** — ASC 606 five-step model on a bundled SaaS contract
 - ✅ **Inventory Controls: The Missing Count** — count reconciliation, FOB cutoff, shrinkage, lower-of-cost-or-NRV
 
-**▶ Play it live:** https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public/accounting-case-game/
+**▶ Play it live:** https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public/accounting-case-game/
 
 ```bash
 npm install

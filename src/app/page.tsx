@@ -5,7 +5,7 @@ import { CasePicker } from '@/components/layout/CasePicker';
 // Standalone HTML games are published on GitHub Pages, so link to their live
 // URLs (they live outside this app's base path). Opening them works the same
 // whether this app is run locally or from Pages.
-const PAGES_BASE = 'https://lanxinjiang-gif.github.io/AI-Teaching-Assistant/public';
+const PAGES_BASE = 'https://lanxinjiang-stonybrook.github.io/AI-Teaching-Assistant/public';
 
 const standaloneGames = [
   {
